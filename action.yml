@@ -46,12 +46,6 @@ runs:
       run: |
         sudo apt update && sudo apt -y install curl jq
 
-    - name: Get pull request number
-      id: pr_nr
-      run: |
-        PR_URL="${{ github.event.comment.issue_url }}"
-        echo "::set-output name=PR_NR::${PR_URL##*/}"
-
     - name: Get commit SHA value
       id: sha_value
       run: |
