@@ -1,0 +1,188 @@
+name: "Schedule user defined tests on Testing Farm"
+description: |
+  A GitHub action will schedule a user defined tests to the Testing Farm to run tmt tests.
+  As soon as tests are finished, either as success or as failure, it updates GitHub pull request status
+
+inputs:
+  api_key:
+    description: "A testing farm API key"
+    required: true
+  tmt_repository: "An url to tmt repository"
+    required: true
+  test_fmf_plan:
+    description: "A fmf plan which will be selected. By default all plans are selected."
+  tests_tmt_ref:
+    description: "A tmt tests branch which will be used for tests"
+    default: "master"
+  compose:
+    description: "A compose for tests"
+    default: "Fedora"
+    required: true
+  create_issue_comment:
+    description: "It creates a github issue Comment"
+    default: "false"
+  pull_request_status_name:
+    description: "GitHub pull request status name"
+    default: "Fedora"
+  debug:
+    description: "Print debug logs when working with testing farm"
+    default: "true"
+  update_pull_request_status:
+    description: "Action will update pull request status. Default: true"
+    default: "true"
+
+outputs:
+  request_id:
+    description: "An ID of a scheduled testing farm request"
+    value: ${{ env.REQ_ID }}
+  request_url:
+    description: "An url of a scheduled testing farm request"
+    value: ${{ env.TF_URL }}
+
+runs:
+  using: ubuntu-20.04
+  steps:
+    - name: Install mandatory packages
+      run: |
+        sudo apt update && sudo apt -y install curl jq
+
+    - name: Get pull request number
+      id: pr_nr
+      run: |
+        PR_URL="${{ github.event.comment.issue_url }}"
+        echo "::set-output name=PR_NR::${PR_URL##*/}"
+
+    - name: Get commit SHA value
+      id: sha_value
+      run: |
+        echo "::set-output name=SHA::$(git re-parse HEAD)"
+
+    - name: Schedule a test on Testing Farm
+      id: sched_test
+      run: |
+        cat << EOF > request.json
+        {
+          "api_key": "${{ inputs.api_key }}",
+          "test": { "fmf": {
+              "url": "${{ inputs.tmt_repository }}",
+              "ref": "${{ inputs.tmt_ref }}",
+              "name": "{{ inputs.tests_tmt_ref }}",
+            }
+          },
+          "environments": [{
+            "arch": "x86_64",
+            "os": {
+              "compose": "${{ inputs.compose }}"
+            }
+          }]
+        }
+        EOF
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          echo "Let's print request.json"
+          cat request.json
+        fi
+        curl https://api.testing-farm.io/requests \
+            --data @request.json \
+            --header "Content-Type: application/json" \
+            --output response.json
+        
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          echo "Let's print testing farm response"
+          cat response.json
+          jq < response.json
+        fi
+        
+        # Store REQ_ID into GITHUB_ENV variables
+        req_id=$(jq -r .id response.json)
+        tf_url=$(jq -r .run.artifacts response.json)
+        echo "REQ_ID=$req_id" >> $GITHUB_ENV
+        echo "TF_URL=$tf_url" >> $GITHUB_ENV
+
+    - name: Switch pull request state to running
+      id: running
+      run: |
+        if [ "${{ inputs.update_pull_request_status }}" == "true" ]; then
+          # Create running.json file for query, whether job is finished or not.
+          cat << EOF > running.json
+          {
+            "sha": "${{ steps.sha_value.outputs.SHA }}",
+            "state": "pending",
+            "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
+            "description": "Build started",
+            "target_url": "${{ env.TF_URL }}/${{ env.REQ_ID }}"
+          }
+          EOF
+          # Update GitHub status description to 'Build started'
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
+            --data @running.json
+        fi
+
+    - name: Check if scheduled test is still running
+      id: still_running
+      run: |
+        CMD=https://api.testing-farm.io/requests/${{ env.REQ_ID }}
+        curl $CMD > job.json
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          cat job.json
+          jq < job.json
+        fi
+        state=$(jq -r .state job.json)
+        while [ "$state" == "running" ] || [ "$state" == "new" ] || [ "$state" == "pending" ] || [ "$state" == "queued" ]; do
+          sleep 30
+          curl $CMD > job.json
+          if [ "${{ inputs.debug }}" == "true" ]; then
+            cat job.json
+            jq < job.json
+          fi
+          state=$(jq -r .state job.json)
+        done
+
+    - name: Get final state of Testing Farm scheduled request
+      id: finale_state
+      run: |
+        curl ${{ secrets.TF_ENDPOINT }}/requests/${{ env.REQ_ID }} > job.json
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          cat job.json
+          jq < job.json
+        fi          
+        state=$(jq -r .state job.json)
+        result=$(jq -r .result.overall job.json)
+        new_state="success"
+        infra_error=" "
+        echo "State is $state and result is: $result"
+        if [ "$state" == "complete" ]; then
+          if [ "$result" != "passed" ]; then
+            new_state="failure"
+          fi
+        else
+          # Mark job in case of infrastructure issues. Report to Testing Farm team
+          infra_error=" - Infra problems"
+          new_state="failure"
+        fi
+        echo "New State is: $new_state"
+        echo "Infra state is: $infra_error"
+        echo "::set-output name=FINAL_STATE::$new_state"
+        echo "::set-output name=INFRA_STATE::$infra_error"
+
+    - name: Switch pull request GitHub status to final state
+      run: |
+        if [ "${{ inputs.update_pull_request_status }}" == "true" ]; then
+          cat << EOF > final.json
+          {
+            "sha": "${{ steps.sha_value.outputs.SHA }}",
+            "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
+            "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
+            "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
+            "target_url": "${{ env.TF_URL }}/${{ env.REQ_ID }}"
+          }
+          EOF
+          if [ "${{ inputs.debug }}" == "true" ]; then
+            cat final.json
+          fi
+          # Switch Github status to proper state
+          curl -X POST -H "Authorization:
+          Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
+          --data @final.json
+      fi
