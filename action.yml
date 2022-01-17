@@ -33,6 +33,10 @@ inputs:
     description: "Environment variables for test env, separated by ;"
     required: false
     default: ''
+  env_secrets:
+    description: "Environment secrets for test env, separated by ;"
+    required: false
+    default: ''
   debug:
     description: "Print debug logs when working with testing farm"
     required: false
@@ -74,6 +78,12 @@ runs:
         python -c 'import json; print({} if not "${{ inpust.env_vars }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.env_vars }}".split(";")]}))' > env_vars
         echo "::set-output name=TMT_ENV_VARS::$(cat env_vars)"
 
+    - name: Generate tmt secrets
+      id: generate_tmt_secrets
+      run: |
+        python -c 'import json; print({} if not "${{ inpust.env_secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.env_secrets }}".split(";")]}))' > env_secrets
+        echo "::set-output name=TMT_ENV_SECRETS::$(cat env_secrets)"
+
     - name: Schedule a test on Testing Farm
       id: sched_test
       run: |
@@ -92,6 +102,7 @@ runs:
               "compose": "${{ inputs.compose }}"
             },
             "variables": "${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }}"
+            "secrets": "${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }}"
           }]
         }
         EOF
