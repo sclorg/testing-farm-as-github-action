@@ -7,12 +7,15 @@ inputs:
   api_key:
     description: "A testing farm API key"
     required: true
-  tmt_repository: "An url to tmt repository"
+  tmt_repository:
+    description: "An url to tmt repository"
     required: true
   test_fmf_plan:
+    required: false
     description: "A fmf plan which will be selected. By default all plans are selected."
   tests_tmt_ref:
     description: "A tmt tests branch which will be used for tests"
+    required: false
     default: "master"
   compose:
     description: "A compose for tests"
@@ -20,15 +23,23 @@ inputs:
     required: true
   create_issue_comment:
     description: "It creates a github issue Comment"
+    required: false
     default: "false"
   pull_request_status_name:
     description: "GitHub pull request status name"
+    required: false
     default: "Fedora"
+  env_vars:
+    description: "Environment variables for test env, separated by ;"
+    required: false
+    default: ''
   debug:
     description: "Print debug logs when working with testing farm"
+    required: false
     default: "true"
   update_pull_request_status:
     description: "Action will update pull request status. Default: true"
+    required: false
     default: "true"
 
 outputs:
@@ -57,6 +68,12 @@ runs:
       run: |
         echo "::set-output name=SHA::$(git re-parse HEAD)"
 
+    - name: Generate tmt variables
+      id: generate_tmt_vars
+      run: |
+        python -c 'import json; print({} if not "${{ inpust.env_vars }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.env_vars }}".split(";")]}))' > env_vars
+        echo "::set-output name=TMT_ENV_VARS::$(cat env_vars)"
+
     - name: Schedule a test on Testing Farm
       id: sched_test
       run: |
@@ -73,7 +90,8 @@ runs:
             "arch": "x86_64",
             "os": {
               "compose": "${{ inputs.compose }}"
-            }
+            },
+            "variables": "${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }}"
           }]
         }
         EOF
