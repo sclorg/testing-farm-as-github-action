@@ -1,64 +1,63 @@
 name: 'Schedule tests on Testing Farm'
-description: |
-  A GitHub action will schedule a user defined tests to the Testing Farm to run tmt tests.
-  As soon as tests are finished, either as success or as failure, it updates GitHub pull request status
+description: 'A GitHub action will schedule a user defined tests to the Testing Farm to run tmt tests. As soon as tests are finished, either as success or as failure, it updates GitHub pull request status'
 author: 'RHSCL team'
 branding:
   icon: circle
   color: red
+
 inputs:
   api_key:
-    description: "A testing farm API key"
+    description: 'A testing farm API key'
     required: true
   tmt_repository:
-    description: "An url to tmt repository"
+    description: 'An url to tmt repository'
     required: true
   test_fmf_plan:
     required: false
-    description: "A fmf plan which will be selected. By default all plans are selected."
+    description: 'A fmf plan which will be selected. By default all plans are selected.'
   tests_tmt_ref:
-    description: "A tmt tests branch which will be used for tests"
+    description: 'A tmt tests branch which will be used for tests'
     required: false
-    default: "master"
+    default: 'master'
   compose:
-    description: "A compose for tests"
-    default: "Fedora"
+    description: 'A compose for tests'
+    default: 'Fedora'
     required: true
   create_issue_comment:
-    description: "It creates a github issue Comment"
+    description: 'It creates a github issue Comment'
     required: false
-    default: "false"
+    default: 'false'
   pull_request_status_name:
-    description: "GitHub pull request status name"
+    description: 'GitHub pull request status name'
     required: false
-    default: "Fedora"
+    default: 'Fedora'
   env_vars:
-    description: "Environment variables for test env, separated by ;"
+    description: 'Environment variables for test env, separated by ;'
     required: false
     default: ''
   env_secrets:
-    description: "Environment secrets for test env, separated by ;"
+    description: 'Environment secrets for test env, separated by ;'
     required: false
     default: ''
   debug:
-    description: "Print debug logs when working with testing farm"
+    description: 'Print debug logs when working with testing farm'
     required: false
-    default: "true"
+    default: 'true'
   update_pull_request_status:
-    description: "Action will update pull request status. Default: true"
+    description: 'Action will update pull request status. Default: true'
     required: false
-    default: "true"
+    default: 'true'
 
 outputs:
   request_id:
-    description: "An ID of a scheduled testing farm request"
+    description: 'An ID of a scheduled testing farm request'
     value: ${{ env.REQ_ID }}
   request_url:
-    description: "An url of a scheduled testing farm request"
+    description: 'An url of a scheduled testing farm request'
     value: ${{ env.TF_URL }}
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Install mandatory packages
       run: |
