@@ -55,7 +55,7 @@ outputs:
     value: ${{ env.TF_URL }}
 
 runs:
-  using: ubuntu-20.04
+  using: "composite"
   steps:
     - name: Install mandatory packages
       run: |
