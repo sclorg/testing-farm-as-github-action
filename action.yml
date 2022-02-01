@@ -1,5 +1,5 @@
 name: 'Schedule tests on Testing Farm'
-description: 'A GitHub action will schedule a user defined tests to the Testing Farm to run tmt tests. As soon as tests are finished, either as success or as failure, it updates GitHub pull request status'
+description: 'A GitHub action will schedule a user defined tests to the Testing Farm to run tmt tests.'
 author: 'RHSCL team'
 branding:
   icon: circle
