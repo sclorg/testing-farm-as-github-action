@@ -72,6 +72,6 @@ jobs:
           pull_request_status_name: "CentOS 7"
 ```
 
-and as soon as the job is finished you will see the test results in the pull request:
+and as soon as the job is finished you will see the test results in the pull request status:
 
 ✅ | ❌ Testing Farm - CentOS 7 - Build finished
