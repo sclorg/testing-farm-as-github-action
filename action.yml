@@ -47,7 +47,6 @@ inputs:
     description: 'Action will update pull request status. Default: true'
     required: false
     default: 'true'
-
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
@@ -55,9 +54,8 @@ outputs:
   request_url:
     description: 'An url of a scheduled testing farm request'
     value: ${{ env.TF_URL }}
-
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install mandatory packages
       run: |
@@ -216,4 +214,4 @@ runs:
           Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
           --data @final.json
-      fi
+        fi
