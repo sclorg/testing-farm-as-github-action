@@ -12,13 +12,13 @@ inputs:
   tmt_repository:
     description: 'An url to tmt repository'
     required: true
+  tmt_branch:
+    description: 'A branch of tmt repository which will be used for tests'
+    required: false
+    default: 'master'
   test_fmf_plan:
     required: false
     description: 'A fmf plan which will be selected. By default all plans are selected.'
-  tests_tmt_ref:
-    description: 'A tmt tests branch which will be used for tests'
-    required: false
-    default: 'master'
   compose:
     description: 'A compose for tests'
     default: 'Fedora'
@@ -92,8 +92,8 @@ runs:
           "api_key": "${{ inputs.api_key }}",
           "test": { "fmf": {
               "url": "${{ inputs.tmt_repository }}",
-              "ref": "${{ inputs.tmt_ref }}",
-              "name": "{{ inputs.tests_tmt_ref }}",
+              "ref": "${{ inputs.tmt_branch }}",
+              "name": "{{ inputs.test_fmf_plan }}",
             }
           },
           "environments": [{

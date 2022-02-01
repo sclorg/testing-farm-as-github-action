@@ -21,8 +21,8 @@ API key to the Testing Farm should be stored in your organization's secrets to s
 |-----------------------------|--------------------------------------------------------|-------------------------------|
 | `api_key`                   | A testing farm API key.                                | empty, **required from user** |
 | `tmt_repository`            | An url to tmt repository                               | empty, **required from user** |
+| `tmt_branch`                | A tmt tests branch which will be used for tests        | master                        |
 | `test_fmf_plan`             | A fmf plan which will be selected from tmt repository. | all                           |
-| `tests_tmt_ref`             | A tmt tests branch which will be used for tests        | master                        |
 | `compose`                   | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes)| Fedora |
 | `create_issue_comment`      | If GitHub action will create a github issue comment.   | false                         |
 | `pull_request_status_name`  | GitHub pull request status name                        | Fedora                        |
