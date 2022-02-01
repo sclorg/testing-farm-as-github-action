@@ -62,7 +62,7 @@ jobs:
           ref: "refs/pull/${{ steps.pr_nr.outputs.PR_NR }}/head"
           
       - name: Schedule test on Testing Farm 
-        uses: action/testing-farm-action@v1
+        uses: actions/schedule-tests-on-testing-farm@v1
         with:
           api_key: ${{ secrets.TF_API_KEY }}
           tmt_repository: https://github.com/sclorg/sclorg-testing-farm
