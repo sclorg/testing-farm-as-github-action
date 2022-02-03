@@ -29,6 +29,7 @@ API key to the Testing Farm should be stored in your organization's secrets to s
 | `arch`                       | Define an architecture for testing environment                                                | x86_64                        |
 | `env_vars`                   | Environment variables for test env, separated by ;                                            | empty                         |
 | `env_secrets`                | Environment secrets for test env, separated by ;                                              | empty                         |
+| `env_artifacts`              | Environment artifacts for test env, separated by ;                                            | empty                         |
 | `debug`                      | Print debug logs when working with testing farm                                               | true                          |
 | `update_pull_request_status` | Action will update pull request status. Default: true                                         | true                          |
 
