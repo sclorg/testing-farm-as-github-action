@@ -47,6 +47,10 @@ inputs:
     description: 'Action will update pull request status. Default: true'
     required: false
     default: 'true'
+  arch:
+    description: 'Define an architecture for testing environment. Default: x86_64'
+    required: false
+    default: 'x86_64'
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
@@ -97,7 +101,7 @@ runs:
             }
           },
           "environments": [{
-            "arch": "x86_64",
+            "arch": "${{ inputs.arch }}",
             "os": {
               "compose": "${{ inputs.compose }}"
             },
