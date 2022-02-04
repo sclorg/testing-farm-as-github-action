@@ -33,7 +33,7 @@ API key to the Testing Farm should be stored in your organization's secrets to s
 
 ## Example
 
-The example below shows how the `testing-farm-as-github-action` action can be used to schedule tests on Testing Farm.
+The example below shows how the `sclorg/testing-farm-as-github-action` action can be used to schedule tests on Testing Farm.
 
 ```yaml
 name: Schedule test on Testing Farm
@@ -64,7 +64,7 @@ jobs:
           ref: "refs/pull/${{ steps.pr_nr.outputs.PR_NR }}/head"
           
       - name: Schedule test on Testing Farm 
-        uses: actions/schedule-tests-on-testing-farm@v1
+        uses: sclorg/testing-farm-as-github-action@v1
         with:
           api_key: ${{ secrets.TF_API_KEY }}
           tmt_repository: https://github.com/sclorg/sclorg-testing-farm
