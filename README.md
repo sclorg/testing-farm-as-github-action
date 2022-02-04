@@ -17,19 +17,20 @@ API key to the Testing Farm should be stored in your organization's secrets to s
 
 ## Action Inputs
 
-|   Input Name                | Description                                            | Default value                 |
-|-----------------------------|--------------------------------------------------------|-------------------------------|
-| `api_key`                   | A testing farm API key.                                | empty, **required from user** |
-| `tmt_repository`            | An url to tmt repository                               | empty, **required from user** |
-| `test_fmf_plan`             | A fmf plan which will be selected from tmt repository. | all                           |
-| `tests_tmt_ref`             | A tmt tests branch which will be used for tests        | master                        |
-| `compose`                   | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes)| Fedora |
-| `create_issue_comment`      | If GitHub action will create a github issue comment.   | false                         |
-| `pull_request_status_name`  | GitHub pull request status name                        | Fedora                        |
-| `env_vars`                  | Environment variables for test env, separated by ;     | empty                         |
-| `env_secrets`               | Environment secrets for test env, separated by ;       | empty                         |
-| `debug`                     | Print debug logs when working with testing farm        | true                          |
-| `update_pull_request_status`| Action will update pull request status. Default: true  | true                          |
+| Input Name                   | Description                                                                                   | Default value                 |
+|------------------------------|-----------------------------------------------------------------------------------------------|-------------------------------|
+| `api_key`                    | A testing farm API key.                                                                       | empty, **required from user** |
+| `tmt_repository`             | An url to tmt repository                                                                      | empty, **required from user** |
+| `test_fmf_plan`              | A fmf plan which will be selected from tmt repository.                                        | all                           |
+| `tests_tmt_ref`              | A tmt tests branch which will be used for tests                                               | master                        |
+| `compose`                    | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) | Fedora                        |
+| `create_issue_comment`       | If GitHub action will create a github issue comment.                                          | false                         |
+| `pull_request_status_name`   | GitHub pull request status name                                                               | Fedora                        |
+| `arch`                       | Define an architecture for testing environment                                                | x86_64                        |
+| `env_vars`                   | Environment variables for test env, separated by ;                                            | empty                         |
+| `env_secrets`                | Environment secrets for test env, separated by ;                                              | empty                         |
+| `debug`                      | Print debug logs when working with testing farm                                               | true                          |
+| `update_pull_request_status` | Action will update pull request status. Default: true                                         | true                          |
 
 ## Example
 
