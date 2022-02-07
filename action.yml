@@ -51,6 +51,14 @@ inputs:
     description: 'Define an architecture for testing environment. Default: x86_64'
     required: false
     default: 'x86_64'
+  copr:
+    description: 'Name of copr to use for the artifacts'
+    required: false
+    default: 'epel-7-x86_64'
+  test_artifacts:
+    description: '"fedora-copr-build" artifacts for testing environment. Separated by ;'
+    required: false
+    default: ''
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
@@ -88,6 +96,12 @@ runs:
         python -c 'import json; print({} if not "${{ inpust.env_secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.env_secrets }}".split(";")]}))' > env_secrets
         echo "::set-output name=TMT_ENV_SECRETS::$(cat env_secrets)"
 
+    - name: Generate tmt artifacts
+      id: generate_tmt_artifacts
+      run: |
+        python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.env_artifacts }}".split(";")])))' > artifacts
+        echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat env_artifacts)"
+
     - name: Schedule a test on Testing Farm
       id: sched_test
       run: |
@@ -105,8 +119,9 @@ runs:
             "os": {
               "compose": "${{ inputs.compose }}"
             },
-            "variables": "${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }}"
-            "secrets": "${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }}"
+            "variables": "${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }}",
+            "secrets": "${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }}",
+            "artifacts: "${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }}"
           }]
         }
         EOF
