@@ -55,8 +55,8 @@ inputs:
     description: 'Name of copr to use for the artifacts'
     required: false
     default: 'epel-7-x86_64'
-  env_artifacts:
-    description: 'Environment artifacts for test env, separated by ;'
+  test_artifacts:
+    description: '"fedora-copr-build" artifacts for testing environment. Separated by ;'
     required: false
     default: ''
 outputs:
