@@ -59,6 +59,10 @@ inputs:
     description: '"fedora-copr-build" artifacts for testing environment. Separated by ;'
     required: false
     default: ''
+  tmt_context:
+    description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
+    required: false
+    default: ''
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
@@ -102,6 +106,12 @@ runs:
         python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.env_artifacts }}".split(";")])))' > artifacts
         echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat env_artifacts)"
 
+    - name: Generate tmt context
+      id: generate_tmt_context
+      run: |
+        python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > tmt_context
+        echo "::set-output name=TMT_CONTEXT::$(cat tmt_context)"
+
     - name: Schedule a test on Testing Farm
       id: sched_test
       run: |
@@ -121,7 +131,10 @@ runs:
             },
             "variables": "${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }}",
             "secrets": "${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }}",
-            "artifacts: "${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }}"
+            "artifacts: "${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }}",
+            "tmt": {
+              "context": ${{ steps.generate_tmt_context.outputs.TMT_CONTEXT }}
+            }
           }]
         }
         EOF
