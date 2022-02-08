@@ -9,18 +9,18 @@ inputs:
   api_key:
     description: 'A testing farm API key'
     required: true
-  tmt_repository:
-    description: 'An url to tmt repository'
+  git_url:
+    description: 'An url to the GIT repository'
     required: true
-  test_fmf_plan:
-    required: false
-    description: 'A fmf plan which will be selected. By default all plans are selected.'
-  tests_tmt_ref:
+  git_ref:
     description: 'A tmt tests branch which will be used for tests'
     required: false
     default: 'master'
+  tmt_plan_regex:
+    required: false
+    description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
   compose:
-    description: 'A compose for tests'
+    description: 'A compose to run tests against.'
     default: 'Fedora'
     required: true
   create_issue_comment:
@@ -31,12 +31,12 @@ inputs:
     description: 'GitHub pull request status name'
     required: false
     default: 'Fedora'
-  env_vars:
-    description: 'Environment variables for test env, separated by ;'
+  variables:
+    description: 'Environment variables for test, separated by ;'
     required: false
     default: ''
-  env_secrets:
-    description: 'Environment secrets for test env, separated by ;'
+  secrets:
+    description: 'Secret environment variables for test env, separated by ;'
     required: false
     default: ''
   debug:
@@ -55,7 +55,7 @@ inputs:
     description: 'Name of copr to use for the artifacts'
     required: false
     default: 'epel-7-x86_64'
-  test_artifacts:
+  copr_artifacts:
     description: '"fedora-copr-build" artifacts for testing environment. Separated by ;'
     required: false
     default: ''
@@ -91,26 +91,26 @@ runs:
     - name: Generate tmt variables
       id: generate_tmt_vars
       run: |
-        python -c 'import json; print({} if not "${{ inpust.env_vars }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.env_vars }}".split(";")]}))' > env_vars
-        echo "::set-output name=TMT_ENV_VARS::$(cat env_vars)"
+        python -c 'import json; print({} if not "${{ inpust.variables }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.variables }}".split(";")]}))' > variables
+        echo "::set-output name=TMT_ENV_VARS::$(cat variables)"
 
     - name: Generate tmt secrets
       id: generate_tmt_secrets
       run: |
-        python -c 'import json; print({} if not "${{ inpust.env_secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.env_secrets }}".split(";")]}))' > env_secrets
-        echo "::set-output name=TMT_ENV_SECRETS::$(cat env_secrets)"
+        python -c 'import json; print({} if not "${{ inpust.secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.secrets }}".split(";")]}))' > secrets
+        echo "::set-output name=TMT_ENV_SECRETS::$(cat secrets)"
 
     - name: Generate tmt artifacts
       id: generate_tmt_artifacts
       run: |
-        python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.env_artifacts }}".split(";")])))' > artifacts
-        echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat env_artifacts)"
+        python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])))' > artifacts
+        echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat copr_artifacts)"
 
     - name: Generate tmt context
-      id: generate_tmt_context
+      id: generate_context
       run: |
-        python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > tmt_context
-        echo "::set-output name=TMT_CONTEXT::$(cat tmt_context)"
+        python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > context
+        echo "::set-output name=TMT_CONTEXT::$(cat context)"
 
     - name: Schedule a test on Testing Farm
       id: sched_test
@@ -119,9 +119,9 @@ runs:
         {
           "api_key": "${{ inputs.api_key }}",
           "test": { "fmf": {
-              "url": "${{ inputs.tmt_repository }}",
-              "ref": "${{ inputs.tmt_ref }}",
-              "name": "{{ inputs.tests_tmt_ref }}",
+              "url": "${{ inputs.git_url }}",
+              "ref": "${{ inputs.git_ref }}",
+              "name": "{{ inputs.tmt_plan_regex }}",
             }
           },
           "environments": [{
@@ -133,26 +133,26 @@ runs:
             "secrets": "${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }}",
             "artifacts: "${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }}",
             "tmt": {
-              "context": ${{ steps.generate_tmt_context.outputs.TMT_CONTEXT }}
+              "context": ${{ steps.generate_context.outputs.TMT_CONTEXT }}
             }
           }]
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
-          echo "Let's print request.json"
-          cat request.json
+          echo "Let's print request.json (except api_key and secrets)"
+          cat request.json | jq 'del(.api_key, .environments[].secrets)'
         fi
         curl https://api.testing-farm.io/requests \
             --data @request.json \
             --header "Content-Type: application/json" \
             --output response.json
-        
+
         if [ "${{ inputs.debug }}" == "true" ]; then
           echo "Let's print testing farm response"
           cat response.json
           jq < response.json
         fi
-        
+
         # Store REQ_ID into GITHUB_ENV variables
         req_id=$(jq -r .id response.json)
         tf_url=$(jq -r .run.artifacts response.json)
@@ -206,7 +206,7 @@ runs:
         if [ "${{ inputs.debug }}" == "true" ]; then
           cat job.json
           jq < job.json
-        fi          
+        fi
         state=$(jq -r .state job.json)
         result=$(jq -r .result.overall job.json)
         new_state="success"
