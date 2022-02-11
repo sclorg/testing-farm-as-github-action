@@ -247,3 +247,19 @@ runs:
           https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
           --data @final.json
         fi
+
+    - name: Add comment with Testing Farm request/result to Pull Request
+      if: ${{ inputs.create_issue_comment == 'true' }}
+      id: github_comment
+      uses: actions/github-script@v4
+      with:
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Testing Farm [request](${{ env.TF_URL }}/${{ env.REQ_ID }})' +
+                  ' for ${{ inputs.compose }}/${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }} regression testing has been created. Once finished, results should be available' +
+                  ' [here](${{ env.TF_URL }}/${{ env.REQ_ID }}/).' +
+                  '\n[Full pipeline log](${{ env.TF_URL }}/${{ env.REQ_ID }}/pipeline.log).'
+          })
