@@ -182,7 +182,7 @@ runs:
 
     - name: Switch pull request state to running
       id: running
-      if: inputs.update_pull_request_status
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         # Create running.json file for query, whether job is finished or not.
         cat << EOF > running.json
@@ -202,6 +202,7 @@ runs:
 
     - name: Check if scheduled test is still running
       id: still_running
+      if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
         CMD=${{ inputs.api_url }}/requests/${{ env.REQ_ID }}
         curl $CMD > job.json
@@ -223,6 +224,7 @@ runs:
 
     - name: Get final state of Testing Farm scheduled request
       id: finale_state
+      if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
         curl ${{ inputs.api_url }}/requests/${{ env.REQ_ID }} > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -250,7 +252,7 @@ runs:
       shell: bash
 
     - name: Switch pull request GitHub status to final state
-      if: inputs.update_pull_request_status
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         cat << EOF > final.json
         {
