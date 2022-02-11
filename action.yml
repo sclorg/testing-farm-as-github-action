@@ -283,8 +283,8 @@ runs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Testing Farm [request](${{ env.TF_URL }}/${{ env.REQ_ID }})' +
-                  ' for ${{ inputs.compose }}/${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }} regression testing has been created. Once finished, results should be available' +
-                  ' [here](${{ env.TF_URL }}/${{ env.REQ_ID }}/).' +
-                  '\n[Full pipeline log](${{ env.TF_URL }}/${{ env.REQ_ID }}/pipeline.log).'
+            body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ env.REQ_ID }})' +
+                  ' for ${{ inputs.compose }}/${{ inputs.test_artifacts }} regression testing has been created. Once finished, results should be available' +
+                  ' [here](${{ env.RESULTS_URL }}/).' +
+                  '\n[Full pipeline log](${{ env.RESULTS_URL }}/pipeline.log).'
           })
