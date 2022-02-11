@@ -47,7 +47,8 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `secrets`                    | Environment secrets for test env, separated by ;                                                                                  | empty                         |
 
 ### Test Artifacts
-
+| Input Name                   | Description                                                                                                                       | Default value                 |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
 | `copr`                       | Copr name to use for the artifacts                                                                                                | epel-7-x86_64                 |
 | `copr_artifacts`             | `fedora-copr-build` artifacts for testing environment, separated by ;                                                             | empty                         |
 
