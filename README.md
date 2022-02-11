@@ -53,7 +53,8 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `copr_artifacts`             | `fedora-copr-build` artifacts for testing environment, separated by ;                                                             | empty                         |
 
 ### Miscellaneous
-
+| Input Name                   | Description                                                                                                                       | Default value                 |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
 | `create_issue_comment`       | If GitHub action will create a github issue comment.                                                                              | false                         |
 | `pull_request_status_name`   | GitHub pull request status name                                                                                                   | Fedora                        |
 | `debug`                      | Print debug logs when working with testing farm                                                                                   | true                          |
