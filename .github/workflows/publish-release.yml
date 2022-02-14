@@ -27,13 +27,6 @@ jobs:
           echo "::set-output name=version::${version}"
           echo "::set-output name=major::${major}"
 
-      - uses: release-drafter/release-drafter@v5
-        with:
-          version: ${{ steps.version.outputs.version }}
-          publish: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: force update major tag
         run: |
           git tag v${{ steps.version.outputs.major }} ${{ steps.version.outputs.tag }} -f
