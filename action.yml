@@ -6,6 +6,10 @@ branding:
   color: red
 
 inputs:
+  api_url:
+    description: 'A testing farm server url'
+    required: true
+    default: 'https://api.dev.testing-farm.io/v0.1'
   api_key:
     description: 'A testing farm API key'
     required: true
@@ -15,7 +19,10 @@ inputs:
   git_ref:
     description: 'A tmt tests branch which will be used for tests'
     required: false
-    default: 'master'
+    default: 'master'    
+  github_token:
+    description: 'A github token passed from secrets'
+    required: true
   tmt_plan_regex:
     required: false
     description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
@@ -63,54 +70,65 @@ inputs:
     description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
     required: false
     default: ''
+  artifacts_url:
+    description: 'Baseurl where results can be found'
+    required: false
+    default: 'http://artifacts.osci.redhat.com/testing-farm'
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
     value: ${{ env.REQ_ID }}
   request_url:
     description: 'An url of a scheduled testing farm request'
-    value: ${{ env.TF_URL }}
+    value: ${{ env.RESULTS_URL }}
 runs:
   using: "composite"
   steps:
     - name: Install mandatory packages
       run: |
         sudo apt update && sudo apt -y install curl jq
+      shell: bash
 
     - name: Get pull request number
       id: pr_nr
       run: |
         PR_URL="${{ github.event.comment.issue_url }}"
         echo "::set-output name=PR_NR::${PR_URL##*/}"
+      shell: bash
 
     - name: Get commit SHA value
       id: sha_value
       run: |
-        echo "::set-output name=SHA::$(git re-parse HEAD)"
+        echo "::set-output name=SHA::$(git rev-parse HEAD)"
+      shell: bash
 
     - name: Generate tmt variables
       id: generate_tmt_vars
       run: |
-        python -c 'import json; print({} if not "${{ inpust.variables }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.variables }}".split(";")]}))' > variables
+        python -c 'import json; print({} if not "${{ inputs.variables }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.variables }}".split(";")]}))' > variables
         echo "::set-output name=TMT_ENV_VARS::$(cat variables)"
+      shell: bash
 
     - name: Generate tmt secrets
       id: generate_tmt_secrets
       run: |
-        python -c 'import json; print({} if not "${{ inpust.secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inpust.secrets }}".split(";")]}))' > secrets
+        python -c 'import json; print({} if not "${{ inputs.secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.secrets }}".split(";")]}))' > secrets
         echo "::set-output name=TMT_ENV_SECRETS::$(cat secrets)"
+      shell: bash
 
     - name: Generate tmt artifacts
-      id: generate_tmt_artifacts
+      id: generate_artifacts
       run: |
-        python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])))' > artifacts
+        python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])))' > copr_artifacts
         echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat copr_artifacts)"
+      shell: bash
 
     - name: Generate tmt context
       id: generate_context
       run: |
-        python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > context
-        echo "::set-output name=TMT_CONTEXT::$(cat context)"
+        python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > tmt_context
+        echo "::set-output name=TMT_CONTEXT::$(cat tmt_context)"
+      shell: bash
 
     - name: Schedule a test on Testing Farm
       id: sched_test
@@ -129,9 +147,9 @@ runs:
             "os": {
               "compose": "${{ inputs.compose }}"
             },
-            "variables": "${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }}",
-            "secrets": "${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }}",
-            "artifacts: "${{ steps.generate_tmt_artifacts.outputs.TMT_ENV_ARTIFACTS }}",
+            "variables": ${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }},
+            "secrets": ${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }},
+            "artifacts": ${{ steps.generate_artifacts.outputs.TMT_ENV_ARTIFACTS }},
             "tmt": {
               "context": ${{ steps.generate_context.outputs.TMT_CONTEXT }}
             }
@@ -142,7 +160,7 @@ runs:
           echo "Let's print request.json (except api_key and secrets)"
           cat request.json | jq 'del(.api_key, .environments[].secrets)'
         fi
-        curl https://api.testing-farm.io/requests \
+        curl ${{ inputs.api_url }}/requests \
             --data @request.json \
             --header "Content-Type: application/json" \
             --output response.json
@@ -157,32 +175,36 @@ runs:
         req_id=$(jq -r .id response.json)
         tf_url=$(jq -r .run.artifacts response.json)
         echo "REQ_ID=$req_id" >> $GITHUB_ENV
-        echo "TF_URL=$tf_url" >> $GITHUB_ENV
+        # NOTE(ivasilev) Target url may not be available at this moment if the job is still queued, so
+        # will rather construct one from artifact_url and id as it has predictable format
+        echo "RESULTS_URL=${{ inputs.artifacts_url }}/$req_id" >> $GITHUB_ENV
+      shell: bash
 
     - name: Switch pull request state to running
       id: running
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
-        if [ "${{ inputs.update_pull_request_status }}" == "true" ]; then
-          # Create running.json file for query, whether job is finished or not.
-          cat << EOF > running.json
-          {
-            "sha": "${{ steps.sha_value.outputs.SHA }}",
-            "state": "pending",
-            "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
-            "description": "Build started",
-            "target_url": "${{ env.TF_URL }}/${{ env.REQ_ID }}"
-          }
-          EOF
-          # Update GitHub status description to 'Build started'
-          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
-            --data @running.json
-        fi
+        # Create running.json file for query, whether job is finished or not.
+        cat << EOF > running.json
+        {
+          "sha": "${{ steps.sha_value.outputs.SHA }}",
+          "state": "pending",
+          "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
+          "description": "Build started",
+          "target_url": "${{ env.RESULTS_URL }}"
+        }
+        EOF
+        # Update GitHub status description to 'Build started'
+        curl -X POST -H "Authorization: Bearer ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
+          --data @running.json
+      shell: bash
 
     - name: Check if scheduled test is still running
       id: still_running
+      if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
-        CMD=https://api.testing-farm.io/requests/${{ env.REQ_ID }}
+        CMD=${{ inputs.api_url }}/requests/${{ env.REQ_ID }}
         curl $CMD > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
           cat job.json
@@ -198,11 +220,13 @@ runs:
           fi
           state=$(jq -r .state job.json)
         done
+      shell: bash
 
     - name: Get final state of Testing Farm scheduled request
       id: finale_state
+      if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
-        curl ${{ secrets.TF_ENDPOINT }}/requests/${{ env.REQ_ID }} > job.json
+        curl ${{ inputs.api_url }}/requests/${{ env.REQ_ID }} > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
           cat job.json
           jq < job.json
@@ -225,25 +249,42 @@ runs:
         echo "Infra state is: $infra_error"
         echo "::set-output name=FINAL_STATE::$new_state"
         echo "::set-output name=INFRA_STATE::$infra_error"
+      shell: bash
 
     - name: Switch pull request GitHub status to final state
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
-        if [ "${{ inputs.update_pull_request_status }}" == "true" ]; then
-          cat << EOF > final.json
-          {
-            "sha": "${{ steps.sha_value.outputs.SHA }}",
-            "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
-            "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
-            "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
-            "target_url": "${{ env.TF_URL }}/${{ env.REQ_ID }}"
-          }
-          EOF
-          if [ "${{ inputs.debug }}" == "true" ]; then
-            cat final.json
-          fi
-          # Switch Github status to proper state
-          curl -X POST -H "Authorization:
-          Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
-          --data @final.json
+        cat << EOF > final.json
+        {
+          "sha": "${{ steps.sha_value.outputs.SHA }}",
+          "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
+          "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
+          "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
+          "target_url": "${{ env.RESULTS_URL }}"
+        }
+        EOF
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          cat final.json
         fi
+        # Switch Github status to proper state
+        curl -X POST -H "Authorization:
+        Bearer ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json" \
+        https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
+        --data @final.json
+      shell: bash
+
+    - name: Add comment with Testing Farm request/result to Pull Request
+      if: ${{ inputs.create_issue_comment == 'true' }}
+      id: github_comment
+      uses: actions/github-script@v4
+      with:
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ env.REQ_ID }})' +
+                  ' for ${{ inputs.compose }}/${{ inputs.test_artifacts }} regression testing has been created. Once finished, results should be available' +
+                  ' [here](${{ env.RESULTS_URL }}/).' +
+                  '\n[Full pipeline log](${{ env.RESULTS_URL }}/pipeline.log).'
+          })
