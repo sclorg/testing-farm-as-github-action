@@ -139,7 +139,7 @@ runs:
           "test": { "fmf": {
               "url": "${{ inputs.git_url }}",
               "ref": "${{ inputs.git_ref }}",
-              "name": "${{ inputs.tmt_plan_regex }}",
+              "name": "${{ inputs.tmt_plan_regex }}"
             }
           },
           "environments": [{
