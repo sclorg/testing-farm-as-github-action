@@ -119,7 +119,7 @@ runs:
     - name: Generate tmt artifacts
       id: generate_artifacts
       run: |
-        python -c 'import json;print(json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])))' > copr_artifacts
+        python -c 'import json;print("" if not "${{ inputs.artifacts }}".strip() else "\"artifacts\"" + ": " + json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])) + ",")' > copr_artifacts
         echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat copr_artifacts)"
       shell: bash
 
@@ -149,7 +149,7 @@ runs:
             },
             "variables": ${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }},
             "secrets": ${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }},
-            "artifacts": ${{ steps.generate_artifacts.outputs.TMT_ENV_ARTIFACTS }},
+            ${{ steps.generate_artifacts.outputs.TMT_ENV_ARTIFACTS }}
             "tmt": {
               "context": ${{ steps.generate_context.outputs.TMT_CONTEXT }}
             }
@@ -194,10 +194,18 @@ runs:
           "target_url": "${{ env.RESULTS_URL }}"
         }
         EOF
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          cat running.json
+        fi
         # Update GitHub status description to 'Build started'
-        curl -X POST -H "Authorization: Bearer ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json" \
+        curl -X POST \
+          -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
-          --data @running.json
+          --data @running.json > update.json
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          cat update.json
+        fi
       shell: bash
 
     - name: Check if scheduled test is still running
@@ -223,7 +231,7 @@ runs:
       shell: bash
 
     - name: Get final state of Testing Farm scheduled request
-      id: finale_state
+      id: final_state
       if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
         curl ${{ inputs.api_url }}/requests/${{ env.REQ_ID }} > job.json
@@ -233,6 +241,7 @@ runs:
         fi
         state=$(jq -r .state job.json)
         result=$(jq -r .result.overall job.json)
+        tf_url=$(jq -r .run.artifacts job.json)
         new_state="success"
         infra_error=" "
         echo "State is $state and result is: $result"
@@ -249,12 +258,13 @@ runs:
         echo "Infra state is: $infra_error"
         echo "::set-output name=FINAL_STATE::$new_state"
         echo "::set-output name=INFRA_STATE::$infra_error"
+        echo "RESULTS_URL=$tf_url" >> $GITHUB_ENV
       shell: bash
 
     - name: Switch pull request GitHub status to final state
       if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
-        cat << EOF > final.json
+        cat << EOF > final_request.json
         {
           "sha": "${{ steps.sha_value.outputs.SHA }}",
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
@@ -264,13 +274,16 @@ runs:
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
-          cat final.json
+          cat final_request.json
         fi
         # Switch Github status to proper state
-        curl -X POST -H "Authorization:
-        Bearer ${{ inputs.github_token }}" -H "Accept: application/vnd.github.v3+json" \
-        https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
-        --data @final.json
+        curl -X POST -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
+          --data @final_request.json > final_response.json
+        if [ "${{ inputs.debug }}" == "true" ]; then
+          cat final_response.json
+        fi
       shell: bash
 
     - name: Add comment with Testing Farm request/result to Pull Request
@@ -283,8 +296,8 @@ runs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ env.REQ_ID }})' +
-                  ' for ${{ inputs.compose }}/${{ inputs.test_artifacts }} regression testing has been created. Once finished, results should be available' +
-                  ' [here](${{ env.RESULTS_URL }}/).' +
+            body: 'Testing Farm [request](${{ env.RESULTS_URL }})' +
+                  ' for ${{ inputs.compose }}/${{ inputs.test_artifacts }} regression testing has been created.' +
+                  '\nOnce finished, results should be available [here](${{ env.RESULTS_URL }}/).' +
                   '\n[Full pipeline log](${{ env.RESULTS_URL }}/pipeline.log).'
           })
