@@ -296,8 +296,8 @@ runs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Testing Farm [request](${{ env.RESULTS_URL }})' +
-                  ' for ${{ inputs.compose }}/${{ inputs.test_artifacts }} regression testing has been created.' +
+            body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ env.REQ_ID }})' +
+                  ' for ${{ inputs.compose }}/${{ inputs.copr_artifacts }} regression testing has been created.' +
                   '\nOnce finished, results should be available [here](${{ env.RESULTS_URL }}/).' +
                   '\n[Full pipeline log](${{ env.RESULTS_URL }}/pipeline.log).'
           })
