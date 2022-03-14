@@ -24,9 +24,10 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 
 ### Testing Farm
 
-| Input Name                   | Description                                                                                                                       | Default value                 |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| `api_key`                    | Testing farm API key.                                                                                                             | empty, **required from user** |
+| Input Name | Description | Default value |
+|------------|-------------|---------------|
+| `api_key`  | Testing farm API key | empty, **required from user** |
+| `api_url`  | Testing farm server url | empty, **required from user** |
 
 ### Tmt Metadata
 
@@ -53,12 +54,13 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `copr_artifacts`             | `fedora-copr-build` artifacts for testing environment, separated by ;                                                             | empty                         |
 
 ### Miscellaneous
-| Input Name                   | Description                                                                                                                       | Default value                 |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| `create_issue_comment`       | If GitHub action will create a github issue comment.                                                                              | false                         |
-| `pull_request_status_name`   | GitHub pull request status name                                                                                                   | Fedora                        |
-| `debug`                      | Print debug logs when working with testing farm                                                                                   | true                          |
-| `update_pull_request_status` | Action will update pull request status. Default: true                                                                             | true                          |
+| Input Name | Description | Default value |
+|------------|-------------|---------------|
+| `github_token` | Github token passed from secrets | `${{ github.token }}` |
+| `create_issue_comment` | If GitHub action will create a github issue comment | false |
+| `pull_request_status_name` | GitHub pull request status name | Fedora |
+| `debug` | Print debug logs when working with testing farm | true |
+| `update_pull_request_status` | Action will update pull request status. Default: true | true |
 
 ## Example
 
