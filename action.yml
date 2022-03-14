@@ -77,10 +77,10 @@ inputs:
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
-    value: ${{ env.REQ_ID }}
+    value: ${{ steps.sched_test.outputs.req_id }}
   request_url:
     description: 'An url of a scheduled testing farm request'
-    value: ${{ env.RESULTS_URL }}
+    value: ${{ steps.sched_test.outputs.results_url }}
 runs:
   using: "composite"
   steps:
@@ -171,13 +171,14 @@ runs:
           jq < response.json
         fi
 
-        # Store REQ_ID into GITHUB_ENV variables
         req_id=$(jq -r .id response.json)
-        tf_url=$(jq -r .run.artifacts response.json)
-        echo "REQ_ID=$req_id" >> $GITHUB_ENV
+        # NOTE(ivasilev) Do not store REQ_ID and RESULTS_URL as GITHUB_ENV variables, as in case multiple
+        # testing farm requests are scheduled subsequent VAR=VAL >> $GITHUB_ENV instructions are ignored and
+        # information from first run only is used.
         # NOTE(ivasilev) Target url may not be available at this moment if the job is still queued, so
         # will rather construct one from artifact_url and id as it has predictable format
-        echo "RESULTS_URL=${{ inputs.artifacts_url }}/$req_id" >> $GITHUB_ENV
+        echo "::set-output name=req_id::$req_id"
+        echo "::set-output name=results_url::${{ inputs.artifacts_url }}/$req_id"
       shell: bash
 
     - name: Switch pull request state to running
@@ -191,7 +192,7 @@ runs:
           "state": "pending",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build started",
-          "target_url": "${{ env.RESULTS_URL }}"
+          "target_url": "${{ steps.sched_test.outputs.results_url }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -212,7 +213,7 @@ runs:
       id: still_running
       if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
-        CMD=${{ inputs.api_url }}/requests/${{ env.REQ_ID }}
+        CMD=${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }}
         curl $CMD > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
           cat job.json
@@ -234,7 +235,7 @@ runs:
       id: final_state
       if: ${{ inputs.update_pull_request_status == 'true'}}
       run: |
-        curl ${{ inputs.api_url }}/requests/${{ env.REQ_ID }} > job.json
+        curl ${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }} > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
           cat job.json
           jq < job.json
@@ -270,7 +271,7 @@ runs:
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
-          "target_url": "${{ env.RESULTS_URL }}"
+          "target_url": "${{ steps.sched_test.outputs.results_url }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -296,8 +297,8 @@ runs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ env.REQ_ID }})' +
+            body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }})' +
                   ' for ${{ inputs.compose }}/${{ inputs.copr_artifacts }} regression testing has been created.' +
-                  '\nOnce finished, results should be available [here](${{ env.RESULTS_URL }}/).' +
-                  '\n[Full pipeline log](${{ env.RESULTS_URL }}/pipeline.log).'
+                  '\nOnce finished, results should be available [here](${{ steps.sched_test.outputs.results_url }}/).' +
+                  '\n[Full pipeline log](${{ steps.sched_test.outputs.results_url }}/pipeline.log).'
           })
