@@ -11,7 +11,7 @@ e.g., with the [Checkout V2](https://github.com/actions/checkout) GitHub Action.
 
 The Action uses ubuntu-20.04 and it is a [composite action](https://docs.github.com/en/actions/creating-actions/about-custom-actions).
 It internally downloads needed binaries `curl` and `jq` for communicating with the Testing Farms API and parsing the responses.
- 
+
 API key to the Testing Farm MUST be stored in your organization's secrets to successfully access its infrastructure.
 See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onboarding.html) for information how to onboard to Testing Farm.
 
@@ -31,27 +31,27 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 
 ### Tmt Metadata
 
-| Input Name                   | Description                                                                                                                       | Default value                 |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| `git_url`                    | An url to the repository with tmt metadata                                                                                        | empty, **required from user** |
-| `git_ref`                    | A tmt tests branch which will be used for tests                                                                                   | master                        |
-| `tmt_plan_regex`             | A regular expression used to select tmt plans.                                                                                    | all                           |
-| `tmt_context`                | A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty                         |
+| Input Name | Description | Default value |
+|------------|-------------|---------------|
+| `git_url` | An url to the repository with tmt metadata | empty, **required from user** |
+| `git_ref` | A tmt tests branch which will be used for tests | master |
+| `tmt_plan_regex` | A regular expression used to select tmt plans | all |
+| `tmt_context`| A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty |
 
 ### Test Environment
 
-| Input Name                   | Description                                                                                                                       | Default value                 |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| `compose`                    | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes)                                     | Fedora                        |
-| `arch`                       | Define an architecture for testing environment                                                                                    | x86_64                        |
-| `variables`                  | Environment variables for test env, separated by ;                                                                                | empty                         |
-| `secrets`                    | Environment secrets for test env, separated by ;                                                                                  | empty                         |
+| Input Name | Description | Default value |
+|------------|-------------|---------------|
+| `compose` | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) | Fedora |
+| `arch` | Define an architecture for testing environment | x86_64 |
+| `variables` | Environment variables for test env, separated by ; | empty |
+| `secrets` | Environment secrets for test env, separated by ; | empty |
 
 ### Test Artifacts
-| Input Name                   | Description                                                                                                                       | Default value                 |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| `copr`                       | Copr name to use for the artifacts                                                                                                | epel-7-x86_64                 |
-| `copr_artifacts`             | `fedora-copr-build` artifacts for testing environment, separated by ;                                                             | empty                         |
+| Input Name | Description | Default value |
+|------------|-------------|---------------|
+| `copr` | Copr name to use for the artifacts | epel-7-x86_64 |
+| `copr_artifacts` | `fedora-copr-build` artifacts for testing environment, separated by ; | empty |
 
 ### Miscellaneous
 | Input Name | Description | Default value |
@@ -83,18 +83,12 @@ jobs:
       && contains(github.event.comment.body, '[test]')
       && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
     steps:
-      - name: Get pull request number
-        id: pr_nr
-        run: |
-          PR_URL="${{ github.event.comment.issue_url }}"
-          echo "::set-output name=PR_NR::${PR_URL##*/}"
-          
       - name: Checkout repo and switch to corresponding pull request
         uses: actions/checkout@v2
         with:
-          git_ref: "refs/pull/${{ steps.pr_nr.outputs.PR_NR }}/head"
-          
-      - name: Schedule test on Testing Farm 
+          git_ref: "refs/pull/${{ github.event.issue.number }}/head"
+
+      - name: Schedule test on Testing Farm
         uses: sclorg/testing-farm-as-github-action@v1
         with:
           api_key: ${{ secrets.TF_API_KEY }}
