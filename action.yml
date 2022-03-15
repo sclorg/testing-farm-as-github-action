@@ -19,7 +19,7 @@ inputs:
   git_ref:
     description: 'A tmt tests branch which will be used for tests'
     required: false
-    default: 'master'    
+    default: 'master'
   github_token:
     description: 'A github token passed from secrets'
     required: true
@@ -112,7 +112,7 @@ runs:
     - name: Generate tmt artifacts
       id: generate_artifacts
       run: |
-        python -c 'import json;print("" if not "${{ inputs.artifacts }}".strip() else "\"artifacts\"" + ": " + json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])) + ",")' > copr_artifacts
+        python -c 'import json;print("" if not "${{ inputs.copr_artifacts }}".strip() else "\"artifacts\"" + ": " + json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])) + ",")' > copr_artifacts
         echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat copr_artifacts)"
       shell: bash
 
