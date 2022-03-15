@@ -19,10 +19,11 @@ inputs:
   git_ref:
     description: 'A tmt tests branch which will be used for tests'
     required: false
-    default: 'master'    
+    default: 'master'
   github_token:
     description: 'A github token passed from secrets'
-    required: true
+    required: false
+    default: ${{ github.token }}
   tmt_plan_regex:
     required: false
     description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
@@ -193,7 +194,7 @@ runs:
         fi
         # Update GitHub status description to 'Build started'
         curl -X POST \
-          -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+          -H "Authorization: Bearer ${{ inputs.github_token }}" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
           --data @running.json > update.json
@@ -271,7 +272,7 @@ runs:
           cat final_request.json
         fi
         # Switch Github status to proper state
-        curl -X POST -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+        curl -X POST -H "Authorization: Bearer ${{ inputs.github_token }}" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/${{ steps.sha_value.outputs.SHA }} \
           --data @final_request.json > final_response.json
