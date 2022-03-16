@@ -8,7 +8,7 @@ branding:
 inputs:
   api_url:
     description: 'A testing farm server url'
-    required: true
+    required: false
     default: 'https://api.dev.testing-farm.io/v0.1'
   api_key:
     description: 'A testing farm API key'
@@ -30,7 +30,7 @@ inputs:
   compose:
     description: 'A compose to run tests against.'
     default: 'Fedora'
-    required: true
+    required: false
   create_issue_comment:
     description: 'It creates a github issue Comment'
     required: false
