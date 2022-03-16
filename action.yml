@@ -253,7 +253,7 @@ runs:
         echo "Infra state is: $infra_error"
         echo "::set-output name=FINAL_STATE::$new_state"
         echo "::set-output name=INFRA_STATE::$infra_error"
-        echo "RESULTS_URL=$tf_url" >> $GITHUB_ENV
+        echo "::set-output name=results_url::$tf_url"
       shell: bash
 
     - name: Switch pull request GitHub status to final state
@@ -265,7 +265,7 @@ runs:
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
-          "target_url": "${{ steps.sched_test.outputs.results_url }}"
+          "target_url": "${{ steps.final_state.outputs.results_url }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -293,6 +293,6 @@ runs:
             repo: context.repo.repo,
             body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }})' +
                   ' for ${{ inputs.compose }}/${{ inputs.copr_artifacts }} regression testing has been created.' +
-                  '\nOnce finished, results should be available [here](${{ steps.sched_test.outputs.results_url }}/).' +
-                  '\n[Full pipeline log](${{ steps.sched_test.outputs.results_url }}/pipeline.log).'
+                  '\nOnce finished, results should be available [here](${{ steps.final_state.outputs.results_url }}/).' +
+                  '\n[Full pipeline log](${{ steps.final_state.outputs.results_url }}/pipeline.log).'
           })
