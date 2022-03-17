@@ -21,25 +21,30 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-# File generates artifacts for TMT
-# Format is in JSON file:
-# { 'artifacts' : [{'type': 'fedora-copr-build', 'id': '1234123:epel8-x86_64'}] }
-
 import json
 import sys
-from typing import List
+from typing import Dict
 
-json_string = ""
+# First parameter has to be defined.
+# File generates variables or secreted for TMT
+# Format is in JSON file:
+# { 'key1': 'value1', 'key2': 'value2' }
+
+json_dict: Dict = {}
+output_name = ""
+if len(sys.argv) == 2:
+    output_name = sys.argv[1]
+    if output_name != "variables" and output_name != "secrets":
+        sys.exit(1)
+
 if len(sys.argv) > 2:
-    artifacts = sys.argv[1]
-    copr = sys.argv[2]
-    if not artifacts.strip():
-        json_string = ""
+    output_name = sys.argv[1]
+    input_variables = sys.argv[2]
+    if not input_variables.strip():
+        json_dict = {}
     else:
-        list_artifacts: List = []
-        for copr_id in artifacts.split(";"):
-            list_artifacts.append({"type": "fedora-copr-build", "id": f"{copr_id}:{copr}"})
-        json_string = json.dumps({"artifacts": list_artifacts})
+        json_dict = {key: value for key, value in [s.split("=", 1) for s in input_variables.split(";")]}
 
-with open("copr_artifacts", "w") as file:
+json_string = json.dumps(json_dict)
+with open(output_name, "w") as file:
     file.write(json_string)
