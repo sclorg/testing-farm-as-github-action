@@ -72,7 +72,7 @@ inputs:
     required: false
     default: ''
   artifacts_name:
-    description: 'Defined public or private artifacts name.'
+    description: 'Defines the scope of Testing Farm. Possible options are public and private'
     required: false
     default: 'public'
 outputs:
