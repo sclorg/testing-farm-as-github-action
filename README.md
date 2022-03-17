@@ -36,7 +36,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `git_url` | An url to the repository with tmt metadata | empty, **required from user** |
 | `git_ref` | A tmt tests branch which will be used for tests | master |
 | `tmt_plan_regex` | A regular expression used to select tmt plans | all |
-| `tmt_context`| A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty |
+| `tmt_context` | A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty |
 
 ### Test Environment
 
@@ -61,6 +61,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
+| `artifacts_name` | Define name for generation artifacts_url. Value can be 'public' or 'private' | public |
 
 ## Example
 
