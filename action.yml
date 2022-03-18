@@ -71,7 +71,7 @@ inputs:
     description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
     required: false
     default: ''
-  artifacts_name:
+  tf_scope:
     description: 'Defines the scope of Testing Farm. Possible options are public and private'
     required: false
     default: 'public'
