@@ -61,7 +61,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
-| `artifacts_name` | Define name for generation artifacts_url. Value can be 'public' or 'private' | public |
+| `tf_scope` | Define the scope of Testing Farm. Possible options are 'public' or 'private' | public |
 
 ## Example
 
