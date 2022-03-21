@@ -27,7 +27,8 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
 | `api_key`  | Testing farm API key | empty, **required from user** |
-| `api_url`  | Testing farm server url | empty, **required from user** |
+| `api_url`  | Testing farm API server url | https://api.dev.testing-farm.io/v0.1 |
+| `tf_scope` | Define the scope of Testing Farm. Possible options are 'public' or 'private' | public |
 
 ### Tmt Metadata
 
@@ -61,7 +62,6 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
-| `tf_scope` | Define the scope of Testing Farm. Possible options are 'public' or 'private' | public |
 
 ## Example
 
