@@ -71,17 +71,17 @@ inputs:
     description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
     required: false
     default: ''
-  artifacts_url:
-    description: 'Baseurl where results can be found'
+  tf_scope:
+    description: 'Defines the scope of Testing Farm. Possible options are public and private'
     required: false
-    default: 'http://artifacts.osci.redhat.com/testing-farm'
+    default: 'public'
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
     value: ${{ steps.sched_test.outputs.req_id }}
   request_url:
     description: 'An url of a scheduled testing farm request'
-    value: ${{ steps.sched_test.outputs.results_url }}
+    value: ${{ steps.artifacts_url.outputs.url }}
 runs:
   using: "composite"
   steps:
@@ -94,6 +94,16 @@ runs:
       id: sha_value
       run: |
         echo "::set-output name=SHA::$(git rev-parse HEAD)"
+      shell: bash
+
+    - name: Set artifacts url
+      id: artifacts_url
+      run: |
+        url="https://artifacts.dev.testing-farm.io"
+        if [ "${{ inputs.tf_scope }}" == "private" ]; then
+          url="http://artifacts.osci.redhat.com/testing-farm"
+        fi
+        echo "::set-output name=url::$url"
       shell: bash
 
     - name: Generate tmt variables
@@ -172,7 +182,6 @@ runs:
         # NOTE(ivasilev) Target url may not be available at this moment if the job is still queued, so
         # will rather construct one from artifact_url and id as it has predictable format
         echo "::set-output name=req_id::$req_id"
-        echo "::set-output name=results_url::${{ inputs.artifacts_url }}/$req_id"
       shell: bash
 
     - name: Switch pull request state to running
@@ -186,7 +195,7 @@ runs:
           "state": "pending",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build started",
-          "target_url": "${{ steps.sched_test.outputs.results_url }}"
+          "target_url": "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -205,7 +214,7 @@ runs:
 
     - name: Check if scheduled test is still running
       id: still_running
-      if: ${{ inputs.update_pull_request_status == 'true'}}
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         CMD=${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }}
         curl $CMD > job.json
@@ -227,7 +236,7 @@ runs:
 
     - name: Get final state of Testing Farm scheduled request
       id: final_state
-      if: ${{ inputs.update_pull_request_status == 'true'}}
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         curl ${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }} > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -236,7 +245,6 @@ runs:
         fi
         state=$(jq -r .state job.json)
         result=$(jq -r .result.overall job.json)
-        tf_url=$(jq -r .run.artifacts job.json)
         new_state="success"
         infra_error=" "
         echo "State is $state and result is: $result"
@@ -253,7 +261,6 @@ runs:
         echo "Infra state is: $infra_error"
         echo "::set-output name=FINAL_STATE::$new_state"
         echo "::set-output name=INFRA_STATE::$infra_error"
-        echo "RESULTS_URL=$tf_url" >> $GITHUB_ENV
       shell: bash
 
     - name: Switch pull request GitHub status to final state
@@ -265,7 +272,7 @@ runs:
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
-          "target_url": "${{ steps.sched_test.outputs.results_url }}"
+          "target_url": "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
@@ -293,6 +300,7 @@ runs:
             repo: context.repo.repo,
             body: 'Testing Farm [request](${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }})' +
                   ' for ${{ inputs.compose }}/${{ inputs.copr_artifacts }} regression testing has been created.' +
-                  '\nOnce finished, results should be available [here](${{ steps.sched_test.outputs.results_url }}/).' +
-                  '\n[Full pipeline log](${{ steps.sched_test.outputs.results_url }}/pipeline.log).'
+                  '\nOnce finished, results should be available ' +
+                  '[here](${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/).' +
+                  '\n[Full pipeline log](${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/pipeline.log).'
           })
