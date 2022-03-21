@@ -81,7 +81,7 @@ outputs:
     value: ${{ steps.sched_test.outputs.req_id }}
   request_url:
     description: 'An url of a scheduled testing farm request'
-    value: ${{ steps.sched_test.outputs.results_url }}
+    value: ${{ steps.artifacts_url.outputs.url }}
 runs:
   using: "composite"
   steps:
@@ -245,7 +245,6 @@ runs:
         fi
         state=$(jq -r .state job.json)
         result=$(jq -r .result.overall job.json)
-        tf_url=$(jq -r .run.artifacts job.json)
         new_state="success"
         infra_error=" "
         echo "State is $state and result is: $result"
@@ -262,7 +261,6 @@ runs:
         echo "Infra state is: $infra_error"
         echo "::set-output name=FINAL_STATE::$new_state"
         echo "::set-output name=INFRA_STATE::$infra_error"
-        echo "::set-output name=RESULT_URL::$tf_url
       shell: bash
 
     - name: Switch pull request GitHub status to final state
@@ -274,7 +272,7 @@ runs:
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
-          "target_url": "${{ steps.final_state.outputs.RESULT_URL }}"
+          "target_url": "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
