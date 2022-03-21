@@ -1,1 +1,4 @@
 .idea
+tests/copr_artifacts
+tests/secrets
+tests/variables
