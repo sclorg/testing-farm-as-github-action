@@ -75,6 +75,10 @@ inputs:
     description: 'Defines the scope of Testing Farm. Possible options are public and private'
     required: false
     default: 'public'
+  environment_settings:
+    description: 'Pass specific settings, like post-install-script, to the testing environment.'
+    required: false
+    default: '{}'
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
@@ -152,6 +156,7 @@ runs:
               "compose": "${{ inputs.compose }}"
             },
             "variables": ${{ steps.generate_tmt_vars.outputs.TMT_ENV_VARS }},
+            "settings": ${{ inputs.environment_settings }},
             "secrets": ${{ steps.generate_tmt_secrets.outputs.TMT_ENV_SECRETS }},
             ${{ steps.generate_artifacts.outputs.TMT_ENV_ARTIFACTS }}
             "tmt": {

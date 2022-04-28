@@ -62,6 +62,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
+| `environment_settings` | Pass custom settings to the test environment. Default: {} | empty |
 
 ## Example
 
