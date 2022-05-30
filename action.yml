@@ -252,6 +252,7 @@ runs:
         result=$(jq -r .result.overall job.json)
         new_state="success"
         infra_error=" "
+        log=""
         echo "State is $state and result is: $result"
         if [ "$state" == "complete" ]; then
           if [ "$result" != "passed" ]; then
@@ -261,11 +262,13 @@ runs:
           # Mark job in case of infrastructure issues. Report to Testing Farm team
           infra_error=" - Infra problems"
           new_state="failure"
+          log="pipeline.log"
         fi
         echo "New State is: $new_state"
         echo "Infra state is: $infra_error"
         echo "::set-output name=FINAL_STATE::$new_state"
         echo "::set-output name=INFRA_STATE::$infra_error"
+        echo "::set-output name=LOG::$log"
       shell: bash
 
     - name: Switch pull request GitHub status to final state
@@ -277,7 +280,7 @@ runs:
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
           "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
-          "target_url": "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}"
+          "target_url": "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/${{ steps.final_state.outputs.LOG }}"
         }
         EOF
         if [ "${{ inputs.debug }}" == "true" ]; then
