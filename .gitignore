@@ -2,3 +2,4 @@
 tests/copr_artifacts
 tests/secrets
 tests/variables
+tests/artifacts

@@ -113,21 +113,21 @@ runs:
     - name: Generate tmt variables
       id: generate_tmt_vars
       run: |
-        python -c 'import json; print({} if not "${{ inputs.variables }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.variables }}".split(";")]}))' > variables
+        python generate_tmt_vars.py "variables" "${{ inputs.variables }}"
         echo "::set-output name=TMT_ENV_VARS::$(cat variables)"
       shell: bash
 
     - name: Generate tmt secrets
       id: generate_tmt_secrets
       run: |
-        python -c 'import json; print({} if not "${{ inputs.secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.secrets }}".split(";")]}))' > secrets
+        python generate_tmt_vars.py "secrets" "${{ inputs.secrets }}"
         echo "::set-output name=TMT_ENV_SECRETS::$(cat secrets)"
       shell: bash
 
     - name: Generate tmt artifacts
       id: generate_artifacts
       run: |
-        python -c 'import json;print("" if not "${{ inputs.copr_artifacts }}".strip() else "\"artifacts\"" + ": " + json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])) + ",")' > copr_artifacts
+        python generate_artifacts.py "${{ inputs.copr_artifacts }}" "${{ inputs.copr }}"
         echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat copr_artifacts)"
       shell: bash
 
