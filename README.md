@@ -6,14 +6,16 @@ The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs
 Pull Request status is automatically updated after the tests are executed,
 if this option is enabled with the `update_pull_request_status` user-defined input variable.
 
-Before calling this GitHub Action, you must first clone your project,
-e.g., with the [Checkout V2](https://github.com/actions/checkout) GitHub Action.
-
 The Action uses ubuntu-20.04 and it is a [composite action](https://docs.github.com/en/actions/creating-actions/about-custom-actions).
 It internally downloads needed binaries `curl` and `jq` for communicating with the Testing Farms API and parsing the responses.
 
 API key to the Testing Farm MUST be stored in your organization's secrets to successfully access its infrastructure.
 See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onboarding.html) for information how to onboard to Testing Farm.
+
+Setting `update_pull_request_status` input to `true` requires information of Pull Request's HEAD SHA value.
+Therefore before calling this GitHub Action, the GitHub repo must be firt cloned and checkouted on the Pull Request, in order to obtain the correct SHA value of Pull Requests's HEAD commit.
+Alternatively, the HEAD SHA of the Pull Request can be provided as a `pr_head_sha` input.
+
 
 ## Compatibility Notes
 
@@ -63,6 +65,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
 | `environment_settings` | Pass custom settings to the test environment. Default: {} | empty |
+| `pr_head_sha` | SHA of the latest commit in PR. Used for communication with GitHub API. | $(git rev-parse HEAD) |
 
 ## Example
 
