@@ -97,7 +97,13 @@ runs:
     - name: Get commit SHA value
       id: sha_value
       run: |
-        echo "::set-output name=SHA::$(git rev-parse HEAD)"
+        _sha=$(git rev-parse HEAD)
+        if [ -z $_sha ]; then
+          echo "Failed to obtain SHA of current commit. Halting"
+          echo "Make sure, that current directory is a git repository"
+          exit 1
+        fi
+        echo "::set-output name=SHA::$_sha"
       shell: bash
 
     - name: Set artifacts url
