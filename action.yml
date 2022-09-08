@@ -105,7 +105,7 @@ runs:
         _sha="${{ inputs.pr_head_sha }}"
         if [[ -z "$_sha" ]]; then
           _sha=$(git rev-parse HEAD)
-          if [[ -z $_sha ]]; then
+          if [[ -z "$_sha" ]]; then
             echo "Failed to obtain SHA of current commit. Halting."
             echo "Make sure, that current directory is a git repository"
             echo "or provide the PR's HEAD SHA as input."
