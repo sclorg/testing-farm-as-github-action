@@ -79,6 +79,10 @@ inputs:
     description: 'Pass specific settings, like post-install-script, to the testing environment.'
     required: false
     default: '{}'
+  pr_head_sha:
+    required: false
+    default: ''
+
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
@@ -96,8 +100,19 @@ runs:
 
     - name: Get commit SHA value
       id: sha_value
+      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
-        echo "::set-output name=SHA::$(git rev-parse HEAD)"
+        _sha="${{ inputs.pr_head_sha }}"
+        if [[ -z "$_sha" ]]; then
+          _sha=$(git rev-parse HEAD)
+          if [[ -z "$_sha" ]]; then
+            echo "Failed to obtain SHA of current commit. Halting."
+            echo "Make sure, that current directory is a git repository"
+            echo "or provide the PR's HEAD SHA as input."
+            exit 1
+          fi
+        fi
+        echo "::set-output name=SHA::$_sha"
       shell: bash
 
     - name: Set artifacts url
