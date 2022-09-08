@@ -103,7 +103,7 @@ runs:
       if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         _sha="${{ inputs.pr_head_sha }}"
-        if [[ -z $_sha ]]; then
+        if [[ -z "$_sha" ]]; then
           _sha=$(git rev-parse HEAD)
           if [[ -z $_sha ]]; then
             echo "Failed to obtain SHA of current commit. Halting."
