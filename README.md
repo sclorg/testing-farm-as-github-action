@@ -13,7 +13,7 @@ API key to the Testing Farm MUST be stored in your organization's secrets to suc
 See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onboarding.html) for information how to onboard to Testing Farm.
 
 Setting `update_pull_request_status` input to `true` requires information of Pull Request's HEAD SHA value.
-Therefore before calling this GitHub Action, the GitHub repo must be firt cloned and checkouted on the Pull Request, in order to obtain the correct SHA value of Pull Requests's HEAD commit.
+Therefore before calling this GitHub Action, the GitHub repo must be first cloned and checked out on the Pull Request, in order to obtain the correct SHA value of Pull Request's HEAD commit.
 Alternatively, the HEAD SHA of the Pull Request can be provided as a `pr_head_sha` input.
 
 
