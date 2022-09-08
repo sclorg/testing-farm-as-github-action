@@ -149,7 +149,7 @@ runs:
     - name: Generate tmt context
       id: generate_context
       run: |
-        python generate_tmt_vars.py "tmt_context"
+        python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > tmt_context
         echo "::set-output name=TMT_CONTEXT::$(cat tmt_context)"
       shell: bash
 

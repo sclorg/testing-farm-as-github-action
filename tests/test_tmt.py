@@ -53,31 +53,9 @@ def test_tmt_variables_missing_second_parameter():
     assert json_string == expected
 
 
-def test_tmt_context_missing_second_parameter():
-    expected = {}
-    output_name = "tmt_context"
-    ret_val = subprocess.call(f"python3 {TESTDIR}/../generate_tmt_vars.py \"{output_name}\"", shell=True)
-    assert ret_val == 0
-    with open(output_name, "r") as f:
-        data = f.read()
-    json_string = json.loads(data)
-    assert json_string == expected
-
-
 def test_tmt_variables_one_parameter():
     expected = {"data": "123"}
     output_name = "variables"
-    ret_val = subprocess.call(f"python3 {TESTDIR}/../generate_tmt_vars.py \"{output_name}\" \"data=123\"", shell=True)
-    assert ret_val == 0
-    with open(output_name, "r") as f:
-        data = f.read()
-    json_string = json.loads(data)
-    assert json_string == expected
-
-
-def test_tmt_context_one_parameter():
-    expected = {"data": "123"}
-    output_name = "tmt_context"
     ret_val = subprocess.call(f"python3 {TESTDIR}/../generate_tmt_vars.py \"{output_name}\" \"data=123\"", shell=True)
     assert ret_val == 0
     with open(output_name, "r") as f:
