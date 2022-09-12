@@ -34,7 +34,7 @@ json_dict: Dict = {}
 output_name = ""
 if len(sys.argv) == 2:
     output_name = sys.argv[1]
-    if output_name != "variables" and output_name != "secrets":
+    if output_name != "variables" and output_name != "secrets" and output_name != "tmt_context":
         sys.exit(1)
 
 if len(sys.argv) > 2:
