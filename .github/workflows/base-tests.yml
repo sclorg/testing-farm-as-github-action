@@ -24,7 +24,7 @@ jobs:
         run: echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Run the tests
-        uses: sclorg/testing-farm-as-github-action@${{ steps.sha.outputs.SHA }}
+        uses: ./
         with:
           api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
           git_url: "https://github.com/sclorg/testing-farm-as-github-action"
