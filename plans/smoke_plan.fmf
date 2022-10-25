@@ -1,0 +1,4 @@
+summary: Basic smoke test
+execute:
+    how: tmt
+    script: echo $((11*11)) > testfile
