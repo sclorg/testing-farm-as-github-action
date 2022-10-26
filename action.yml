@@ -29,7 +29,7 @@ inputs:
     description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
   compose:
     description: 'A compose to run tests against.'
-    default: 'Fedora'
+    default: 'Fedora-latest'
     required: false
   create_issue_comment:
     description: 'It creates a github issue Comment'
