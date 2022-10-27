@@ -18,11 +18,6 @@ jobs:
         with:
           ref: "refs/pull/${{ github.event.issue.number }}/head"
 
-      - name: Obtain HEAD SHA
-        shell: bash
-        id: sha
-        run: echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
       - name: Run the tests
         uses: ./
         with:
