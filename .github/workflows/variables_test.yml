@@ -25,4 +25,4 @@ jobs:
           git_url: "https://github.com/sclorg/testing-farm-as-github-action"
           git_ref: "main"
           pull_request_status_name: "Variables test"
-          variables: "SOME_DUMMY_VARIABLE:FOO_BAR_VARIABLE;OS_VARIABLE=DUMMY_OS"
+          variables: "SOME_DUMMY_VARIABLE=FOO_BAR_VARIABLE;OS_VARIABLE=DUMMY_OS"
