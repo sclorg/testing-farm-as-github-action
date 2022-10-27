@@ -8,7 +8,7 @@ execute:
             final_result=1
         fi
         # Test if variable $OS_VARIABLE is 'DUMMY_OS'
-        if [ "$OS_VARIABLE" == "DUMMY_OS" ]; then
+        if [ "$OS_VARIABLE" != "DUMMY_OS" ]; then
             final_result=1
         fi
         exit $final_result
