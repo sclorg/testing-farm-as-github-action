@@ -1,4 +1,8 @@
 summary: Basic smoke test
 execute:
     how: tmt
-    script: echo $((11*11)) > testfile
+    script: |
+        set +x
+        echo "Set 11*11 to testfile"
+        echo $((11*11)) > testfile
+        cat testfile
