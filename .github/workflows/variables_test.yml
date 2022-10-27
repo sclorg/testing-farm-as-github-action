@@ -5,7 +5,7 @@ on:
 jobs:
   container-tests:
     runs-on: ubuntu-22.04
-    name: "Smoke test for testing farm as a github action"
+    name: "Variables test for testing farm as a github action"
 
     if: |
       github.event.issue.pull_request
