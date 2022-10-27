@@ -1,0 +1,28 @@
+on:
+  issue_comment:
+    types:
+      - created
+jobs:
+  container-tests:
+    runs-on: ubuntu-22.04
+    name: "Variables test for testing farm as a github action"
+
+    if: |
+      github.event.issue.pull_request
+      && contains(github.event.comment.body, '[test]')
+      && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          ref: "refs/pull/${{ github.event.issue.number }}/head"
+
+      - name: Run the tests
+        uses: ./
+        with:
+          api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
+          git_url: "https://github.com/sclorg/testing-farm-as-github-action"
+          git_ref: "main"
+          pull_request_status_name: "Variables test"
+          variables: "SOME_DUMMY_VARIABLE=FOO_BAR_VARIABLE;OS_VARIABLE=DUMMY_OS"
