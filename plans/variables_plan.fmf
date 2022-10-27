@@ -3,7 +3,7 @@ execute:
     how: tmt
     script: |
         final_result=0
-        # Test if variaable $SOME_DUMMY_VARIABLE is 'foo_bar_variable'
+        # Test if variable $SOME_DUMMY_VARIABLE is 'FOO_BAR_VARIABLE'
         if [ "$SOME_DUMMY_VARIABLE" != "FOO_BAR_VARIABLE" ]; then
             final_result=1
         fi
