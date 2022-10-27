@@ -112,7 +112,7 @@ runs:
             exit 1
           fi
         fi
-        echo "::set-output name=SHA::$_sha"
+        echo "SHA=$_sha" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Set artifacts url
@@ -122,35 +122,35 @@ runs:
         if [ "${{ inputs.tf_scope }}" == "private" ]; then
           url="http://artifacts.osci.redhat.com/testing-farm"
         fi
-        echo "::set-output name=url::$url"
+        echo "url=$url" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate tmt variables
       id: generate_tmt_vars
       run: |
         python -c 'import json; print({} if not "${{ inputs.variables }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.variables }}".split(";")]}))' > variables
-        echo "::set-output name=TMT_ENV_VARS::$(cat variables)"
+        echo "TMT_ENV_VARS=$(cat variables)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate tmt secrets
       id: generate_tmt_secrets
       run: |
         python -c 'import json; print({} if not "${{ inputs.secrets }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.secrets }}".split(";")]}))' > secrets
-        echo "::set-output name=TMT_ENV_SECRETS::$(cat secrets)"
+        echo "TMT_ENV_SECRETS=$(cat secrets)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate tmt artifacts
       id: generate_artifacts
       run: |
         python -c 'import json;print("" if not "${{ inputs.copr_artifacts }}".strip() else "\"artifacts\"" + ": " + json.dumps(([{"type": "fedora-copr-build", "id": "{}:${{ inputs.copr }}".format(copr_id)} for copr_id in "${{ inputs.copr_artifacts }}".split(";")])) + ",")' > copr_artifacts
-        echo "::set-output name=TMT_ENV_ARTIFACTS::$(cat copr_artifacts)"
+        echo "TMT_ENV_ARTIFACTS=$(cat copr_artifacts)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate tmt context
       id: generate_context
       run: |
         python -c 'import json; print({} if not "${{ inputs.tmt_context }}".strip() else json.dumps({key: value for key, value in [s.split("=", 1) for s in "${{ inputs.tmt_context }}".split(";")]}))' > tmt_context
-        echo "::set-output name=TMT_CONTEXT::$(cat tmt_context)"
+        echo "TMT_CONTEXT=$(cat tmt_context)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Schedule a test on Testing Farm
@@ -201,7 +201,7 @@ runs:
         # information from first run only is used.
         # NOTE(ivasilev) Target url may not be available at this moment if the job is still queued, so
         # will rather construct one from artifact_url and id as it has predictable format
-        echo "::set-output name=req_id::$req_id"
+        echo "req_id=$req_id" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Switch pull request state to running
@@ -281,9 +281,9 @@ runs:
         fi
         echo "New State is: $new_state"
         echo "Infra state is: $infra_error"
-        echo "::set-output name=FINAL_STATE::$new_state"
-        echo "::set-output name=INFRA_STATE::$infra_error"
-        echo "::set-output name=LOG::$log"
+        echo "FINAL_STATE=$new_state" >> $GITHUB_OUTPUT
+        echo "INFRA_STATE=$infra_error" >> $GITHUB_OUTPUT
+        echo "LOG=$log" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Switch pull request GitHub status to final state
