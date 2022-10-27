@@ -24,5 +24,6 @@ jobs:
           api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
           git_url: "https://github.com/sclorg/testing-farm-as-github-action"
           git_ref: "main"
+          tmt_plan_regex: "variables_plan"
           pull_request_status_name: "Variables test"
           variables: "SOME_DUMMY_VARIABLE=FOO_BAR_VARIABLE;OS_VARIABLE=DUMMY_OS"

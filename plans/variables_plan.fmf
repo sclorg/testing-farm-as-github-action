@@ -2,13 +2,20 @@ summary: Basic variables test
 execute:
     how: tmt
     script: |
+        set +x
+        echo "Set final_result to 0 as initial value"
         final_result=0
         # Test if variable $SOME_DUMMY_VARIABLE is 'FOO_BAR_VARIABLE'
+        echo "Test if variable SOME_DUMMY_VARIABLE equals to FOO_BAR_VARIABLE"
         if [ "$SOME_DUMMY_VARIABLE" != "FOO_BAR_VARIABLE" ]; then
+            echo "$SOME_DUMMY_VARIABLE does not equal to FOO_BAR_VARIABLE"
             final_result=1
         fi
         # Test if variable $OS_VARIABLE is 'DUMMY_OS'
+        echo "Test if variable OS_VARIABLE equals DUMMY_OS"
         if [ "$OS_VARIABLE" != "DUMMY_OS" ]; then
+            echo "$OS_VARIABLE does not equal to DUMMY_OS"
             final_result=1
         fi
+        echo "Final result is $final_result."
         exit $final_result
