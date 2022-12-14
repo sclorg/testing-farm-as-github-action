@@ -122,9 +122,6 @@ jobs:
     runs-on: ubuntu-20.04
     # Let's tests the repository when pull request is merged
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
       - name: Schedule test on Testing Farm
         uses: sclorg/testing-farm-as-github-action@v1
         with:
