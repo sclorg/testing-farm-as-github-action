@@ -69,6 +69,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 
 ## Example
 
+### Pull request example
 The example below shows how the `sclorg/testing-farm-as-github-action` action can be used to schedule tests on Testing Farm.
 
 ```yaml
@@ -105,3 +106,27 @@ jobs:
 and as soon as the job is finished you will see the test results in the pull request status:
 
 ✅ | ❌ Testing Farm - CentOS 7 - Build finished
+
+### Run workflow at push to the main branch.
+The example below shows how the `sclorg/testing-farm-as-github-action` action can be used when pull request is merged.
+
+```yaml
+name: Testing repository by Testing Farm when pull request is merged
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    # Let's tests the repository when pull request is merged
+    steps:
+      - name: Schedule test on Testing Farm
+        uses: sclorg/testing-farm-as-github-action@v1
+        with:
+          api_key: ${{ secrets.TF_API_KEY }}
+          git_url: https://github.com/sclorg/sclorg-testing-farm
+          tmt_plan_regex: "centos"
+          update_pull_request_status: "false"
+```
