@@ -87,8 +87,8 @@ Create a directory `.github/workflows` in your GitHub repository.
 ### Testing pull request changes via Testing Farm
 
 Create a file like `testing-farm-pr.yml`
-The file can look like as is mentioned in [README.md](https://github.com/sclorg/testing-farm-as-github-action#example)
+The file can look like as is mentioned in [README.md](https://github.com/sclorg/testing-farm-as-github-action#pull-request-example)
 
 ### Testing or other actions performed at push to the main branch.
 Create a file like `testing-farm-merge.yml`
-The file can look like as is mentioned in [README.md](https://github.com/sclorg/testing-farm-as-github-action#example)
+The file can look like as is mentioned in [README.md](https://github.com/sclorg/testing-farm-as-github-action#run-workflow-at-push-to-the-main-branch)
