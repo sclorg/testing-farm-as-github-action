@@ -55,12 +55,6 @@ prepare:
       script: |
         # install packages on guest system
 
-    - name: Install packages on machine by ansible
-      how: ansible
-      playbook:
-        - ansible-plan.yml
-      extra-args: -vv
-
     - name: Clone repo and switch to the PR
       how: shell
       script: |
