@@ -17,7 +17,7 @@ In your GitHub or GitLab repos create:
 * [.fmf](https://github.com/sclorg/sclorg-testing-farm/tree/main/.fmf) directory with file [version](https://github.com/sclorg/sclorg-testing-farm/blob/main/.fmf/version) which contains 1.
 * [plans](https://github.com/sclorg/sclorg-testing-farm/tree/main/plans) directory which will contain TMT plans for Testing Farm.
 * create a TMT plan like it is already done here [c9s](https://github.com/sclorg/sclorg-testing-farm/blob/main/plans/c9s.fmf).
-* The TMT plan contains instructions how to setup, install and execute tests on quest provided by Testing Farm. For more information see [documentation](https://tmt.readthedocs.io/en/stable/examples.html#plans) or take an inspiration from our [plans](https://github.com/sclorg/sclorg-testing-farm/tree/main/plans) directory.
+* The TMT plan contains instructions how to setup, install and execute tests on guest provided by Testing Farm. For more information see [documentation](https://tmt.readthedocs.io/en/stable/examples.html#plans) or take an inspiration from our [plans](https://github.com/sclorg/sclorg-testing-farm/tree/main/plans) directory.
 
 To create a TMT plan by `tmt` tool, run a command:
 ```bash
