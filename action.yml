@@ -327,3 +327,11 @@ runs:
                   '[here](${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/).' +
                   '\n[Full pipeline log](${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/pipeline.log).'
           })
+
+    - name: Exit with error in case of failure in test
+      shell: bash
+      run: |
+        final_state="${{ steps.final_state.outputs.FINAL_STATE }}"
+        if [ "$final_state" == failure ]; then
+          exit 1
+        fi
