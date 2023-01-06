@@ -66,6 +66,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
 | `environment_settings` | Pass custom settings to the test environment. Default: {} | empty |
 | `pr_head_sha` | SHA of the latest commit in PR. Used for communication with GitHub API. | $(git rev-parse HEAD) |
+| `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 
 ## Example
 

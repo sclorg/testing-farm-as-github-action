@@ -55,6 +55,10 @@ inputs:
     description: 'Action will update pull request status. Default: true'
     required: false
     default: 'true'
+  create_github_summary:
+    description: 'Action will create github summary. Possible options: "false", "true", "key=value"'
+    required: false
+    default: 'true'
   arch:
     description: 'Define an architecture for testing environment. Default: x86_64'
     required: false
@@ -328,6 +332,34 @@ runs:
                   '[here](${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/).' +
                   '\n[Full pipeline log](${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/pipeline.log).'
           })
+
+    - name: Create github summary
+      if: ${{ inputs.create_github_summary != 'false' }}
+      shell: bash
+      run: |
+        if [ -z "${{ steps.final_state.outputs.INFRA_STATE }}" ]; then
+          infra_state=OK
+        else
+          infra_state=Failed
+        fi
+        user_summary="${{ inputs.create_github_summary }}"
+        if [ "$user_summary" != 'true' ]; then
+          # In this case we expect key=value string inside
+          # 'create_github_summary' input.
+          # We obtain from it a table column and insert it to the GITHUB_STEP_SUMMARY.
+          user_key="${user_summary%%=*}|"
+          user_value="${user_summary##*=}|"
+          user_line="--|"
+        fi
+        tfaga_summary_header="Testing Farm as a GitHub Action summary:"
+        if  ! cat "$GITHUB_STEP_SUMMARY" | grep "$tfaga_summary_header" > /dev/null; then
+          echo "$tfaga_summary_header" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Compose | Arch | $user_key Infrastructure State | Test result | Link to logs |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---------|------| $user_line ----------------------|-------------|--------------|" >> "$GITHUB_STEP_SUMMARY"
+        fi
+        echo "|${{ inputs.compose }}|${{ inputs.arch }}| $user_value $infra_state |"\
+             " ${{ steps.final_state.outputs.FINAL_STATE }}|"\
+             "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}|" >> "$GITHUB_STEP_SUMMARY"
 
     - name: Exit with error in case of failure in test
       shell: bash
