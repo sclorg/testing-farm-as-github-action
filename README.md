@@ -45,7 +45,7 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
-| `compose` | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) | Fedora |
+| `compose` | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) | Fedora-latest |
 | `arch` | Define an architecture for testing environment | x86_64 |
 | `variables` | Environment variables for test env, separated by ; | empty |
 | `secrets` | Environment secrets for test env, separated by ; | empty |
