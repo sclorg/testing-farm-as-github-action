@@ -267,7 +267,7 @@ runs:
         state=$(jq -r .state job.json)
         result=$(jq -r .result.overall job.json)
         new_state="success"
-        infra_error=" "
+        infra_error=""
         log=""
         echo "State is $state and result is: $result"
         if [ "$state" == "complete" ]; then
@@ -276,7 +276,7 @@ runs:
           fi
         else
           # Mark job in case of infrastructure issues. Report to Testing Farm team
-          infra_error=" - Infra problems"
+          infra_error="- Infra problems"
           new_state="failure"
           log="pipeline.log"
         fi
@@ -295,7 +295,7 @@ runs:
           "sha": "${{ steps.sha_value.outputs.SHA }}",
           "state": "${{ steps.final_state.outputs.FINAL_STATE }}",
           "context": "Testing Farm - ${{ inputs.pull_request_status_name }}",
-          "description": "Build finished${{ steps.final_state.outputs.INFRA_STATE }}",
+          "description": "Build finished ${{ steps.final_state.outputs.INFRA_STATE }}",
           "target_url": "${{ steps.artifacts_url.outputs.url }}/${{ steps.sched_test.outputs.req_id }}/${{ steps.final_state.outputs.LOG }}"
         }
         EOF
