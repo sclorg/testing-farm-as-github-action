@@ -26,4 +26,4 @@ jobs:
           git_ref: "main"
           tmt_plan_regex: "smoke_plan"
           pull_request_status_name: "GitHub summary test"
-          create_github_summary: "true"
+          create_github_summary: "user_defined_key=user_defined_value"
