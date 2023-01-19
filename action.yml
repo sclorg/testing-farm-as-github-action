@@ -319,7 +319,7 @@ runs:
     - name: Add comment with Testing Farm request/result to Pull Request
       if: ${{ inputs.create_issue_comment == 'true' }}
       id: github_comment
-      uses: actions/github-script@v4
+      uses: actions/github-script@v6
       with:
         script: |
           github.issues.createComment({
