@@ -237,7 +237,6 @@ runs:
 
     - name: Check if scheduled test is still running
       id: still_running
-      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         CMD=${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }}
         curl $CMD > job.json
@@ -259,7 +258,6 @@ runs:
 
     - name: Get final state of Testing Farm scheduled request
       id: final_state
-      if: ${{ inputs.update_pull_request_status == 'true' }}
       run: |
         curl ${{ inputs.api_url }}/requests/${{ steps.sched_test.outputs.req_id }} > job.json
         if [ "${{ inputs.debug }}" == "true" ]; then
