@@ -1,0 +1,54 @@
+{
+  "name": "testing-farm-as-github-action",
+  "version": "2.0.0",
+  "description": "A GitHub action will schedule a user defined tests to the Testing Farm to run tmt tests",
+  "main": "src/main.ts",
+  "type": "module",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
+    "lint": "eslint src/**/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "vitest run --coverage",
+    "update-snapshots": "vitest run --update",
+    "all": "yarn && yarn run build && yarn run format && yarn run lint && yarn run package && yarn test"
+  },
+  "packageManager": "yarn@3.6.4",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sclorg/testing-farm-as-github-action.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sclorg/testing-farm-as-github-action/issues"
+  },
+  "homepage": "https://github.com/sclorg/testing-farm-as-github-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
+    "@octokit/core": "^5.0.1",
+    "@octokit/rest": "^20.0.2",
+    "@octokit/types": "^12.2.0",
+    "testing-farm": "^1.5.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/node": "^20.9.0",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vercel/ncc": "^0.38.1",
+    "@vitest/coverage-v8": "^0.34.6",
+    "eslint": "^8.53.0",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6",
+    "vitest-fetch-mock": "^0.2.2"
+  }
+}
