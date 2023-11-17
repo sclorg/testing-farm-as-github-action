@@ -26,15 +26,8 @@ import {
   tmtEnvVarsSchema,
 } from './schema/input';
 
-async function action(
-  octokit: Octokit,
-  mock?: {
-    context: typeof context;
-  }
-): Promise<void> {
-  const githubContext = mock?.context ?? context;
-
-  const pr = await PullRequest.initialize(githubContext.issue.number, octokit);
+async function action(octokit: Octokit): Promise<void> {
+  const pr = await PullRequest.initialize(context.issue.number, octokit);
 
   const tfInstance = getInput('api_url');
 

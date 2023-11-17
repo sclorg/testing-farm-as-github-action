@@ -1,5 +1,10 @@
 # testing-farm-as-github-action
 
+[![codecov][codecov-status]][codecov]
+
+[codecov]: https://codecov.io/github/sclorg/testing-farm-as-github-action
+[codecov-status]: https://codecov.io/github/sclorg/testing-farm-as-github-action/graph/badge.svg
+
 Testing Farm as GitHub Action is a GitHub Action for executing tests on the [Testing Farm Service](https://docs.testing-farm.io).
 
 The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs.io/en/latest/spec.html) by the user of this GitHub Action.

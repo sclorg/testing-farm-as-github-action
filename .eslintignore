@@ -2,5 +2,6 @@ dist/
 lib/
 node_modules/
 tests/
+__mocks__/
 
 vite.config.ts

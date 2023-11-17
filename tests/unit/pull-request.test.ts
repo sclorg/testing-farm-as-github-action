@@ -1,8 +1,12 @@
-// This file contains unit tests for Pull Request class.
+/** This file contains unit tests for Pull Request class.
+ * vitest general documentation - https://vitest.dev/
+ * vi API documentation (mocking) - https://vitest.dev/api/vi.html#vi
+ */
 import { Octokit } from '@octokit/core';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PullRequest } from '../../src/pull-request';
+import { afterEach } from 'node:test';
 
 const octokit = {
   request: (
@@ -79,9 +83,15 @@ interface TestContext {
 describe('Pull Request class', () => {
   beforeEach<TestContext>(async context => {
     // populate context.repo object
-    process.env['GITHUB_REPOSITORY'] = 'sclorg/testing-farm-as-github-action';
+    vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
+    // simulate pull_request_status_name input
+    vi.stubEnv('INPUT_PULL_REQUEST_STATUS_NAME', 'Fedora');
 
     context.pr = await PullRequest.initialize(1, octokit);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it<TestContext>('can be instantiated', async context => {
@@ -96,9 +106,6 @@ describe('Pull Request class', () => {
   });
 
   it<TestContext>('can set status', async context => {
-    // simulate pull_request_status_name input
-    process.env['INPUT_PULL_REQUEST_STATUS_NAME'] = 'Fedora';
-
     await context.pr.setStatus('success', 'some description', 'some url');
   });
 });

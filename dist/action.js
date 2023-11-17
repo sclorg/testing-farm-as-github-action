@@ -4,10 +4,8 @@ import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 import { PullRequest } from './pull-request';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, } from './schema/input';
-async function action(octokit, mock) {
-    var _a;
-    const githubContext = (_a = mock === null || mock === void 0 ? void 0 : mock.context) !== null && _a !== void 0 ? _a : context;
-    const pr = await PullRequest.initialize(githubContext.issue.number, octokit);
+async function action(octokit) {
+    const pr = await PullRequest.initialize(context.issue.number, octokit);
     const tfInstance = getInput('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value

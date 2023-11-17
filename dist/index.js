@@ -42268,10 +42268,8 @@ const timeoutSchema = z.coerce.number();
 
 
 
-async function action(octokit, mock) {
-    var _a;
-    const githubContext = (_a = mock === null || mock === void 0 ? void 0 : mock.context) !== null && _a !== void 0 ? _a : github.context;
-    const pr = await PullRequest.initialize(githubContext.issue.number, octokit);
+async function action(octokit) {
+    const pr = await PullRequest.initialize(github.context.issue.number, octokit);
     const tfInstance = (0,core.getInput)('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
