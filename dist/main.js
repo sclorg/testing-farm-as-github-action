@@ -18,6 +18,7 @@ catch (error) {
     else {
         message = JSON.stringify(error);
     }
+    // Log the error and set the action status to failed
     setFailed(message);
 }
 //# sourceMappingURL=main.js.map

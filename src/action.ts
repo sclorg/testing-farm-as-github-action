@@ -223,8 +223,7 @@ async function action(octokit: Octokit): Promise<void> {
         'copr_artifacts'
       )} regression testing has been created.` +
         `Once finished, results should be available [here](${tfArtifactUrl}/${tfResponse.id}/).\n` +
-        `[Full pipeline log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log).`,
-      octokit
+        `[Full pipeline log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log).`
     );
   }
 
