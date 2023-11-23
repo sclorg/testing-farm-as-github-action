@@ -42450,10 +42450,12 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 
 
 
-const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_2__.Octokit({
-    auth: (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }),
-});
 try {
+    const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_2__.Octokit({
+        auth: (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }),
+    });
+    // Call the action function from action.ts
+    // all the code should be inside this try block
     await (0,_action__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .Z)(octokit);
 }
 catch (error) {

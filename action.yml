@@ -84,7 +84,7 @@ inputs:
     required: false
     default: ''
   timeout:
-    description: 'Action is waiting for testing farm to finish or until timeout is reached.'
+    description: 'Action is waiting for testing farm to finish or until timeout is reached. Value is in minutes.'
     required: false
     default: '480'
 
