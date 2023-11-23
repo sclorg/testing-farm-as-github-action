@@ -23,8 +23,10 @@ Alternatively, the HEAD SHA of the Pull Request can be provided as a `pr_head_sh
 
 ## Compatibility Notes
 
-⚠ Currently only testing of copr builds is supported by the action.
-See [Testing Farm docs](https://docs.testing-farm.io) for more information on supported test artifacts which Testing Farm can install into the environment.
+> [!IMPORTANT]
+>
+> Currently only testing of copr builds is supported by the action.
+> See [Testing Farm docs](https://docs.testing-farm.io) for more information on supported test artifacts which Testing > > Farm can install into the environment.
 
 ## Action Inputs
 
