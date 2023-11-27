@@ -9,7 +9,7 @@ export declare const requestSchema: z.ZodObject<{
 export type Request = z.infer<typeof requestSchema>;
 export declare const requestDetailsSchema: z.ZodObject<{
     state: z.ZodString;
-    result: z.ZodObject<{
+    result: z.ZodNullable<z.ZodObject<{
         summary: z.ZodUnion<[z.ZodString, z.ZodNull]>;
         overall: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -18,18 +18,18 @@ export declare const requestDetailsSchema: z.ZodObject<{
     }, {
         summary: string | null;
         overall: string;
-    }>;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     state: string;
     result: {
         summary: string | null;
         overall: string;
-    };
+    } | null;
 }, {
     state: string;
     result: {
         summary: string | null;
         overall: string;
-    };
+    } | null;
 }>;
 export type RequestDetails = z.infer<typeof requestDetailsSchema>;

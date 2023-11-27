@@ -4,9 +4,11 @@ export const requestSchema = z.object({
 });
 export const requestDetailsSchema = z.object({
     state: z.string(),
-    result: z.object({
+    result: z
+        .object({
         summary: z.union([z.string(), z.null()]),
         overall: z.string(),
-    }),
+    })
+        .nullable(),
 });
 //# sourceMappingURL=testing-farm-api.js.map
