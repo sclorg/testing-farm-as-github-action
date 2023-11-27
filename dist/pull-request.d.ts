@@ -20,7 +20,7 @@ export declare class PullRequest {
      * @param description - The description of the status
      * @param url - The URL to link to from the status
      */
-    setStatus(state: Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['parameters']['state'], description: string, url: string): Promise<void>;
+    setStatus(state: Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['parameters']['state'], description: string, url?: string): Promise<void>;
     /**
      * Comment on the Pull Request using the GitHub API.
      * @param body - The body of the comment
