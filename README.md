@@ -1,5 +1,10 @@
 # testing-farm-as-github-action
 
+[![codecov][codecov-status]][codecov]
+
+[codecov]: https://codecov.io/github/sclorg/testing-farm-as-github-action
+[codecov-status]: https://codecov.io/github/sclorg/testing-farm-as-github-action/graph/badge.svg
+
 Testing Farm as GitHub Action is a GitHub Action for executing tests on the [Testing Farm Service](https://docs.testing-farm.io).
 
 The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs.io/en/latest/spec.html) by the user of this GitHub Action.
@@ -16,11 +21,12 @@ Setting `update_pull_request_status` input to `true` requires information of Pul
 Therefore before calling this GitHub Action, the GitHub repo must be first cloned and checked out on the Pull Request, in order to obtain the correct SHA value of Pull Request's HEAD commit.
 Alternatively, the HEAD SHA of the Pull Request can be provided as a `pr_head_sha` input.
 
-
 ## Compatibility Notes
 
-⚠ Currently only testing of copr builds is supported by the action.
-See [Testing Farm docs](https://docs.testing-farm.io) for more information on supported test artifacts which Testing Farm can install into the environment.
+> [!IMPORTANT]
+>
+> Currently only testing of copr builds is supported by the action.
+> See [Testing Farm docs](https://docs.testing-farm.io) for more information on supported test artifacts which Testing > > Farm can install into the environment.
 
 ## Action Inputs
 
@@ -51,12 +57,14 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `secrets` | Environment secrets for test env, separated by ; | empty |
 
 ### Test Artifacts
+
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
 | `copr` | Copr name to use for the artifacts | epel-7-x86_64 |
 | `copr_artifacts` | `fedora-copr-build` artifacts for testing environment, separated by ; | empty |
 
 ### Miscellaneous
+
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
 | `github_token` | Github token passed from secrets | `${{ github.token }}` |
@@ -67,10 +75,12 @@ See [Testing Farm docs](https://docs.testing-farm.io) for more information on su
 | `environment_settings` | Pass custom settings to the test environment. Default: {} | empty |
 | `pr_head_sha` | SHA of the latest commit in PR. Used for communication with GitHub API. | $(git rev-parse HEAD) |
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
+| `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
 
 ## Example
 
 ### Pull request example
+
 The example below shows how the `sclorg/testing-farm-as-github-action` action can be used to schedule tests on Testing Farm.
 
 ```yaml
@@ -108,7 +118,8 @@ and as soon as the job is finished you will see the test results in the pull req
 
 ✅ | ❌ Testing Farm - CentOS 7 - Build finished
 
-### Run workflow at push to the main branch.
+### Run workflow at push to the main branch
+
 The example below shows how the `sclorg/testing-farm-as-github-action` action can be used when pull request is merged.
 
 ```yaml
