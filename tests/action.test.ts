@@ -187,22 +187,10 @@ describe('Integration test', () => {
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({
-        state: 'new',
-        result: { overall: '', summary: null },
-      })
-      .mockResolvedValueOnce({
-        state: 'queued',
-        result: { overall: '', summary: null },
-      })
-      .mockResolvedValueOnce({
-        state: 'pending',
-        result: { overall: '', summary: null },
-      })
-      .mockResolvedValueOnce({
-        state: 'running',
-        result: { overall: '', summary: null },
-      })
+      .mockResolvedValueOnce({ state: 'new', result: null })
+      .mockResolvedValueOnce({ state: 'queued', result: null })
+      .mockResolvedValueOnce({ state: 'pending', result: null })
+      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },

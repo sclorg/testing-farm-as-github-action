@@ -186,7 +186,7 @@ async function action(pr: PullRequest): Promise<void> {
 
   // Get final state of Testing Farm scheduled request
   const state = tfResult.state;
-  const result = tfResult.result.overall;
+  const result = tfResult.result ? tfResult.result.overall : 'unknown';
   let finalState: Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['parameters']['state'] =
     'success' as const;
   let infraError = '';
@@ -264,7 +264,13 @@ async function action(pr: PullRequest): Promise<void> {
 
   // Exit with error in case of failure in test
   if (finalState === 'failure') {
-    throw new Error(`Testing Farm test failed - ${tfResult.result.summary}`);
+    throw new Error(
+      `Testing Farm test failed - ${
+        tfResult.result
+          ? tfResult.result.summary ?? 'No summary provided'
+          : 'No summary provided'
+      }`
+    );
   }
 }
 
