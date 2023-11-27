@@ -1,11 +1,9 @@
 import { debug, getBooleanInput, getInput, notice, setOutput, summary, } from '@actions/core';
-import { context } from '@actions/github';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
-import { PullRequest } from './pull-request';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, } from './schema/input';
-async function action(octokit) {
-    const pr = await PullRequest.initialize(context.issue.number, octokit);
+import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
+async function action(pr) {
     const tfInstance = getInput('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
@@ -66,12 +64,13 @@ async function action(octokit) {
         ],
     };
     // The strict mode should be enabled once https://github.com/redhat-plumbers-in-action/testing-farm/issues/71 is fixed
-    const tfResponse = (await api.newRequest(request, false));
+    const tfResponseRaw = await api.newRequest(request, false);
     // Remove all secrets from request before printing it
     delete request.api_key;
     request.environments.map((env) => delete env.secrets);
     debug(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
-    debug(`Testing Farm response: ${JSON.stringify(tfResponse, null, 2)}`);
+    debug(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
+    const tfResponse = requestSchema.parse(tfResponseRaw);
     // Create Pull Request status in state pending
     const usePullRequestStatuses = getBooleanInput('update_pull_request_status');
     if (usePullRequestStatuses) {
@@ -87,7 +86,7 @@ async function action(octokit) {
     // Ask Testing Farm every 30 seconds
     debug(`Testing Farm - waiting for results (timeout: ${timeout} minutes)`);
     do {
-        tfResult = await api.requestDetails(tfResponse.id);
+        tfResult = requestDetailsSchema.parse(await api.requestDetails(tfResponse.id, false));
         if (tfResult.state !== 'running' &&
             tfResult.state !== 'new' &&
             tfResult.state !== 'pending' &&

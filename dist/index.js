@@ -33225,7 +33225,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 6474:
+/***/ 2286:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -33245,8 +33245,6 @@ __nccwpck_require__.d(common_utils_namespaceObject, {
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./node_modules/axios/lib/helpers/bind.js
 
 
@@ -42176,54 +42174,6 @@ class TestingFarmAPI {
 //# sourceMappingURL=index.js.map
 ;// CONCATENATED MODULE: external "timers/promises"
 const promises_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("timers/promises");
-;// CONCATENATED MODULE: ./src/pull-request.ts
-
-
-/**
- * Class for holding information about a Pull Request and interacting with it via the GitHub API.
- */
-class PullRequest {
-    /**
-     * PullRequest constructor, it's not meant to be called directly, use the static initialize method instead.
-     * @param number - The Pull Request number
-     * @param sha - The head sha of the Pull Request
-     * @param octokit - The Octokit instance to use for interacting with the GitHub API
-     */
-    constructor(number, sha, octokit) {
-        this.number = number;
-        this.sha = sha;
-        this.octokit = octokit;
-    }
-    /**
-     * Set the Pull Request status using the GitHub API.
-     * @param state - The state of the status, can be one of error, failure, pending or success
-     * @param description - The description of the status
-     * @param url - The URL to link to from the status
-     */
-    async setStatus(state, description, url) {
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, github.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,core.getInput)('pull_request_status_name')}`, description, target_url: url }));
-        (0,core.debug)(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
-    }
-    /**
-     * Comment on the Pull Request using the GitHub API.
-     * @param body - The body of the comment
-     */
-    async addComment(body) {
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, github.context.repo), { issue_number: this.number, body }));
-        (0,core.debug)(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
-    }
-    /**
-     * Initialize a PullRequest instance using data fetched from GitHub API.
-     * @param number - The Pull Request number
-     * @param octokit - The Octokit instance to use for interacting with the GitHub API
-     * @returns A Promise that resolves to a PullRequest instance
-     */
-    static async initialize(number, octokit) {
-        const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', Object.assign(Object.assign({}, github.context.repo), { pull_number: number }));
-        return new this(data.number, data.head.sha, octokit);
-    }
-}
-
 ;// CONCATENATED MODULE: ./src/schema/input.ts
 
 const tfScopeSchema = z["enum"](['public', 'private']);
@@ -42286,15 +42236,26 @@ const envSettingsSchema = z.object({
     .optional();
 const timeoutSchema = z.coerce.number();
 
+;// CONCATENATED MODULE: ./src/schema/testing-farm-api.ts
+
+const testing_farm_api_requestSchema = z.object({
+    id: z.string(),
+});
+const requestDetailsSchema = z.object({
+    state: z.string(),
+    result: z.object({
+        summary: z.union([z.string(), z["null"]()]),
+        overall: z.string(),
+    }),
+});
+
 ;// CONCATENATED MODULE: ./src/action.ts
 
 
 
 
 
-
-async function action(octokit) {
-    const pr = await PullRequest.initialize(github.context.issue.number, octokit);
+async function action(pr) {
     const tfInstance = (0,core.getInput)('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
@@ -42355,12 +42316,13 @@ async function action(octokit) {
         ],
     };
     // The strict mode should be enabled once https://github.com/redhat-plumbers-in-action/testing-farm/issues/71 is fixed
-    const tfResponse = (await api.newRequest(request, false));
+    const tfResponseRaw = await api.newRequest(request, false);
     // Remove all secrets from request before printing it
     delete request.api_key;
     request.environments.map((env) => delete env.secrets);
     (0,core.debug)(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
-    (0,core.debug)(`Testing Farm response: ${JSON.stringify(tfResponse, null, 2)}`);
+    (0,core.debug)(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
+    const tfResponse = testing_farm_api_requestSchema.parse(tfResponseRaw);
     // Create Pull Request status in state pending
     const usePullRequestStatuses = (0,core.getBooleanInput)('update_pull_request_status');
     if (usePullRequestStatuses) {
@@ -42376,7 +42338,7 @@ async function action(octokit) {
     // Ask Testing Farm every 30 seconds
     (0,core.debug)(`Testing Farm - waiting for results (timeout: ${timeout} minutes)`);
     do {
-        tfResult = await api.requestDetails(tfResponse.id);
+        tfResult = requestDetailsSchema.parse(await api.requestDetails(tfResponse.id, false));
         if (tfResult.state !== 'running' &&
             tfResult.state !== 'new' &&
             tfResult.state !== 'pending' &&
@@ -42468,20 +42430,27 @@ async function action(octokit) {
 __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6762);
-/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6474);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(6762);
+/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(2286);
+/* harmony import */ var _pull_request__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4773);
 
 
 
 
+
+
+let pr = undefined;
 try {
-    const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_2__.Octokit({
+    const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_4__.Octokit({
         auth: (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }),
     });
+    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_3__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
     // Call the action function from action.ts
     // all the code should be inside this try block
-    await (0,_action__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .Z)(octokit);
+    await (0,_action__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Z)(pr);
 }
 catch (error) {
     let message;
@@ -42491,12 +42460,76 @@ catch (error) {
     else {
         message = JSON.stringify(error);
     }
+    // Set the Pull Request status to error when error occurs
+    if (pr) {
+        await pr.setStatus('error', `Error occurred: ${message.slice(0, 30)}`);
+    }
     // Log the error and set the action status to failed
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(message);
 }
 
 __webpack_async_result__();
 } catch(e) { __webpack_async_result__(e); } }, 1);
+
+/***/ }),
+
+/***/ 4773:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "i": () => (/* binding */ PullRequest)
+/* harmony export */ });
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
+
+
+/**
+ * Class for holding information about a Pull Request and interacting with it via the GitHub API.
+ */
+class PullRequest {
+    /**
+     * PullRequest constructor, it's not meant to be called directly, use the static initialize method instead.
+     * @param number - The Pull Request number
+     * @param sha - The head sha of the Pull Request
+     * @param octokit - The Octokit instance to use for interacting with the GitHub API
+     */
+    constructor(number, sha, octokit) {
+        this.number = number;
+        this.sha = sha;
+        this.octokit = octokit;
+    }
+    /**
+     * Set the Pull Request status using the GitHub API.
+     * @param state - The state of the status, can be one of error, failure, pending or success
+     * @param description - The description of the status
+     * @param url - The URL to link to from the status
+     */
+    async setStatus(state, description, url) {
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pull_request_status_name')}`, description, target_url: url }));
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
+    }
+    /**
+     * Comment on the Pull Request using the GitHub API.
+     * @param body - The body of the comment
+     */
+    async addComment(body) {
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { issue_number: this.number, body }));
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
+    }
+    /**
+     * Initialize a PullRequest instance using data fetched from GitHub API.
+     * @param number - The Pull Request number
+     * @param octokit - The Octokit instance to use for interacting with the GitHub API
+     * @returns A Promise that resolves to a PullRequest instance
+     */
+    static async initialize(number, octokit) {
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { pull_number: number }));
+        return new this(data.number, data.head.sha, octokit);
+    }
+}
+
 
 /***/ }),
 
