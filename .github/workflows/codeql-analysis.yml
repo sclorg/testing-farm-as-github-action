@@ -5,8 +5,6 @@ on:
     branches: [ main, typescript ]
   pull_request:
     branches: [ main, typescript ]
-  schedule:
-    - cron: '31 7 * * 3'
 
 permissions:
   contents: read
