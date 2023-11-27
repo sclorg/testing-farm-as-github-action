@@ -14,6 +14,7 @@ import {
 
 import action from '../src/action';
 import { NewRequest } from 'testing-farm';
+import { PullRequest } from '../src/pull-request';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -208,11 +209,10 @@ describe('Integration test', () => {
       });
 
     // Run action
-    await action(
-      new Octokit({
-        auth: 'mock-token',
-      })
-    );
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(1, octokit);
+
+    await action(pr);
 
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);

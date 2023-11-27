@@ -6,8 +6,6 @@ import {
   setOutput,
   summary,
 } from '@actions/core';
-import { context } from '@actions/github';
-import { Octokit } from '@octokit/core';
 import { Endpoints } from '@octokit/types';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
@@ -31,9 +29,7 @@ import {
   requestSchema,
 } from './schema/testing-farm-api';
 
-async function action(octokit: Octokit): Promise<void> {
-  const pr = await PullRequest.initialize(context.issue.number, octokit);
-
+async function action(pr: PullRequest): Promise<void> {
   const tfInstance = getInput('api_url');
 
   const api = new TestingFarmAPI(tfInstance);

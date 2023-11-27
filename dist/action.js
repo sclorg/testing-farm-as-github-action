@@ -1,12 +1,9 @@
 import { debug, getBooleanInput, getInput, notice, setOutput, summary, } from '@actions/core';
-import { context } from '@actions/github';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
-import { PullRequest } from './pull-request';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
-async function action(octokit) {
-    const pr = await PullRequest.initialize(context.issue.number, octokit);
+async function action(pr) {
     const tfInstance = getInput('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
