@@ -14,6 +14,7 @@ import {
 
 import action from '../src/action';
 import { NewRequest } from 'testing-farm';
+import { PullRequest } from '../src/pull-request';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -186,21 +187,32 @@ describe('Integration test', () => {
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new' })
-      .mockResolvedValueOnce({ state: 'queued' })
-      .mockResolvedValueOnce({ state: 'pending' })
-      .mockResolvedValueOnce({ state: 'running' })
+      .mockResolvedValueOnce({
+        state: 'new',
+        result: { overall: '', summary: null },
+      })
+      .mockResolvedValueOnce({
+        state: 'queued',
+        result: { overall: '', summary: null },
+      })
+      .mockResolvedValueOnce({
+        state: 'pending',
+        result: { overall: '', summary: null },
+      })
+      .mockResolvedValueOnce({
+        state: 'running',
+        result: { overall: '', summary: null },
+      })
       .mockResolvedValueOnce({
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
       });
 
     // Run action
-    await action(
-      new Octokit({
-        auth: 'mock-token',
-      })
-    );
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(1, octokit);
+
+    await action(pr);
 
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
