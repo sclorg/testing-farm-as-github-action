@@ -7,12 +7,14 @@ import '@total-typescript/ts-reset';
 import action from './action';
 import { PullRequest } from './pull-request';
 
+let pr: PullRequest | undefined = undefined;
+
 try {
   const octokit = new Octokit({
     auth: getInput('github_token', { required: true }),
   });
 
-  const pr = await PullRequest.initialize(context.issue.number, octokit);
+  pr = await PullRequest.initialize(context.issue.number, octokit);
 
   // Call the action function from action.ts
   // all the code should be inside this try block
@@ -24,6 +26,11 @@ try {
     message = error.message;
   } else {
     message = JSON.stringify(error);
+  }
+
+  // Set the Pull Request status to error when error occurs
+  if (pr) {
+    await pr.setStatus('error', `Error occurred: ${message.slice(0, 30)}`);
   }
 
   // Log the error and set the action status to failed

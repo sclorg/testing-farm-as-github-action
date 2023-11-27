@@ -28,7 +28,7 @@ export class PullRequest {
   async setStatus(
     state: Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['parameters']['state'],
     description: string,
-    url: string
+    url?: string
   ) {
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/statuses/{sha}',

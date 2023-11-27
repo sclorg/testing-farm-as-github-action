@@ -42442,11 +42442,12 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 
 
 
+let pr = undefined;
 try {
     const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_4__.Octokit({
         auth: (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }),
     });
-    const pr = await _pull_request__WEBPACK_IMPORTED_MODULE_3__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_3__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
     // Call the action function from action.ts
     // all the code should be inside this try block
     await (0,_action__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Z)(pr);
@@ -42458,6 +42459,10 @@ catch (error) {
     }
     else {
         message = JSON.stringify(error);
+    }
+    // Set the Pull Request status to error when error occurs
+    if (pr) {
+        await pr.setStatus('error', `Error occurred: ${message.slice(0, 30)}`);
     }
     // Log the error and set the action status to failed
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(message);
