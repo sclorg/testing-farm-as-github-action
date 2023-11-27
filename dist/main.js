@@ -24,7 +24,7 @@ catch (error) {
     }
     // Set the Pull Request status to error when error occurs
     if (pr) {
-        await pr.setStatus('error', `Error occurred: ${message.slice(0, 30)}`);
+        await pr.setStatus('error', `${message}`);
     }
     // Log the error and set the action status to failed
     setFailed(message);
