@@ -33225,7 +33225,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 6474:
+/***/ 3105:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -42286,7 +42286,21 @@ const envSettingsSchema = z.object({
     .optional();
 const timeoutSchema = z.coerce.number();
 
+;// CONCATENATED MODULE: ./src/schema/testing-farm-api.ts
+
+const testing_farm_api_requestSchema = z.object({
+    id: z.string(),
+});
+const requestDetailsSchema = z.object({
+    state: z.string(),
+    result: z.object({
+        summary: z.union([z.string(), z["null"]()]),
+        overall: z.string(),
+    }),
+});
+
 ;// CONCATENATED MODULE: ./src/action.ts
+
 
 
 
@@ -42355,12 +42369,13 @@ async function action(octokit) {
         ],
     };
     // The strict mode should be enabled once https://github.com/redhat-plumbers-in-action/testing-farm/issues/71 is fixed
-    const tfResponse = (await api.newRequest(request, false));
+    const tfResponseRaw = await api.newRequest(request, false);
     // Remove all secrets from request before printing it
     delete request.api_key;
     request.environments.map((env) => delete env.secrets);
     (0,core.debug)(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
-    (0,core.debug)(`Testing Farm response: ${JSON.stringify(tfResponse, null, 2)}`);
+    (0,core.debug)(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
+    const tfResponse = testing_farm_api_requestSchema.parse(tfResponseRaw);
     // Create Pull Request status in state pending
     const usePullRequestStatuses = (0,core.getBooleanInput)('update_pull_request_status');
     if (usePullRequestStatuses) {
@@ -42376,7 +42391,7 @@ async function action(octokit) {
     // Ask Testing Farm every 30 seconds
     (0,core.debug)(`Testing Farm - waiting for results (timeout: ${timeout} minutes)`);
     do {
-        tfResult = await api.requestDetails(tfResponse.id);
+        tfResult = requestDetailsSchema.parse(await api.requestDetails(tfResponse.id, false));
         if (tfResult.state !== 'running' &&
             tfResult.state !== 'new' &&
             tfResult.state !== 'pending' &&
@@ -42470,7 +42485,7 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6762);
 /* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6474);
+/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3105);
 
 
 

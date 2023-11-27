@@ -9,7 +9,7 @@ import {
 import { context } from '@actions/github';
 import { Octokit } from '@octokit/core';
 import { Endpoints } from '@octokit/types';
-import TestingFarmAPI, { Request } from 'testing-farm';
+import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 
 import { PullRequest } from './pull-request';
@@ -25,6 +25,11 @@ import {
   tmtEnvSecretsSchema,
   tmtEnvVarsSchema,
 } from './schema/input';
+import {
+  RequestDetails,
+  requestDetailsSchema,
+  requestSchema,
+} from './schema/testing-farm-api';
 
 async function action(octokit: Octokit): Promise<void> {
   const pr = await PullRequest.initialize(context.issue.number, octokit);
@@ -111,7 +116,7 @@ async function action(octokit: Octokit): Promise<void> {
   };
 
   // The strict mode should be enabled once https://github.com/redhat-plumbers-in-action/testing-farm/issues/71 is fixed
-  const tfResponse = (await api.newRequest(request, false)) as Request;
+  const tfResponseRaw = await api.newRequest(request, false);
 
   // Remove all secrets from request before printing it
   delete (request as Partial<typeof request>).api_key;
@@ -125,7 +130,9 @@ async function action(octokit: Octokit): Promise<void> {
       2
     )}`
   );
-  debug(`Testing Farm response: ${JSON.stringify(tfResponse, null, 2)}`);
+  debug(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
+
+  const tfResponse = requestSchema.parse(tfResponseRaw);
 
   // Create Pull Request status in state pending
   const usePullRequestStatuses = getBooleanInput('update_pull_request_status');
@@ -142,13 +149,16 @@ async function action(octokit: Octokit): Promise<void> {
   const parsedTimeout = timeoutSchema.safeParse(getInput('timeout'));
   // set timeout to 960 * 30 seconds ~ 8 hours ; timeout from input is in minutes (hence * 2)
   let timeout = parsedTimeout.success ? parsedTimeout.data * 2 : 960;
-  let tfResult: Request;
+  let tfResult: RequestDetails;
 
   // Check if scheduled test is still running
   // Ask Testing Farm every 30 seconds
   debug(`Testing Farm - waiting for results (timeout: ${timeout} minutes)`);
   do {
-    tfResult = await api.requestDetails(tfResponse.id);
+    tfResult = requestDetailsSchema.parse(
+      await api.requestDetails(tfResponse.id, false)
+    );
+
     if (
       tfResult.state !== 'running' &&
       tfResult.state !== 'new' &&
