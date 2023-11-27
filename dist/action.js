@@ -4,6 +4,7 @@ import { setTimeout } from 'timers/promises';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
+    var _a;
     const tfInstance = getInput('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
@@ -104,7 +105,7 @@ async function action(pr) {
     debug(`response:'${JSON.stringify(tfResult, null, 2)}'`);
     // Get final state of Testing Farm scheduled request
     const state = tfResult.state;
-    const result = tfResult.result.overall;
+    const result = tfResult.result ? tfResult.result.overall : 'unknown';
     let finalState = 'success';
     let infraError = '';
     let log = '';
@@ -165,7 +166,9 @@ async function action(pr) {
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new Error(`Testing Farm test failed - ${tfResult.result.summary}`);
+        throw new Error(`Testing Farm test failed - ${tfResult.result
+            ? (_a = tfResult.result.summary) !== null && _a !== void 0 ? _a : 'No summary provided'
+            : 'No summary provided'}`);
     }
 }
 export default action;
