@@ -1,6 +1,7 @@
 import { debug, getBooleanInput, getInput, notice, setOutput, summary, } from '@actions/core';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
+import { TFError } from './error';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
@@ -99,8 +100,7 @@ async function action(pr) {
         await setTimeout(interval);
     } while (timeout > 0);
     if (timeout === 0) {
-        await pr.setStatus('failure', 'Timeout reached', `${tfArtifactUrl}/${tfResponse.id}`);
-        throw new Error(`Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`);
+        throw new TFError(`Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`, `${tfArtifactUrl}/${tfResponse.id}`);
     }
     debug(`response:'${JSON.stringify(tfResult, null, 2)}'`);
     // Get final state of Testing Farm scheduled request
@@ -166,9 +166,9 @@ async function action(pr) {
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new Error(`Testing Farm test failed - ${tfResult.result
+        throw new TFError(`Testing Farm test failed - ${tfResult.result
             ? (_a = tfResult.result.summary) !== null && _a !== void 0 ? _a : 'No summary provided'
-            : 'No summary provided'}`);
+            : 'No summary provided'}`, `${tfArtifactUrl}/${tfResponse.id}`);
     }
 }
 export default action;

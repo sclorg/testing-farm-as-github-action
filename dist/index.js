@@ -42174,6 +42174,8 @@ class TestingFarmAPI {
 //# sourceMappingURL=index.js.map
 ;// CONCATENATED MODULE: external "timers/promises"
 const promises_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("timers/promises");
+// EXTERNAL MODULE: ./src/error.ts
+var error = __nccwpck_require__(6388);
 ;// CONCATENATED MODULE: ./src/schema/input.ts
 
 const tfScopeSchema = z["enum"](['public', 'private']);
@@ -42251,6 +42253,7 @@ const requestDetailsSchema = z.object({
 });
 
 ;// CONCATENATED MODULE: ./src/action.ts
+
 
 
 
@@ -42352,8 +42355,7 @@ async function action(pr) {
         await (0,promises_namespaceObject.setTimeout)(interval);
     } while (timeout > 0);
     if (timeout === 0) {
-        await pr.setStatus('failure', 'Timeout reached', `${tfArtifactUrl}/${tfResponse.id}`);
-        throw new Error(`Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`);
+        throw new error/* TFError */._(`Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`, `${tfArtifactUrl}/${tfResponse.id}`);
     }
     (0,core.debug)(`response:'${JSON.stringify(tfResult, null, 2)}'`);
     // Get final state of Testing Farm scheduled request
@@ -42418,12 +42420,33 @@ async function action(pr) {
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new Error(`Testing Farm test failed - ${tfResult.result
+        throw new error/* TFError */._(`Testing Farm test failed - ${tfResult.result
             ? (_a = tfResult.result.summary) !== null && _a !== void 0 ? _a : 'No summary provided'
-            : 'No summary provided'}`);
+            : 'No summary provided'}`, `${tfArtifactUrl}/${tfResponse.id}`);
     }
 }
 /* harmony default export */ const src_action = (action);
+
+
+/***/ }),
+
+/***/ 6388:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "_": () => (/* binding */ TFError)
+/* harmony export */ });
+/**
+ * Custom error class for TF errors.
+ * @param message - The error message
+ * @param url - The optional URL to link to Testing Farm logs
+ */
+class TFError extends Error {
+    constructor(message, url) {
+        super(message);
+        this.url = url;
+    }
+}
 
 
 /***/ }),
@@ -42436,10 +42459,12 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(6762);
-/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(6762);
+/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(2286);
-/* harmony import */ var _pull_request__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4773);
+/* harmony import */ var _error__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6388);
+/* harmony import */ var _pull_request__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(4773);
+
 
 
 
@@ -42448,10 +42473,10 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 
 let pr = undefined;
 try {
-    const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_4__.Octokit({
+    const octokit = new _octokit_core__WEBPACK_IMPORTED_MODULE_5__.Octokit({
         auth: (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }),
     });
-    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_3__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_4__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
     // Call the action function from action.ts
     // all the code should be inside this try block
     await (0,_action__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Z)(pr);
@@ -42465,8 +42490,10 @@ catch (error) {
         message = JSON.stringify(error);
     }
     // Set the Pull Request status to error when error occurs
-    if (pr) {
-        await pr.setStatus('error', `Error occurred: ${message.slice(0, 30)}`);
+    //? Note: getBooleanInput('update_pull_request_status') is used also in action(), there should be a better way to do this
+    if (pr && (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('update_pull_request_status')) {
+        const url = error instanceof _error__WEBPACK_IMPORTED_MODULE_3__/* .TFError */ ._ ? error.url : undefined;
+        await pr.setStatus('error', `${message}`, url);
     }
     // Log the error and set the action status to failed
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(message);
