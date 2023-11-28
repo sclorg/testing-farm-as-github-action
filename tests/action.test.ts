@@ -213,7 +213,7 @@ describe('Integration test', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>https://artifacts.dev.testing-farm.io/1/pipeline.log</td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[https://artifacts.dev.testing-farm.io/1/pipeline.log](pipeline.log)</td></tr></table>
 `);
 
     expect(error).not.toHaveBeenCalled();
