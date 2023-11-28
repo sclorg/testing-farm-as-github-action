@@ -1,10 +1,11 @@
-import { getInput, setFailed } from '@actions/core';
+import { getBooleanInput, getInput, setFailed } from '@actions/core';
 import { context } from '@actions/github';
 import { Octokit } from '@octokit/core';
 
 import '@total-typescript/ts-reset';
 
 import action from './action';
+import { TFError } from './error';
 import { PullRequest } from './pull-request';
 
 let pr: PullRequest | undefined = undefined;
@@ -29,8 +30,10 @@ try {
   }
 
   // Set the Pull Request status to error when error occurs
-  if (pr) {
-    await pr.setStatus('error', `${message}`);
+  //? Note: getBooleanInput('update_pull_request_status') is used also in action(), there should be a better way to do this
+  if (pr && getBooleanInput('update_pull_request_status')) {
+    const url = error instanceof TFError ? error.url : undefined;
+    await pr.setStatus('error', `${message}`, url);
   }
 
   // Log the error and set the action status to failed

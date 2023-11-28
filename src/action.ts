@@ -10,6 +10,7 @@ import { Endpoints } from '@octokit/types';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 
+import { TFError } from './error';
 import { PullRequest } from './pull-request';
 
 import {
@@ -171,14 +172,9 @@ async function action(pr: PullRequest): Promise<void> {
   } while (timeout > 0);
 
   if (timeout === 0) {
-    await pr.setStatus(
-      'failure',
-      'Timeout reached',
+    throw new TFError(
+      `Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`,
       `${tfArtifactUrl}/${tfResponse.id}`
-    );
-
-    throw new Error(
-      `Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`
     );
   }
 
@@ -264,12 +260,13 @@ async function action(pr: PullRequest): Promise<void> {
 
   // Exit with error in case of failure in test
   if (finalState === 'failure') {
-    throw new Error(
+    throw new TFError(
       `Testing Farm test failed - ${
         tfResult.result
           ? tfResult.result.summary ?? 'No summary provided'
           : 'No summary provided'
-      }`
+      }`,
+      `${tfArtifactUrl}/${tfResponse.id}`
     );
   }
 }
