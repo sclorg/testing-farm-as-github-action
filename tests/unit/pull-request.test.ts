@@ -102,7 +102,7 @@ describe('Pull Request class', () => {
   });
 
   it<TestContext>('can create comment', async context => {
-    await context.pr.addComment('some comment', context.pr.octokit);
+    await context.pr.addComment('some comment');
   });
 
   it<TestContext>('can set status', async context => {
