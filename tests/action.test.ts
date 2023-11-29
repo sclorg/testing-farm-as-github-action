@@ -219,6 +219,18 @@ describe('Integration tests', () => {
 
     // First call to request PR details, next two calls for setting the status
     expect(mocks.request).toHaveBeenCalledTimes(3);
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'POST /repos/{owner}/{repo}/statuses/{sha}',
+      {
+        context: 'Testing Farm - Fedora',
+        description: 'Build finished ',
+        owner: 'sclorg',
+        repo: 'testing-farm-as-github-action',
+        sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
+        state: 'success',
+        target_url: 'https://artifacts.dev.testing-farm.io/1',
+      }
+    );
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
@@ -292,5 +304,77 @@ describe('Integration tests', () => {
     // Test summary
     // When timeout is reached, the summary is currently empty
     await assertSummary(``);
+  });
+
+  test('Testing Farm private scope', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    // api_key - A testing farm server api key
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    // git_url - An url to the GIT repository
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
+    vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    // tf_scope - Defines the scope of Testing Farm. Possible options are public and private
+    vi.stubEnv('INPUT_TF_SCOPE', 'private');
+
+    // Mock Testing Farm API
+    vi.mocked(mocks.newRequest).mockImplementation(
+      async (_request: NewRequest, _strict: boolean) => {
+        return Promise.resolve({
+          id: '1',
+        });
+      }
+    );
+    vi.mocked(mocks.requestDetails)
+      .mockResolvedValueOnce({ state: 'new', result: null })
+      .mockResolvedValueOnce({ state: 'queued', result: null })
+      .mockResolvedValueOnce({ state: 'pending', result: null })
+      .mockResolvedValueOnce({ state: 'running', result: null })
+      .mockResolvedValueOnce({
+        state: 'complete',
+        result: { overall: 'passed', summary: '\\o/' },
+      });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(1, octokit);
+
+    await action(pr);
+
+    // Check if we have waited for Testing Farm to finish
+    expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
+
+    // Test outputs
+    expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
+    expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
+      '"https://api.dev.testing-farm.io/requests/1"'
+    );
+
+    // First call to request PR details, next two calls for setting the status
+    expect(mocks.request).toHaveBeenCalledTimes(3);
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'POST /repos/{owner}/{repo}/statuses/{sha}',
+      {
+        context: 'Testing Farm - Fedora',
+        description: 'Build finished ',
+        owner: 'sclorg',
+        repo: 'testing-farm-as-github-action',
+        sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
+        state: 'success',
+        target_url: 'http://artifacts.osci.redhat.com/testing-farm/1',
+      }
+    );
+
+    // Test summary
+    await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>Fedora-latest</td><td>x86_64</td><td>OK</td><td>success</td><td>[http://artifacts.osci.redhat.com/testing-farm/1/pipeline.log](pipeline.log)</td></tr></table>
+`);
+
+    expect(mocks.TFError).not.toHaveBeenCalled();
   });
 });
