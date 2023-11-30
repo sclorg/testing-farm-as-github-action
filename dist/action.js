@@ -159,7 +159,7 @@ async function action(pr) {
                 getInput('arch'),
                 infraError,
                 finalState,
-                `${tfArtifactUrl}/${tfResponse.id}/pipeline.log`,
+                `[${tfArtifactUrl}/${tfResponse.id}/pipeline.log](pipeline.log)`,
             ],
         ])
             .write();

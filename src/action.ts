@@ -252,7 +252,7 @@ async function action(pr: PullRequest): Promise<void> {
           getInput('arch'),
           infraError,
           finalState,
-          `${tfArtifactUrl}/${tfResponse.id}/pipeline.log`,
+          `[${tfArtifactUrl}/${tfResponse.id}/pipeline.log](pipeline.log)`,
         ],
       ])
       .write();

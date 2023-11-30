@@ -1,4 +1,4 @@
-name: Unit tests
+name: Unit and Integration tests
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: Unit Tests - Node.js
+    name: Node.js
     runs-on: ubuntu-latest
 
     steps:

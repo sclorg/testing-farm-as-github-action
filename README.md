@@ -11,15 +11,8 @@ The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs
 Pull Request status is automatically updated after the tests are executed,
 if this option is enabled with the `update_pull_request_status` user-defined input variable.
 
-The Action uses ubuntu-20.04 and it is a [composite action](https://docs.github.com/en/actions/creating-actions/about-custom-actions).
-It internally downloads needed binaries `curl` and `jq` for communicating with the Testing Farms API and parsing the responses.
-
 API key to the Testing Farm MUST be stored in your organization's secrets to successfully access its infrastructure.
 See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onboarding.html) for information how to onboard to Testing Farm.
-
-Setting `update_pull_request_status` input to `true` requires information of Pull Request's HEAD SHA value.
-Therefore before calling this GitHub Action, the GitHub repo must be first cloned and checked out on the Pull Request, in order to obtain the correct SHA value of Pull Request's HEAD commit.
-Alternatively, the HEAD SHA of the Pull Request can be provided as a `pr_head_sha` input.
 
 ## Compatibility Notes
 
@@ -73,7 +66,7 @@ Alternatively, the HEAD SHA of the Pull Request can be provided as a `pr_head_sh
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
 | `environment_settings` | Pass custom settings to the test environment. Default: {} | empty |
-| `pr_head_sha` | SHA of the latest commit in PR. Used for communication with GitHub API. | $(git rev-parse HEAD) |
+| `pr_head_sha` | SHA of the latest commit in PR. Used for setting commit statuses. | $(git rev-parse HEAD) |
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
 
@@ -92,7 +85,7 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     # Let's schedule tests only on user request. NOT automatically.
     # Only repository owner or member can schedule tests
     if: |
@@ -100,11 +93,6 @@ jobs:
       && contains(github.event.comment.body, '[test]')
       && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
     steps:
-      - name: Checkout repo and switch to corresponding pull request
-        uses: actions/checkout@v2
-        with:
-          git_ref: "refs/pull/${{ github.event.issue.number }}/head"
-
       - name: Schedule test on Testing Farm
         uses: sclorg/testing-farm-as-github-action@v1
         with:
@@ -120,10 +108,10 @@ and as soon as the job is finished you will see the test results in the pull req
 
 ### Run workflow at push to the main branch
 
-The example below shows how the `sclorg/testing-farm-as-github-action` action can be used when pull request is merged.
+The example below shows how the `sclorg/testing-farm-as-github-action` action can be used when pushing commits to `main` branch.
 
 ```yaml
-name: Testing repository by Testing Farm when pull request is merged
+name: Testing repository by Testing Farm when push to main branch
 on:
   push:
     branches:
@@ -131,8 +119,7 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-20.04
-    # Let's tests the repository when pull request is merged
+    runs-on: ubuntu-latest
     steps:
       - name: Schedule test on Testing Farm
         uses: sclorg/testing-farm-as-github-action@v1
