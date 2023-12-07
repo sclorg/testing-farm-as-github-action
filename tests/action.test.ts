@@ -234,7 +234,7 @@ describe('Integration tests', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[https://artifacts.dev.testing-farm.io/1/pipeline.log](pipeline.log)</td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[pipeline.log](https://artifacts.dev.testing-farm.io/1/pipeline.log)</td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -315,7 +315,7 @@ describe('Integration tests', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>Fedora-latest</td><td>x86_64</td><td>OK</td><td>failure</td><td>[https://artifacts.dev.testing-farm.io/1/pipeline.log](pipeline.log)</td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>failure</td><td>[pipeline.log](https://artifacts.dev.testing-farm.io/1/pipeline.log)</td></tr></table>
 `);
   });
 
@@ -394,7 +394,7 @@ describe('Integration tests', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>Fedora-latest</td><td>x86_64</td><td>Failed</td><td>failure</td><td>[https://artifacts.dev.testing-farm.io/1/pipeline.log](pipeline.log)</td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>Failed</td><td>failure</td><td>[pipeline.log](https://artifacts.dev.testing-farm.io/1/pipeline.log)</td></tr></table>
 `);
   });
 
@@ -532,7 +532,7 @@ describe('Integration tests', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>Fedora-latest</td><td>x86_64</td><td>OK</td><td>success</td><td>[http://artifacts.osci.redhat.com/testing-farm/1/pipeline.log](pipeline.log)</td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[pipeline.log](http://artifacts.osci.redhat.com/testing-farm/1/pipeline.log)</td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -604,7 +604,7 @@ describe('Integration tests', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[https://artifacts.dev.testing-farm.io/1/pipeline.log](pipeline.log)</td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[pipeline.log](https://artifacts.dev.testing-farm.io/1/pipeline.log)</td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
