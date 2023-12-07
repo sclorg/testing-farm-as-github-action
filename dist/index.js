@@ -42413,7 +42413,7 @@ async function action(pr) {
                 (0,core.getInput)('arch'),
                 infraError,
                 finalState,
-                `[${tfArtifactUrl}/${tfResponse.id}/pipeline.log](pipeline.log)`,
+                `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
             ],
         ])
             .write();
