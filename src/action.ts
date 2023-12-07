@@ -195,7 +195,7 @@ async function action(pr: PullRequest): Promise<void> {
     }
   } else {
     // Mark job in case of infrastructure issues. Report to Testing Farm team
-    infraError = '- Infra problems';
+    infraError = ' - Infra problems';
     finalState = 'failure' as const;
     log = 'pipeline.log';
   }
@@ -211,7 +211,7 @@ async function action(pr: PullRequest): Promise<void> {
   if (usePullRequestStatuses) {
     await pr.setStatus(
       finalState,
-      `Build finished ${infraError}`,
+      `Build finished${infraError}`,
       `${tfArtifactUrl}/${tfResponse.id}`
     );
   }
@@ -231,12 +231,6 @@ async function action(pr: PullRequest): Promise<void> {
 
   // Create Github Summary
   if (getBooleanInput('create_github_summary')) {
-    if (infraError === '') {
-      infraError = 'OK';
-    } else {
-      infraError = 'Failed';
-    }
-
     await summary
       .addHeading('Testing Farm as a GitHub Action summary')
       .addTable([
@@ -250,7 +244,7 @@ async function action(pr: PullRequest): Promise<void> {
         [
           getInput('compose'),
           getInput('arch'),
-          infraError,
+          infraError === '' ? 'OK' : 'Failed',
           finalState,
           `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
         ],
@@ -261,7 +255,7 @@ async function action(pr: PullRequest): Promise<void> {
   // Exit with error in case of failure in test
   if (finalState === 'failure') {
     throw new TFError(
-      `Testing Farm test failed - ${
+      `Build finished${infraError} - ${
         tfResult.result
           ? tfResult.result.summary ?? 'No summary provided'
           : 'No summary provided'
