@@ -117,7 +117,7 @@ async function action(pr) {
     }
     else {
         // Mark job in case of infrastructure issues. Report to Testing Farm team
-        infraError = '- Infra problems';
+        infraError = ' - Infra problems';
         finalState = 'failure';
         log = 'pipeline.log';
     }
@@ -128,7 +128,7 @@ async function action(pr) {
     setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
     // Switch Pull Request Status to final state
     if (usePullRequestStatuses) {
-        await pr.setStatus(finalState, `Build finished ${infraError}`, `${tfArtifactUrl}/${tfResponse.id}`);
+        await pr.setStatus(finalState, `Build finished${infraError}`, `${tfArtifactUrl}/${tfResponse.id}`);
     }
     // Add comment with Testing Farm request/result to Pull Request
     if (getBooleanInput('create_issue_comment')) {
@@ -138,12 +138,6 @@ async function action(pr) {
     }
     // Create Github Summary
     if (getBooleanInput('create_github_summary')) {
-        if (infraError === '') {
-            infraError = 'OK';
-        }
-        else {
-            infraError = 'Failed';
-        }
         await summary
             .addHeading('Testing Farm as a GitHub Action summary')
             .addTable([
@@ -157,7 +151,7 @@ async function action(pr) {
             [
                 getInput('compose'),
                 getInput('arch'),
-                infraError,
+                infraError === '' ? 'OK' : 'Failed',
                 finalState,
                 `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
             ],
@@ -166,7 +160,7 @@ async function action(pr) {
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new TFError(`Testing Farm test failed - ${tfResult.result
+        throw new TFError(`Build finished${infraError} - ${tfResult.result
             ? (_a = tfResult.result.summary) !== null && _a !== void 0 ? _a : 'No summary provided'
             : 'No summary provided'}`, `${tfArtifactUrl}/${tfResponse.id}`);
     }
