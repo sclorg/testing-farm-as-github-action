@@ -42377,7 +42377,7 @@ async function action(pr) {
         log = 'pipeline.log';
     }
     (0,core.notice)(`Final state is: ${finalState}`);
-    (0,core.notice)(`Infra state is: ${infraError}`);
+    (0,core.notice)(`Infra state is: ${infraError === '' ? 'OK' : 'Failed'}`);
     // Set outputs
     (0,core.setOutput)('request_id', tfResponse.id);
     (0,core.setOutput)('request_url', `${tfInstance}/requests/${tfResponse.id}`);
