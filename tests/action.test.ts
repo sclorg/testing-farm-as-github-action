@@ -223,7 +223,7 @@ describe('Integration tests', () => {
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
         context: 'Testing Farm - Fedora',
-        description: 'Build finished',
+        description: 'Build finished - \\o/',
         owner: 'sclorg',
         repo: 'testing-farm-as-github-action',
         sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
@@ -304,7 +304,7 @@ describe('Integration tests', () => {
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
         context: 'Testing Farm - Fedora',
-        description: 'Build finished',
+        description: 'Build finished - \\o/',
         owner: 'sclorg',
         repo: 'testing-farm-as-github-action',
         sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
@@ -360,7 +360,7 @@ describe('Integration tests', () => {
     } catch (error) {
       expect(error).toMatchInlineSnapshot(`
         {
-          "message": "Build finished - Infra problems - No summary provided",
+          "message": "Build failed - Infra problems",
           "url": "https://artifacts.dev.testing-farm.io/1",
         }
       `);
@@ -383,7 +383,7 @@ describe('Integration tests', () => {
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
         context: 'Testing Farm - Fedora',
-        description: 'Build finished - Infra problems',
+        description: 'Build failed - Infra problems',
         owner: 'sclorg',
         repo: 'testing-farm-as-github-action',
         sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
@@ -521,7 +521,7 @@ describe('Integration tests', () => {
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
         context: 'Testing Farm - Fedora',
-        description: 'Build finished',
+        description: 'Build finished - \\o/',
         owner: 'sclorg',
         repo: 'testing-farm-as-github-action',
         sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',

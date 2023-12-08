@@ -33225,7 +33225,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 2286:
+/***/ 4727:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -42176,6 +42176,22 @@ class TestingFarmAPI {
 const promises_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("timers/promises");
 // EXTERNAL MODULE: ./src/error.ts
 var error = __nccwpck_require__(6388);
+;// CONCATENATED MODULE: ./src/util.ts
+
+function composeStatusDescription(infraError, tfSummary) {
+    let description = infraError
+        ? 'Build failed - Infra problems'
+        : 'Build finished';
+    return description + tfSummary;
+}
+function getSummary(result) {
+    const parsedResult = z.object({
+        summary: z.string().min(1),
+    })
+        .safeParse(result);
+    return parsedResult.success ? ` - ${parsedResult.data.summary}` : '';
+}
+
 ;// CONCATENATED MODULE: ./src/schema/input.ts
 
 const tfScopeSchema = z["enum"](['public', 'private']);
@@ -42259,8 +42275,8 @@ const requestDetailsSchema = z.object({
 
 
 
+
 async function action(pr) {
-    var _a;
     const tfInstance = (0,core.getInput)('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
@@ -42362,7 +42378,7 @@ async function action(pr) {
     const state = tfResult.state;
     const result = tfResult.result ? tfResult.result.overall : 'unknown';
     let finalState = 'success';
-    let infraError = '';
+    let infraError = false;
     let log = '';
     (0,core.notice)(`State is ${state} and result is: ${result}`);
     if (state === 'complete') {
@@ -42372,18 +42388,18 @@ async function action(pr) {
     }
     else {
         // Mark job in case of infrastructure issues. Report to Testing Farm team
-        infraError = ' - Infra problems';
+        infraError = true;
         finalState = 'failure';
         log = 'pipeline.log';
     }
     (0,core.notice)(`Final state is: ${finalState}`);
-    (0,core.notice)(`Infra state is: ${infraError === '' ? 'OK' : 'Failed'}`);
+    (0,core.notice)(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
     // Set outputs
     (0,core.setOutput)('request_id', tfResponse.id);
     (0,core.setOutput)('request_url', `${tfInstance}/requests/${tfResponse.id}`);
     // Switch Pull Request Status to final state
     if (usePullRequestStatuses) {
-        await pr.setStatus(finalState, `Build finished${infraError}`, `${tfArtifactUrl}/${tfResponse.id}`);
+        await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
     }
     // Add comment with Testing Farm request/result to Pull Request
     if ((0,core.getBooleanInput)('create_issue_comment')) {
@@ -42405,7 +42421,7 @@ async function action(pr) {
             [
                 (0,core.getInput)('compose'),
                 (0,core.getInput)('arch'),
-                infraError === '' ? 'OK' : 'Failed',
+                infraError ? 'Failed' : 'OK',
                 finalState,
                 `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
             ],
@@ -42414,9 +42430,7 @@ async function action(pr) {
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new error/* TFError */._(`Build finished${infraError} - ${tfResult.result
-            ? (_a = tfResult.result.summary) !== null && _a !== void 0 ? _a : 'No summary provided'
-            : 'No summary provided'}`, `${tfArtifactUrl}/${tfResponse.id}`);
+        throw new error/* TFError */._(composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
     }
 }
 /* harmony default export */ const src_action = (action);
@@ -42455,7 +42469,7 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(6762);
 /* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(2286);
+/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4727);
 /* harmony import */ var _error__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6388);
 /* harmony import */ var _pull_request__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(4773);
 
