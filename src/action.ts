@@ -12,6 +12,7 @@ import { setTimeout } from 'timers/promises';
 
 import { TFError } from './error';
 import { PullRequest } from './pull-request';
+import { composeStatusDescription, getSummary } from './util';
 
 import {
   envSettingsSchema,
@@ -185,7 +186,7 @@ async function action(pr: PullRequest): Promise<void> {
   const result = tfResult.result ? tfResult.result.overall : 'unknown';
   let finalState: Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['parameters']['state'] =
     'success' as const;
-  let infraError = '';
+  let infraError = false;
   let log = '';
 
   notice(`State is ${state} and result is: ${result}`);
@@ -195,13 +196,13 @@ async function action(pr: PullRequest): Promise<void> {
     }
   } else {
     // Mark job in case of infrastructure issues. Report to Testing Farm team
-    infraError = ' - Infra problems';
+    infraError = true;
     finalState = 'failure' as const;
     log = 'pipeline.log';
   }
 
   notice(`Final state is: ${finalState}`);
-  notice(`Infra state is: ${infraError === '' ? 'OK' : 'Failed'}`);
+  notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
 
   // Set outputs
   setOutput('request_id', tfResponse.id);
@@ -211,7 +212,7 @@ async function action(pr: PullRequest): Promise<void> {
   if (usePullRequestStatuses) {
     await pr.setStatus(
       finalState,
-      `Build finished${infraError}`,
+      composeStatusDescription(infraError, getSummary(tfResult.result)),
       `${tfArtifactUrl}/${tfResponse.id}`
     );
   }
@@ -244,7 +245,7 @@ async function action(pr: PullRequest): Promise<void> {
         [
           getInput('compose'),
           getInput('arch'),
-          infraError === '' ? 'OK' : 'Failed',
+          infraError ? 'Failed' : 'OK',
           finalState,
           `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
         ],
@@ -255,11 +256,7 @@ async function action(pr: PullRequest): Promise<void> {
   // Exit with error in case of failure in test
   if (finalState === 'failure') {
     throw new TFError(
-      `Build finished${infraError} - ${
-        tfResult.result
-          ? tfResult.result.summary ?? 'No summary provided'
-          : 'No summary provided'
-      }`,
+      composeStatusDescription(infraError, getSummary(tfResult.result)),
       `${tfArtifactUrl}/${tfResponse.id}`
     );
   }
