@@ -122,7 +122,7 @@ async function action(pr) {
         log = 'pipeline.log';
     }
     notice(`Final state is: ${finalState}`);
-    notice(`Infra state is: ${infraError}`);
+    notice(`Infra state is: ${infraError === '' ? 'OK' : 'Failed'}`);
     // Set outputs
     setOutput('request_id', tfResponse.id);
     setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
