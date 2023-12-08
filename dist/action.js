@@ -2,10 +2,10 @@ import { debug, getBooleanInput, getInput, notice, setOutput, summary, } from '@
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 import { TFError } from './error';
+import { composeStatusDescription, getSummary } from './util';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
-    var _a;
     const tfInstance = getInput('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
@@ -107,7 +107,7 @@ async function action(pr) {
     const state = tfResult.state;
     const result = tfResult.result ? tfResult.result.overall : 'unknown';
     let finalState = 'success';
-    let infraError = '';
+    let infraError = false;
     let log = '';
     notice(`State is ${state} and result is: ${result}`);
     if (state === 'complete') {
@@ -117,18 +117,18 @@ async function action(pr) {
     }
     else {
         // Mark job in case of infrastructure issues. Report to Testing Farm team
-        infraError = ' - Infra problems';
+        infraError = true;
         finalState = 'failure';
         log = 'pipeline.log';
     }
     notice(`Final state is: ${finalState}`);
-    notice(`Infra state is: ${infraError === '' ? 'OK' : 'Failed'}`);
+    notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
     // Set outputs
     setOutput('request_id', tfResponse.id);
     setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
     // Switch Pull Request Status to final state
     if (usePullRequestStatuses) {
-        await pr.setStatus(finalState, `Build finished${infraError}`, `${tfArtifactUrl}/${tfResponse.id}`);
+        await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
     }
     // Add comment with Testing Farm request/result to Pull Request
     if (getBooleanInput('create_issue_comment')) {
@@ -151,7 +151,7 @@ async function action(pr) {
             [
                 getInput('compose'),
                 getInput('arch'),
-                infraError === '' ? 'OK' : 'Failed',
+                infraError ? 'Failed' : 'OK',
                 finalState,
                 `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
             ],
@@ -160,9 +160,7 @@ async function action(pr) {
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new TFError(`Build finished${infraError} - ${tfResult.result
-            ? (_a = tfResult.result.summary) !== null && _a !== void 0 ? _a : 'No summary provided'
-            : 'No summary provided'}`, `${tfArtifactUrl}/${tfResponse.id}`);
+        throw new TFError(composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
     }
 }
 export default action;
