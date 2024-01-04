@@ -1,7 +1,8 @@
 import { debug, getInput } from '@actions/core';
 import { context } from '@actions/github';
-import { Octokit } from '@octokit/core';
 import { Endpoints } from '@octokit/types';
+
+import { CustomOctokit } from './octokit';
 
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
@@ -16,7 +17,7 @@ export class PullRequest {
   private constructor(
     readonly number: number,
     readonly sha: string,
-    readonly octokit: Octokit
+    readonly octokit: CustomOctokit
   ) {}
 
   /**
@@ -72,7 +73,7 @@ export class PullRequest {
    */
   static async initialize(
     number: number,
-    octokit: Octokit
+    octokit: CustomOctokit
   ): Promise<PullRequest> {
     const { data } = await octokit.request(
       'GET /repos/{owner}/{repo}/pulls/{pull_number}',

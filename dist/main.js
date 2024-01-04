@@ -1,15 +1,13 @@
 import { getBooleanInput, getInput, setFailed } from '@actions/core';
 import { context } from '@actions/github';
-import { Octokit } from '@octokit/core';
 import '@total-typescript/ts-reset';
 import action from './action';
 import { TFError } from './error';
+import { getOctokit } from './octokit';
 import { PullRequest } from './pull-request';
 let pr = undefined;
 try {
-    const octokit = new Octokit({
-        auth: getInput('github_token', { required: true }),
-    });
+    const octokit = getOctokit(getInput('github_token', { required: true }));
     pr = await PullRequest.initialize(context.issue.number, octokit);
     // Call the action function from action.ts
     // all the code should be inside this try block
