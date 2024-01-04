@@ -15,14 +15,14 @@ export declare const tmtArtifactsSchema: z.ZodDefault<z.ZodArray<z.ZodObject<{
     install: z.ZodOptional<z.ZodBoolean>;
     order: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    type: string;
     id: string;
+    type: string;
     packages?: string[] | undefined;
     install?: boolean | undefined;
     order?: number | undefined;
 }, {
-    type: string;
     id: string;
+    type: string;
     packages?: string[] | undefined;
     install?: boolean | undefined;
     order?: number | undefined;
