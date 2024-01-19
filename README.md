@@ -60,7 +60,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onb
 
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
-| `github_token` | Github token passed from secrets | `${{ github.token }}` |
+| `github_token` | GitHub token passed from secrets | `${{ github.token }}` |
 | `create_issue_comment` | If GitHub action will create a github issue comment | false |
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
 | `debug` | Print debug logs when working with testing farm | true |
@@ -69,6 +69,19 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onb
 | `pr_head_sha` | SHA of the latest commit in PR. Used for setting commit statuses. | $(git rev-parse HEAD) |
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
+
+> [!TIP]
+>
+> Testing Farm as GitHub Action requires a GitHub token with the following permissions:
+>
+> ```yml
+> permissions:
+>   contents: read
+>   # This is required for the ability to create Issue comment
+>   pull-requests: write
+>   # This is required for the ability to create/update the Pull request status
+>   statuses: write
+> ```
 
 ## Example
 
