@@ -74,7 +74,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onb
 >
 > Testing Farm as GitHub Action requires a GitHub token with the following permissions:
 >
-> ```yml
+> ```yaml
 > permissions:
 >   contents: read
 >   # This is required for the ability to create Issue comment
