@@ -50,7 +50,7 @@ inputs:
   update_pull_request_status:
     description: 'Action will update pull request status. Default: true'
     required: false
-    default: 'true'
+    default: 'false'
   create_github_summary:
     description: 'Action will create github summary. Possible options: "false", "true", "key=value"'
     required: false

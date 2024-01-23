@@ -64,7 +64,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onb
 | `create_issue_comment` | If GitHub action will create a github issue comment | false |
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
 | `debug` | Print debug logs when working with testing farm | true |
-| `update_pull_request_status` | Action will update pull request status. | true |
+| `update_pull_request_status` | Action will update pull request status. | false |
 | `environment_settings` | Pass custom settings to the test environment. | empty |
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
