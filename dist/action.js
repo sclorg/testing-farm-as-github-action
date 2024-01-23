@@ -9,10 +9,7 @@ async function action(pr) {
     const tfInstance = getInput('api_url');
     const api = new TestingFarmAPI(tfInstance);
     // Get commit SHA value
-    let sha = getInput('pr_head_sha');
-    if (sha === '') {
-        sha = pr.sha;
-    }
+    const sha = pr.sha;
     debug(`SHA: '${sha}'`);
     // Set artifacts url
     const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
