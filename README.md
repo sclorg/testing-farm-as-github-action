@@ -66,7 +66,6 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onb
 | `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. Default: true | true |
 | `environment_settings` | Pass custom settings to the test environment. Default: {} | empty |
-| `pr_head_sha` | SHA of the latest commit in PR. Used for setting commit statuses. | $(git rev-parse HEAD) |
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
 

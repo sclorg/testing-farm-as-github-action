@@ -37,10 +37,7 @@ async function action(pr: PullRequest): Promise<void> {
   const api = new TestingFarmAPI(tfInstance);
 
   // Get commit SHA value
-  let sha = getInput('pr_head_sha');
-  if (sha === '') {
-    sha = pr.sha;
-  }
+  const sha = pr.sha;
   debug(`SHA: '${sha}'`);
 
   // Set artifacts url
