@@ -26,8 +26,8 @@ function setDefaultInputs() {
   vi.stubEnv('INPUT_VARIABLES', '');
   // secrets - Secret environment variables for test env, separated by ;
   vi.stubEnv('INPUT_SECRETS', '');
-  // update_pull_request_status - Action will update pull request status. Default: true
-  vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
+  // update_pull_request_status - Action will update pull request status. Default: false
+  vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'false');
   // create_github_summary - Action will create github summary. Possible options: "false", "true", "key=value"
   vi.stubEnv('INPUT_CREATE_GITHUB_SUMMARY', 'true');
   // arch - Define an architecture for testing environment. Default: x86_64
@@ -218,17 +218,13 @@ describe('Integration tests', () => {
     );
 
     // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(3);
+    expect(mocks.request).toHaveBeenCalledTimes(1);
     expect(mocks.request).toHaveBeenLastCalledWith(
-      'POST /repos/{owner}/{repo}/statuses/{sha}',
+      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
       {
-        context: 'Testing Farm - Fedora',
-        description: 'Build finished - \\o/',
         owner: 'sclorg',
+        pull_number: 1,
         repo: 'testing-farm-as-github-action',
-        sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
-        state: 'success',
-        target_url: 'https://artifacts.dev.testing-farm.io/1',
       }
     );
 
@@ -253,6 +249,7 @@ describe('Integration tests', () => {
     );
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
@@ -332,6 +329,7 @@ describe('Integration tests', () => {
     );
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
@@ -411,6 +409,7 @@ describe('Integration tests', () => {
     );
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
     // Override default inputs
     // Action is waiting for testing farm to finish or until timeout is reached
@@ -477,6 +476,7 @@ describe('Integration tests', () => {
     );
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
     // Override default inputs
     // tf_scope - Defines the scope of Testing Farm. Possible options are public and private
@@ -551,6 +551,7 @@ describe('Integration tests', () => {
     );
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
     // Override default inputs
     // create_issue_comment - It creates a github issue Comment
