@@ -14,16 +14,16 @@ inputs:
     description: 'A testing farm API key'
     required: true
   git_url:
-    description: 'An url to the GIT repository'
+    description: 'An url to the GIT repository with TMT plans'
     required: true
   git_ref:
-    description: 'A tmt tests branch which will be used for tests'
+    description: 'A TMT tests branch which will be used for tests'
     required: false
     default: 'master'
   github_token:
-    description: GitHub TOKEN or PAT
+    description: 'GitHub TOKEN or PAT'
     required: false
-    default: ${{ github.token }}
+    default: '${{ github.token }}'
   tmt_plan_regex:
     required: false
     description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
