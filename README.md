@@ -12,7 +12,7 @@ Pull Request status is automatically updated after the tests are executed,
 if this option is enabled with the `update_pull_request_status` user-defined input variable.
 
 API key to the Testing Farm MUST be stored in your organization's secrets to successfully access its infrastructure.
-See [Testing Farm onboarding guide](https://docs.testing-farm.io/general/0.1/onboarding.html) for information how to onboard to Testing Farm.
+See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/0.1/onboarding.html) for information how to onboard to Testing Farm.
 
 ## Compatibility Notes
 
