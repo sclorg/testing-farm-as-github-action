@@ -5,7 +5,7 @@ there are several steps which you have to do it.
 
 ## Ask Testing Farm team for public or private ranch
 
-Before any implementation as Testing Farm team for API_KEY here [onboarding](https://docs.testing-farm.io/general/0.1/onboarding.html).
+Before any implementation as Testing Farm team for API_KEY here [onboarding](https://docs.testing-farm.io/Testing%20Farm/0.1/onboarding.html).
 
 Public ranch is used for testing your upstream repository on Fedora, CentOS 7, and CentOS Stream guests.
 
