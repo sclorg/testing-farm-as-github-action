@@ -44098,11 +44098,9 @@ async function action(pr) {
     const request = {
         api_key: (0,core.getInput)('api_key', { required: true }),
         test: {
-            fmf: {
-                url: (0,core.getInput)('git_url', { required: true }),
-                ref: (0,core.getInput)('git_ref'),
-                name: (0,core.getInput)('tmt_plan_regex'),
-            },
+            fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref: (0,core.getInput)('git_ref') }, ((0,core.getInput)('tmt_plan_regex')
+                ? { name: (0,core.getInput)('tmt_plan_regex') }
+                : {})),
         },
         environments: [
             {
