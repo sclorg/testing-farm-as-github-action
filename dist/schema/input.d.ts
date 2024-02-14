@@ -76,3 +76,4 @@ export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
     } | undefined;
 }>>;
 export declare const timeoutSchema: z.ZodNumber;
+export declare const tmtPlanRegexSchema: z.ZodString;
