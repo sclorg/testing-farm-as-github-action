@@ -42,7 +42,9 @@ async function action(pr) {
     const request = {
         api_key: getInput('api_key', { required: true }),
         test: {
-            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref: getInput('git_ref') }, (getInput('tmt_plan_regex') ? { name: getInput('tmt_plan_regex') } : {})),
+            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref: getInput('git_ref') }, (getInput('tmt_plan_regex')
+                ? { name: getInput('tmt_plan_regex') }
+                : {})),
         },
         environments: [
             {
