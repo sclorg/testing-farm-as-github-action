@@ -90,7 +90,10 @@ async function action(pr: PullRequest): Promise<void> {
       fmf: {
         url: getInput('git_url', { required: true }),
         ref: getInput('git_ref'),
-        name: getInput('tmt_plan_regex'),
+        // Conditionally include the name attribute only if tmt_plan_regex is not null
+        ...(getInput('tmt_plan_regex')
+          ? { name: getInput('tmt_plan_regex') }
+          : {}),
       },
     },
     environments: [
