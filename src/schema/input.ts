@@ -74,3 +74,5 @@ export const envSettingsSchema = z
   .optional();
 
 export const timeoutSchema = z.coerce.number();
+
+export const tmtPlanRegexSchema = z.string().min(1);

@@ -44038,6 +44038,7 @@ const envSettingsSchema = z.object({
 })
     .optional();
 const timeoutSchema = z.coerce.number();
+const tmtPlanRegexSchema = z.string().min(1);
 
 ;// CONCATENATED MODULE: ./src/schema/testing-farm-api.ts
 
@@ -44091,6 +44092,11 @@ async function action(pr) {
     const tmtContext = tmtContextParsed.success
         ? tmtContextSchema.parse(tmtContextParsed.data)
         : undefined;
+    // Conditionally include the name attribute only if tmt_plan_regex is not null
+    const tmtPlanRegexParsed = tmtPlanRegexSchema.safeParse((0,core.getInput)('tmt_plan_regex'));
+    const tmtPlanRegex = tmtPlanRegexParsed.success
+        ? { name: tmtPlanRegexParsed.data }
+        : {};
     // Generate environment settings
     const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse((0,core.getInput)('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
@@ -44098,9 +44104,7 @@ async function action(pr) {
     const request = {
         api_key: (0,core.getInput)('api_key', { required: true }),
         test: {
-            fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref: (0,core.getInput)('git_ref') }, ((0,core.getInput)('tmt_plan_regex')
-                ? { name: (0,core.getInput)('tmt_plan_regex') }
-                : {})),
+            fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref: (0,core.getInput)('git_ref') }, tmtPlanRegex),
         },
         environments: [
             {
