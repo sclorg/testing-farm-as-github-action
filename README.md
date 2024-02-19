@@ -95,6 +95,11 @@ on:
     types:
       - created
 
+# The concurrency key is used to prevent multiple workflows from running at the same time
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -128,6 +133,11 @@ on:
   push:
     branches:
       - main
+
+# The concurrency key is used to prevent multiple workflows from running at the same time
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:
