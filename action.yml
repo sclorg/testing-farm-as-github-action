@@ -93,3 +93,5 @@ outputs:
 runs:
   using: node20
   main: dist/index.js
+  post-if: cancelled()
+  post: dist/index.js
