@@ -2,6 +2,7 @@ import { debug, getBooleanInput, getInput, notice, setOutput, summary, } from '@
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 import { TFError } from './error';
+import { setTfArtifactUrl, setTfRequestId } from './state';
 import { composeStatusDescription, getSummary } from './util';
 import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
@@ -71,11 +72,14 @@ async function action(pr) {
     debug(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
     debug(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
     const tfResponse = requestSchema.parse(tfResponseRaw);
+    // Set outputs and states
+    debug('Setting outputs and states');
+    setOutput('request_id', tfResponse.id);
+    setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
+    setTfRequestId(tfResponse.id);
+    setTfArtifactUrl(`${tfArtifactUrl}/${tfResponse.id}`);
     // Create Pull Request status in state pending
-    const usePullRequestStatuses = getBooleanInput('update_pull_request_status');
-    if (usePullRequestStatuses) {
-        await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}/${tfResponse.id}`);
-    }
+    await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}/${tfResponse.id}`);
     // Interval of 30 seconds in milliseconds
     const interval = 30 * 1000;
     const parsedTimeout = timeoutSchema.safeParse(getInput('timeout'));
@@ -121,13 +125,8 @@ async function action(pr) {
     }
     notice(`Final state is: ${finalState}`);
     notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
-    // Set outputs
-    setOutput('request_id', tfResponse.id);
-    setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
     // Switch Pull Request Status to final state
-    if (usePullRequestStatuses) {
-        await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
-    }
+    await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
     // Add comment with Testing Farm request/result to Pull Request
     if (getBooleanInput('create_issue_comment')) {
         await pr.addComment(`Testing Farm [request](${tfInstance}/requests/${tfResponse.id}) for ${getInput('compose')}/${getInput('copr_artifacts')} regression testing has been created.` +

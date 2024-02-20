@@ -1,4 +1,4 @@
-import { debug, getInput } from '@actions/core';
+import { debug, getBooleanInput, getInput } from '@actions/core';
 import { context } from '@actions/github';
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
@@ -22,6 +22,12 @@ export class PullRequest {
      * @param url - The URL to link to from the status
      */
     async setStatus(state, description, url) {
+        const usePullRequestStatuses = getBooleanInput('update_pull_request_status');
+        // Don't set the statuses when they are disabled
+        if (!usePullRequestStatuses) {
+            debug('Skipping setting Pull Request Status');
+            return;
+        }
         const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, context.repo), { sha: this.sha, state, context: `Testing Farm - ${getInput('pull_request_status_name')}`, description, target_url: url }));
         debug(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
     }

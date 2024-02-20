@@ -97,6 +97,12 @@ vi.mock('@actions/core', async () => {
     setOutput: vi.fn().mockImplementation((name, value) => {
       process.env[`OUTPUT_${name.toUpperCase()}`] = value;
     }),
+    saveState: vi.fn().mockImplementation((name, value) => {
+      vi.stubEnv(`STATE_${name.toUpperCase()}`, value);
+    }),
+    getState: vi.fn().mockImplementation(name => {
+      return process.env[`STATE_${name.toUpperCase()}`];
+    }),
   };
 });
 
@@ -115,7 +121,7 @@ async function assertSummary(expected: string): Promise<void> {
   expect(file).toEqual(expected);
 }
 
-describe('Integration tests', () => {
+describe('Integration tests - action.ts', () => {
   beforeEach(async () => {
     // Mock setTimeout promise to resolve immediately
     vi.mocked(mocks.setTimeout).mockImplementation(async timeout => {

@@ -86,6 +86,8 @@ describe('Pull Request class', () => {
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
     // simulate pull_request_status_name input
     vi.stubEnv('INPUT_PULL_REQUEST_STATUS_NAME', 'Fedora');
+    // simulate update_pull_request_status
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
     context.pr = await PullRequest.initialize(1, octokit);
   });

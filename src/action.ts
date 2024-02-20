@@ -12,6 +12,7 @@ import { setTimeout } from 'timers/promises';
 
 import { TFError } from './error';
 import { PullRequest } from './pull-request';
+import { setTfArtifactUrl, setTfRequestId } from './state';
 import { composeStatusDescription, getSummary } from './util';
 
 import {
@@ -138,9 +139,12 @@ async function action(pr: PullRequest): Promise<void> {
 
   const tfResponse = requestSchema.parse(tfResponseRaw);
 
-  // Set outputs
+  // Set outputs and states
+  debug('Setting outputs and states');
   setOutput('request_id', tfResponse.id);
   setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
+  setTfRequestId(tfResponse.id);
+  setTfArtifactUrl(`${tfArtifactUrl}/${tfResponse.id}`);
 
   // Create Pull Request status in state pending
   await pr.setStatus(
