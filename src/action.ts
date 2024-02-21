@@ -138,6 +138,10 @@ async function action(pr: PullRequest): Promise<void> {
 
   const tfResponse = requestSchema.parse(tfResponseRaw);
 
+  // Set outputs
+  setOutput('request_id', tfResponse.id);
+  setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
+
   // Create Pull Request status in state pending
   const usePullRequestStatuses = getBooleanInput('update_pull_request_status');
   if (usePullRequestStatuses) {
@@ -209,10 +213,6 @@ async function action(pr: PullRequest): Promise<void> {
 
   notice(`Final state is: ${finalState}`);
   notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
-
-  // Set outputs
-  setOutput('request_id', tfResponse.id);
-  setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
 
   // Switch Pull Request Status to final state
   if (usePullRequestStatuses) {
