@@ -1,4 +1,4 @@
-import { debug, getInput } from '@actions/core';
+import { debug, getBooleanInput, getInput } from '@actions/core';
 import { context } from '@actions/github';
 import { Endpoints } from '@octokit/types';
 
@@ -31,6 +31,16 @@ export class PullRequest {
     description: string,
     url?: string
   ) {
+    const usePullRequestStatuses = getBooleanInput(
+      'update_pull_request_status'
+    );
+
+    // Don't set the statuses when they are disabled
+    if (!usePullRequestStatuses) {
+      debug('Skipping setting Pull Request Status');
+      return;
+    }
+
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {

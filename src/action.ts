@@ -143,14 +143,11 @@ async function action(pr: PullRequest): Promise<void> {
   setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
 
   // Create Pull Request status in state pending
-  const usePullRequestStatuses = getBooleanInput('update_pull_request_status');
-  if (usePullRequestStatuses) {
-    await pr.setStatus(
-      'pending',
-      'Build started',
-      `${tfArtifactUrl}/${tfResponse.id}`
-    );
-  }
+  await pr.setStatus(
+    'pending',
+    'Build started',
+    `${tfArtifactUrl}/${tfResponse.id}`
+  );
 
   // Interval of 30 seconds in milliseconds
   const interval = 30 * 1000;
@@ -215,13 +212,11 @@ async function action(pr: PullRequest): Promise<void> {
   notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
 
   // Switch Pull Request Status to final state
-  if (usePullRequestStatuses) {
-    await pr.setStatus(
-      finalState,
-      composeStatusDescription(infraError, getSummary(tfResult.result)),
-      `${tfArtifactUrl}/${tfResponse.id}`
-    );
-  }
+  await pr.setStatus(
+    finalState,
+    composeStatusDescription(infraError, getSummary(tfResult.result)),
+    `${tfArtifactUrl}/${tfResponse.id}`
+  );
 
   // Add comment with Testing Farm request/result to Pull Request
   if (getBooleanInput('create_issue_comment')) {
