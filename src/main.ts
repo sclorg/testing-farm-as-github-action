@@ -1,4 +1,4 @@
-import { getBooleanInput, getInput, setFailed } from '@actions/core';
+import { getInput, getState, setFailed } from '@actions/core';
 import { context } from '@actions/github';
 
 import '@total-typescript/ts-reset';
@@ -28,8 +28,7 @@ try {
   }
 
   // Set the Pull Request status to error when error occurs
-  //? Note: getBooleanInput('update_pull_request_status') is used also in action(), there should be a better way to do this
-  if (pr && getBooleanInput('update_pull_request_status')) {
+  if (pr) {
     const url = error instanceof TFError ? error.url : undefined;
     await pr.setStatus('error', `${message}`, url);
   }
