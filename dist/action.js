@@ -15,7 +15,7 @@ async function action(pr) {
     // Set artifacts url
     const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
     const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
-    const tfArtifactUrl = tfScope === 'public'
+    const tfUrl = tfScope === 'public'
         ? 'https://artifacts.dev.testing-farm.io'
         : 'http://artifacts.osci.redhat.com/testing-farm';
     // Generate tmt variables
@@ -72,14 +72,17 @@ async function action(pr) {
     debug(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
     debug(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
     const tfResponse = requestSchema.parse(tfResponseRaw);
+    const tfArtifactUrl = `${tfUrl}/${tfResponse.id}`;
+    notice(`Testing Farm logs: ${tfArtifactUrl}`);
     // Set outputs and states
     debug('Setting outputs and states');
     setOutput('request_id', tfResponse.id);
     setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
+    setOutput('test_log_url', tfArtifactUrl);
     setTfRequestId(tfResponse.id);
-    setTfArtifactUrl(`${tfArtifactUrl}/${tfResponse.id}`);
+    setTfArtifactUrl(tfArtifactUrl);
     // Create Pull Request status in state pending
-    await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}/${tfResponse.id}`);
+    await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`);
     // Interval of 30 seconds in milliseconds
     const interval = 30 * 1000;
     const parsedTimeout = timeoutSchema.safeParse(getInput('timeout'));
@@ -102,7 +105,7 @@ async function action(pr) {
         await setTimeout(interval);
     } while (timeout > 0);
     if (timeout === 0) {
-        throw new TFError(`Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`, `${tfArtifactUrl}/${tfResponse.id}`);
+        throw new TFError(`Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`, `${tfArtifactUrl}`);
     }
     debug(`response:'${JSON.stringify(tfResult, null, 2)}'`);
     // Get final state of Testing Farm scheduled request
@@ -126,12 +129,12 @@ async function action(pr) {
     notice(`Final state is: ${finalState}`);
     notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
     // Switch Pull Request Status to final state
-    await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
+    await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}`);
     // Add comment with Testing Farm request/result to Pull Request
     if (getBooleanInput('create_issue_comment')) {
         await pr.addComment(`Testing Farm [request](${tfInstance}/requests/${tfResponse.id}) for ${getInput('compose')}/${getInput('copr_artifacts')} regression testing has been created.` +
-            `Once finished, results should be available [here](${tfArtifactUrl}/${tfResponse.id}/).\n` +
-            `[Full pipeline log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log).`);
+            `Once finished, results should be available [here](${tfArtifactUrl}/).\n` +
+            `[Full pipeline log](${tfArtifactUrl}/pipeline.log).`);
     }
     // Create Github Summary
     if (getBooleanInput('create_github_summary')) {
@@ -150,14 +153,14 @@ async function action(pr) {
                 getInput('arch'),
                 infraError ? 'Failed' : 'OK',
                 finalState,
-                `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
+                `[pipeline.log](${tfArtifactUrl}/pipeline.log)`,
             ],
         ])
             .write();
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {
-        throw new TFError(composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}/${tfResponse.id}`);
+        throw new TFError(composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}`);
     }
 }
 export default action;
