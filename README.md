@@ -69,6 +69,15 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
 
+
+## Action Outputs
+| Output Name | Description |
+|-------------|-------------|
+| `request_id` | An ID of a scheduled testing farm request. |
+| `request_url` | An URL of a scheduled testing farm request. |
+| `test_log_url` | An URL of a scheduled test logs. |
+
+
 > [!TIP]
 >
 > Testing Farm as GitHub Action requires a GitHub token with the following permissions:

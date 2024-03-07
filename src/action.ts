@@ -46,7 +46,7 @@ async function action(pr: PullRequest): Promise<void> {
   const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
   const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
 
-  const tfArtifactUrl =
+  const tfUrl =
     tfScope === 'public'
       ? 'https://artifacts.dev.testing-farm.io'
       : 'http://artifacts.osci.redhat.com/testing-farm';
@@ -138,20 +138,19 @@ async function action(pr: PullRequest): Promise<void> {
   debug(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
 
   const tfResponse = requestSchema.parse(tfResponseRaw);
+  const tfArtifactUrl = `${tfUrl}/${tfResponse.id}`;
+  notice(`Testing Farm logs: ${tfArtifactUrl}`);
 
   // Set outputs and states
   debug('Setting outputs and states');
   setOutput('request_id', tfResponse.id);
   setOutput('request_url', `${tfInstance}/requests/${tfResponse.id}`);
+  setOutput('test_log_url', tfArtifactUrl);
   setTfRequestId(tfResponse.id);
-  setTfArtifactUrl(`${tfArtifactUrl}/${tfResponse.id}`);
+  setTfArtifactUrl(tfArtifactUrl);
 
   // Create Pull Request status in state pending
-  await pr.setStatus(
-    'pending',
-    'Build started',
-    `${tfArtifactUrl}/${tfResponse.id}`
-  );
+  await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`);
 
   // Interval of 30 seconds in milliseconds
   const interval = 30 * 1000;
@@ -186,7 +185,7 @@ async function action(pr: PullRequest): Promise<void> {
   if (timeout === 0) {
     throw new TFError(
       `Testing Farm - timeout reached. The test is still in state: '${tfResult.state}'`,
-      `${tfArtifactUrl}/${tfResponse.id}`
+      `${tfArtifactUrl}`
     );
   }
 
@@ -219,7 +218,7 @@ async function action(pr: PullRequest): Promise<void> {
   await pr.setStatus(
     finalState,
     composeStatusDescription(infraError, getSummary(tfResult.result)),
-    `${tfArtifactUrl}/${tfResponse.id}`
+    `${tfArtifactUrl}`
   );
 
   // Add comment with Testing Farm request/result to Pull Request
@@ -230,8 +229,8 @@ async function action(pr: PullRequest): Promise<void> {
       }) for ${getInput('compose')}/${getInput(
         'copr_artifacts'
       )} regression testing has been created.` +
-        `Once finished, results should be available [here](${tfArtifactUrl}/${tfResponse.id}/).\n` +
-        `[Full pipeline log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log).`
+        `Once finished, results should be available [here](${tfArtifactUrl}/).\n` +
+        `[Full pipeline log](${tfArtifactUrl}/pipeline.log).`
     );
   }
 
@@ -252,7 +251,7 @@ async function action(pr: PullRequest): Promise<void> {
           getInput('arch'),
           infraError ? 'Failed' : 'OK',
           finalState,
-          `[pipeline.log](${tfArtifactUrl}/${tfResponse.id}/pipeline.log)`,
+          `[pipeline.log](${tfArtifactUrl}/pipeline.log)`,
         ],
       ])
       .write();
@@ -262,7 +261,7 @@ async function action(pr: PullRequest): Promise<void> {
   if (finalState === 'failure') {
     throw new TFError(
       composeStatusDescription(infraError, getSummary(tfResult.result)),
-      `${tfArtifactUrl}/${tfResponse.id}`
+      `${tfArtifactUrl}`
     );
   }
 }

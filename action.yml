@@ -88,7 +88,9 @@ outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'
   request_url:
-    description: 'An url of a scheduled testing farm request'
+    description: 'An URL of a scheduled testing farm request'
+  test_log_url:
+    description: 'An URL of a scheduled test logs'
 
 runs:
   using: node20
