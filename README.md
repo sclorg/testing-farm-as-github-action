@@ -97,7 +97,7 @@ on:
 
 # The concurrency key is used to prevent multiple workflows from running at the same time
 concurrency:
-  group: ${{ github.head_ref }}
+  group: my-concurrency-group
   cancel-in-progress: true
 
 jobs:
@@ -111,7 +111,7 @@ jobs:
       && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
     steps:
       - name: Schedule test on Testing Farm
-        uses: sclorg/testing-farm-as-github-action@v1
+        uses: sclorg/testing-farm-as-github-action@v2
         with:
           api_key: ${{ secrets.TF_API_KEY }}
           git_url: https://github.com/sclorg/sclorg-testing-farm
