@@ -222,6 +222,9 @@ describe('Integration tests - action.ts', () => {
     expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
       '"https://api.dev.testing-farm.io/requests/1"'
     );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
+    );
 
     // First call to request PR details, next two calls for setting the status
     expect(mocks.request).toHaveBeenCalledTimes(1);
@@ -299,6 +302,9 @@ describe('Integration tests - action.ts', () => {
     expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
     expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
       '"https://api.dev.testing-farm.io/requests/1"'
+    );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
     );
 
     // First call to request PR details, next two calls for setting the status
@@ -379,6 +385,9 @@ describe('Integration tests - action.ts', () => {
     expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
     expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
       '"https://api.dev.testing-farm.io/requests/1"'
+    );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
     );
 
     // First call to request PR details, next two calls for setting the status
@@ -520,6 +529,9 @@ describe('Integration tests - action.ts', () => {
     expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
       '"https://api.dev.testing-farm.io/requests/1"'
     );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
+    );
 
     // First call to request PR details, next two calls for setting the status
     expect(mocks.request).toHaveBeenCalledTimes(3);
@@ -594,6 +606,9 @@ describe('Integration tests - action.ts', () => {
     expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
     expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
       '"https://api.dev.testing-farm.io/requests/1"'
+    );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
     );
 
     // First call to request PR details, next two calls for setting the status, the last call is for issue comment
