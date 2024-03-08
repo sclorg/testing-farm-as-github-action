@@ -153,10 +153,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Schedule test on Testing Farm
-        uses: sclorg/testing-farm-as-github-action@v1
+        uses: sclorg/testing-farm-as-github-action@v2
         with:
           api_key: ${{ secrets.TF_API_KEY }}
           git_url: https://github.com/sclorg/sclorg-testing-farm
-          tmt_plan_regex: "centos"
-          update_pull_request_status: "false"
 ```
