@@ -17471,9 +17471,9 @@ const environmentSchema = lib.z.object({
         .optional(),
     tmt: lib.z.object({
         context: lib.z.object({
-            distro: lib.z.string().min(1),
-            arch: lib.z.string().min(1),
-            trigger: lib.z.string().min(1),
+            distro: lib.z.string().min(1).optional(),
+            arch: lib.z.string().min(1).optional(),
+            trigger: lib.z.string().min(1).optional(),
         })
             .optional()
             .nullable(),
@@ -40131,9 +40131,9 @@ const tmtArtifactsSchema = lib.z.array(lib.z.object({
     .default([]);
 // https://testing-farm.gitlab.io/api/#operation/requestsPost
 const tmtContextSchema = lib.z.object({
-    distro: lib.z.string().min(1),
-    arch: lib.z.string().min(1),
-    trigger: lib.z.string().min(1),
+    distro: lib.z.string().min(1).optional(),
+    arch: lib.z.string().min(1).optional(),
+    trigger: lib.z.string().min(1).optional(),
 })
     .optional()
     .or(lib.z.object({}).transform(() => undefined));
