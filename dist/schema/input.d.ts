@@ -28,17 +28,17 @@ export declare const tmtArtifactsSchema: z.ZodDefault<z.ZodArray<z.ZodObject<{
     order?: number | undefined;
 }>, "many">>;
 export declare const tmtContextSchema: z.ZodUnion<[z.ZodOptional<z.ZodObject<{
-    distro: z.ZodString;
-    arch: z.ZodString;
-    trigger: z.ZodString;
+    distro: z.ZodOptional<z.ZodString>;
+    arch: z.ZodOptional<z.ZodString>;
+    trigger: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    distro: string;
-    arch: string;
-    trigger: string;
+    distro?: string | undefined;
+    arch?: string | undefined;
+    trigger?: string | undefined;
 }, {
-    distro: string;
-    arch: string;
-    trigger: string;
+    distro?: string | undefined;
+    arch?: string | undefined;
+    trigger?: string | undefined;
 }>>, z.ZodEffects<z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>, undefined, {}>]>;
 export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
     pipeline: z.ZodOptional<z.ZodObject<{

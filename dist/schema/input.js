@@ -41,9 +41,9 @@ export const tmtArtifactsSchema = z
 // https://testing-farm.gitlab.io/api/#operation/requestsPost
 export const tmtContextSchema = z
     .object({
-    distro: z.string().min(1),
-    arch: z.string().min(1),
-    trigger: z.string().min(1),
+    distro: z.string().min(1).optional(),
+    arch: z.string().min(1).optional(),
+    trigger: z.string().min(1).optional(),
 })
     .optional()
     .or(z.object({}).transform(() => undefined));

@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 import {
   tmtArtifactsInputSchema,
   tmtContextInputSchema,
+  tmtContextSchema,
   tmtEnvSecretsSchema,
   tmtEnvVarsSchema,
 } from '../../src/schema/input';
@@ -16,6 +17,52 @@ describe('tmt variables/secrets/context input', () => {
     expect(tmtEnvVarsSchema.parse(input)).toMatchInlineSnapshot('{}');
     expect(tmtEnvSecretsSchema.parse(input)).toMatchInlineSnapshot('{}');
     expect(tmtContextInputSchema.parse(input)).toMatchInlineSnapshot('{}');
+  });
+
+  test('single input key', () => {
+    const input = 'FOO=some-value';
+
+    expect(tmtEnvVarsSchema.parse(input)).toMatchInlineSnapshot(`
+      {
+        "FOO": "some-value",
+      }
+    `);
+    expect(tmtEnvSecretsSchema.parse(input)).toMatchInlineSnapshot(`
+      {
+        "FOO": "some-value",
+      }
+    `);
+    expect(tmtContextInputSchema.parse(input)).toMatchInlineSnapshot(`
+      {
+        "FOO": "some-value",
+      }
+    `);
+  });
+
+  test('tmt-context input', () => {
+    let input = 'distro=fedora;arch=x86_64;trigger=push';
+
+    expect(tmtContextSchema.parse(tmtContextInputSchema.parse(input)))
+      .toMatchInlineSnapshot(`
+      {
+        "arch": "x86_64",
+        "distro": "fedora",
+        "trigger": "push",
+      }
+    `);
+
+    input = 'arch=x86_64';
+    expect(tmtContextSchema.parse(tmtContextInputSchema.parse(input)))
+      .toMatchInlineSnapshot(`
+      {
+        "arch": "x86_64",
+      }
+    `);
+
+    input = '';
+    expect(
+      tmtContextSchema.parse(tmtContextInputSchema.parse(input))
+    ).toMatchInlineSnapshot('{}');
   });
 
   test('standard input', () => {
