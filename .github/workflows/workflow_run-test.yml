@@ -1,0 +1,54 @@
+
+name: E2E tests - workflow_run example
+on:
+  workflow_run:
+    workflows: [ Gather Pull Request Metadata ]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    outputs:
+      pr-metadata: ${{ steps.artifact.outputs.pr-metadata-json }}
+
+    steps:
+      - id: artifact
+        name: Download Pull Request Metadata artifact
+        uses: redhat-plumbers-in-action/download-artifact@v1
+        with:
+          name: Pull Request Metadata
+
+  test:
+    needs: metadata
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ fromJSON(needs.metadata.outputs.pr-metadata).number }}
+      cancel-in-progress: true
+
+    permissions:
+      statuses: write
+      pull-requests: write
+
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4
+
+      - name: Run the tests
+        uses: ./
+        with:
+          api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
+          git_url: "https://github.com/sclorg/testing-farm-as-github-action"
+          git_ref: "main"
+          tmt_plan_regex: "smoke_plan"
+          pull_request_status_name: "Smoke test - pull_request_target"
+          update_pull_request_status: "true"
+          pr_number: ${{ fromJSON(needs.metadata.outputs.pr-metadata).number }}

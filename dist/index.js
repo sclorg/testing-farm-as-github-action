@@ -40052,7 +40052,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 4876:
+/***/ 434:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -40089,69 +40089,8 @@ function getSummary(result) {
     return parsedResult.success ? ` - ${parsedResult.data.summary}` : '';
 }
 
-;// CONCATENATED MODULE: ./src/schema/input.ts
-
-const tfScopeSchema = lib.z["enum"](['public', 'private']);
-// Parse string input into object of key-value pairs
-// input: 'REPO_URL=GITHUB_SERVER_URL/GITHUB_REPOSITORY;REPO_NAME=GITHUB_REPOSITORY'
-// output: { REPO_URL: 'GITHUB_SERVER_URL/GITHUB_REPOSITORY', REPO_NAME: 'GITHUB_REPOSITORY' }
-const stringToArraySchema = lib.z.string().transform(str => str.split(';'));
-const keyValueArrayToObjectSchema = stringToArraySchema.transform(arr => {
-    let obj = {};
-    arr.forEach(item => {
-        const [key, value] = item.split('=');
-        // ''.split('=') returns [''] ; we have to check for this case
-        if (key === '' && value === undefined)
-            return;
-        // 'abc'.split('=') returns ['abc'] ; we have to check for this case
-        obj[key] = value !== null && value !== void 0 ? value : '';
-    });
-    return lib.z.record(lib.z.string(), lib.z.string()).parse(obj);
-});
-const tmtEnvVarsSchema = keyValueArrayToObjectSchema;
-const tmtEnvSecretsSchema = keyValueArrayToObjectSchema;
-const tmtArtifactsInputSchema = stringToArraySchema.transform(arr => {
-    let artifacts = [];
-    arr.forEach(item => {
-        if (item === '')
-            return;
-        artifacts.push({ type: 'fedora-copr-build', id: item });
-    });
-    return artifacts;
-});
-const tmtContextInputSchema = keyValueArrayToObjectSchema;
-// https://testing-farm.gitlab.io/api/#operation/requestsPost
-const tmtArtifactsSchema = lib.z.array(lib.z.object({
-    id: lib.z.string().min(1),
-    type: lib.z.string().min(1),
-    packages: lib.z.array(lib.z.string().min(1)).optional(),
-    install: lib.z.boolean().optional(),
-    order: lib.z.number().optional(),
-}))
-    .default([]);
-// https://testing-farm.gitlab.io/api/#operation/requestsPost
-const tmtContextSchema = lib.z.object({
-    distro: lib.z.string().min(1),
-    arch: lib.z.string().min(1),
-    trigger: lib.z.string().min(1),
-})
-    .optional()
-    .or(lib.z.object({}).transform(() => undefined));
-const envSettingsSchema = lib.z.object({
-    pipeline: lib.z.object({
-        skip_guest_setup: lib.z.boolean().optional(),
-    })
-        .optional(),
-    provisioning: lib.z.object({
-        post_install_script: lib.z.string().min(1).optional(),
-        tags: lib.z.record(lib.z.string()).optional(),
-    })
-        .optional(),
-})
-    .optional();
-const timeoutSchema = lib.z.coerce.number();
-const tmtPlanRegexSchema = lib.z.string().min(1);
-
+// EXTERNAL MODULE: ./src/schema/input.ts
+var input = __nccwpck_require__(9281);
 ;// CONCATENATED MODULE: ./src/schema/testing-farm-api.ts
 
 const requestSchema = lib.z.object({
@@ -40182,36 +40121,36 @@ async function action(pr) {
     const sha = pr.sha;
     (0,core.debug)(`SHA: '${sha}'`);
     // Set artifacts url
-    const tfScopeParsed = tfScopeSchema.safeParse((0,core.getInput)('tf_scope'));
+    const tfScopeParsed = input/* tfScopeSchema.safeParse */.ky.safeParse((0,core.getInput)('tf_scope'));
     const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
     const tfUrl = tfScope === 'public'
         ? 'https://artifacts.dev.testing-farm.io'
         : 'http://artifacts.osci.redhat.com/testing-farm';
     // Generate tmt variables
-    const tmtEnvVarsParsed = tmtEnvVarsSchema.safeParse((0,core.getInput)('variables'));
+    const tmtEnvVarsParsed = input/* tmtEnvVarsSchema.safeParse */.ch.safeParse((0,core.getInput)('variables'));
     const tmtEnvVars = tmtEnvVarsParsed.success ? tmtEnvVarsParsed.data : {};
     // Generate tmt secrets
-    const tmtEnvSecretsParsed = tmtEnvSecretsSchema.safeParse((0,core.getInput)('secrets'));
+    const tmtEnvSecretsParsed = input/* tmtEnvSecretsSchema.safeParse */.hC.safeParse((0,core.getInput)('secrets'));
     const tmtEnvSecrets = tmtEnvSecretsParsed.success
         ? tmtEnvSecretsParsed.data
         : {};
     // Generate tmt artifacts
-    const tmtArtifactsParsed = tmtArtifactsInputSchema.safeParse((0,core.getInput)('copr_artifacts'));
+    const tmtArtifactsParsed = input/* tmtArtifactsInputSchema.safeParse */.tb.safeParse((0,core.getInput)('copr_artifacts'));
     const tmtArtifacts = tmtArtifactsParsed.success
-        ? tmtArtifactsSchema.parse(tmtArtifactsParsed.data)
+        ? input/* tmtArtifactsSchema.parse */.lr.parse(tmtArtifactsParsed.data)
         : [];
     // Generate tmt context
-    const tmtContextParsed = tmtContextInputSchema.safeParse((0,core.getInput)('tmt_context'));
+    const tmtContextParsed = input/* tmtContextInputSchema.safeParse */.HE.safeParse((0,core.getInput)('tmt_context'));
     const tmtContext = tmtContextParsed.success
-        ? tmtContextSchema.parse(tmtContextParsed.data)
+        ? input/* tmtContextSchema.parse */.J8.parse(tmtContextParsed.data)
         : undefined;
     // Conditionally include the name attribute only if tmt_plan_regex is not null
-    const tmtPlanRegexParsed = tmtPlanRegexSchema.safeParse((0,core.getInput)('tmt_plan_regex'));
+    const tmtPlanRegexParsed = input/* tmtPlanRegexSchema.safeParse */.zJ.safeParse((0,core.getInput)('tmt_plan_regex'));
     const tmtPlanRegex = tmtPlanRegexParsed.success
         ? { name: tmtPlanRegexParsed.data }
         : {};
     // Generate environment settings
-    const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse((0,core.getInput)('environment_settings')));
+    const envSettingsParsed = input/* envSettingsSchema.safeParse */.Qd.safeParse(JSON.parse((0,core.getInput)('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
     // Schedule a test on Testing Farm
     const request = {
@@ -40254,7 +40193,7 @@ async function action(pr) {
     await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`);
     // Interval of 30 seconds in milliseconds
     const interval = 30 * 1000;
-    const parsedTimeout = timeoutSchema.safeParse((0,core.getInput)('timeout'));
+    const parsedTimeout = input/* timeoutSchema.safeParse */.bJ.safeParse((0,core.getInput)('timeout'));
     // set timeout to 960 * 30 seconds ~ 8 hours ; timeout from input is in minutes (hence * 2)
     let timeout = parsedTimeout.success ? parsedTimeout.data * 2 : 960;
     let tfResult;
@@ -40365,12 +40304,14 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4876);
+/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(434);
 /* harmony import */ var _error__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6388);
 /* harmony import */ var _octokit__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(6161);
 /* harmony import */ var _post__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(7051);
 /* harmony import */ var _pull_request__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(4773);
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(9738);
+/* harmony import */ var _schema_input__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(9281);
+
 
 
 
@@ -40384,7 +40325,11 @@ let pr = undefined;
 // All the code should be inside this try block
 try {
     const octokit = (0,_octokit__WEBPACK_IMPORTED_MODULE_4__/* .getOctokit */ .P)((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }));
-    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+    const parsedPrNumber = _schema_input__WEBPACK_IMPORTED_MODULE_8__/* .prNumberSchema.safeParse */ ._3.safeParse((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pr_number'));
+    const prNumber = parsedPrNumber.success
+        ? parsedPrNumber.data
+        : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number;
+    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(prNumber, octokit);
     // Check if the script was invoked in the post step
     if (!_state__WEBPACK_IMPORTED_MODULE_7__/* .isPost */ .f5) {
         // Call the action function from action.ts
@@ -40554,6 +40499,91 @@ class PullRequest {
         return new this(data.number, data.head.sha, octokit);
     }
 }
+
+
+/***/ }),
+
+/***/ 9281:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "HE": () => (/* binding */ tmtContextInputSchema),
+/* harmony export */   "J8": () => (/* binding */ tmtContextSchema),
+/* harmony export */   "Qd": () => (/* binding */ envSettingsSchema),
+/* harmony export */   "_3": () => (/* binding */ prNumberSchema),
+/* harmony export */   "bJ": () => (/* binding */ timeoutSchema),
+/* harmony export */   "ch": () => (/* binding */ tmtEnvVarsSchema),
+/* harmony export */   "hC": () => (/* binding */ tmtEnvSecretsSchema),
+/* harmony export */   "ky": () => (/* binding */ tfScopeSchema),
+/* harmony export */   "lr": () => (/* binding */ tmtArtifactsSchema),
+/* harmony export */   "tb": () => (/* binding */ tmtArtifactsInputSchema),
+/* harmony export */   "zJ": () => (/* binding */ tmtPlanRegexSchema)
+/* harmony export */ });
+/* unused harmony export numberSchema */
+/* harmony import */ var zod__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2300);
+
+const tfScopeSchema = zod__WEBPACK_IMPORTED_MODULE_0__.z["enum"](['public', 'private']);
+// Parse string input into object of key-value pairs
+// input: 'REPO_URL=GITHUB_SERVER_URL/GITHUB_REPOSITORY;REPO_NAME=GITHUB_REPOSITORY'
+// output: { REPO_URL: 'GITHUB_SERVER_URL/GITHUB_REPOSITORY', REPO_NAME: 'GITHUB_REPOSITORY' }
+const stringToArraySchema = zod__WEBPACK_IMPORTED_MODULE_0__.z.string().transform(str => str.split(';'));
+const keyValueArrayToObjectSchema = stringToArraySchema.transform(arr => {
+    let obj = {};
+    arr.forEach(item => {
+        const [key, value] = item.split('=');
+        // ''.split('=') returns [''] ; we have to check for this case
+        if (key === '' && value === undefined)
+            return;
+        // 'abc'.split('=') returns ['abc'] ; we have to check for this case
+        obj[key] = value !== null && value !== void 0 ? value : '';
+    });
+    return zod__WEBPACK_IMPORTED_MODULE_0__.z.record(zod__WEBPACK_IMPORTED_MODULE_0__.z.string(), zod__WEBPACK_IMPORTED_MODULE_0__.z.string()).parse(obj);
+});
+const tmtEnvVarsSchema = keyValueArrayToObjectSchema;
+const tmtEnvSecretsSchema = keyValueArrayToObjectSchema;
+const tmtArtifactsInputSchema = stringToArraySchema.transform(arr => {
+    let artifacts = [];
+    arr.forEach(item => {
+        if (item === '')
+            return;
+        artifacts.push({ type: 'fedora-copr-build', id: item });
+    });
+    return artifacts;
+});
+const tmtContextInputSchema = keyValueArrayToObjectSchema;
+// https://testing-farm.gitlab.io/api/#operation/requestsPost
+const tmtArtifactsSchema = zod__WEBPACK_IMPORTED_MODULE_0__.z.array(zod__WEBPACK_IMPORTED_MODULE_0__.z.object({
+    id: zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1),
+    type: zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1),
+    packages: zod__WEBPACK_IMPORTED_MODULE_0__.z.array(zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1)).optional(),
+    install: zod__WEBPACK_IMPORTED_MODULE_0__.z.boolean().optional(),
+    order: zod__WEBPACK_IMPORTED_MODULE_0__.z.number().optional(),
+}))
+    .default([]);
+// https://testing-farm.gitlab.io/api/#operation/requestsPost
+const tmtContextSchema = zod__WEBPACK_IMPORTED_MODULE_0__.z.object({
+    distro: zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1),
+    arch: zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1),
+    trigger: zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1),
+})
+    .optional()
+    .or(zod__WEBPACK_IMPORTED_MODULE_0__.z.object({}).transform(() => undefined));
+const envSettingsSchema = zod__WEBPACK_IMPORTED_MODULE_0__.z.object({
+    pipeline: zod__WEBPACK_IMPORTED_MODULE_0__.z.object({
+        skip_guest_setup: zod__WEBPACK_IMPORTED_MODULE_0__.z.boolean().optional(),
+    })
+        .optional(),
+    provisioning: zod__WEBPACK_IMPORTED_MODULE_0__.z.object({
+        post_install_script: zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1).optional(),
+        tags: zod__WEBPACK_IMPORTED_MODULE_0__.z.record(zod__WEBPACK_IMPORTED_MODULE_0__.z.string()).optional(),
+    })
+        .optional(),
+})
+    .optional();
+const numberSchema = zod__WEBPACK_IMPORTED_MODULE_0__.z.coerce.number();
+const timeoutSchema = numberSchema;
+const prNumberSchema = numberSchema;
+const tmtPlanRegexSchema = zod__WEBPACK_IMPORTED_MODULE_0__.z.string().min(1);
 
 
 /***/ }),

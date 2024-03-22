@@ -9,6 +9,7 @@ import { getOctokit } from './octokit';
 import post from './post';
 import { PullRequest } from './pull-request';
 import { isPost } from './state';
+import { prNumberSchema } from './schema/input';
 
 let pr: PullRequest | undefined = undefined;
 
@@ -16,7 +17,12 @@ let pr: PullRequest | undefined = undefined;
 try {
   const octokit = getOctokit(getInput('github_token', { required: true }));
 
-  pr = await PullRequest.initialize(context.issue.number, octokit);
+  const parsedPrNumber = prNumberSchema.safeParse(getInput('pr_number'));
+  const prNumber = parsedPrNumber.success
+    ? parsedPrNumber.data
+    : context.issue.number;
+
+  pr = await PullRequest.initialize(prNumber, octokit);
 
   // Check if the script was invoked in the post step
   if (!isPost) {

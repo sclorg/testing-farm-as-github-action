@@ -75,5 +75,7 @@ export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
         tags?: Record<string, string> | undefined;
     } | undefined;
 }>>;
+export declare const numberSchema: z.ZodNumber;
 export declare const timeoutSchema: z.ZodNumber;
+export declare const prNumberSchema: z.ZodNumber;
 export declare const tmtPlanRegexSchema: z.ZodString;

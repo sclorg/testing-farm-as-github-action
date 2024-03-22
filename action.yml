@@ -79,6 +79,10 @@ inputs:
     description: 'Pass specific settings, like post-install-script, to the testing environment.'
     required: false
     default: '{}'
+  pr_number:
+    description: 'Pull request number; by default context.issue.number is used'
+    required: false
+    default: ''
   timeout:
     description: 'Action is waiting for testing farm to finish or until timeout is reached. Value is in minutes.'
     required: false

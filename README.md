@@ -67,6 +67,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `update_pull_request_status` | Action will update pull request status. | false |
 | `environment_settings` | Pass custom settings to the test environment. | empty |
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
+| `pr_number` | Pull request number. | `context.issue.number` |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
 
 
