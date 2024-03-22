@@ -40140,9 +40140,7 @@ const tmtContextSchema = lib.z.object({
     module: lib.z.string().min(1).optional(),
     initiator: lib.z.string().min(1).optional(),
     trigger: lib.z.string().min(1).optional(),
-})
-    .optional()
-    .or(lib.z.object({}).transform(() => undefined));
+});
 const envSettingsSchema = lib.z.object({
     pipeline: lib.z.object({
         skip_guest_setup: lib.z.boolean().optional(),

@@ -27,7 +27,7 @@ export declare const tmtArtifactsSchema: z.ZodDefault<z.ZodArray<z.ZodObject<{
     install?: boolean | undefined;
     order?: number | undefined;
 }>, "many">>;
-export declare const tmtContextSchema: z.ZodUnion<[z.ZodOptional<z.ZodObject<{
+export declare const tmtContextSchema: z.ZodObject<{
     distro: z.ZodOptional<z.ZodString>;
     variant: z.ZodOptional<z.ZodString>;
     arch: z.ZodOptional<z.ZodString>;
@@ -54,7 +54,7 @@ export declare const tmtContextSchema: z.ZodUnion<[z.ZodOptional<z.ZodObject<{
     module?: string | undefined;
     initiator?: string | undefined;
     trigger?: string | undefined;
-}>>, z.ZodEffects<z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>, undefined, {}>]>;
+}>;
 export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
     pipeline: z.ZodOptional<z.ZodObject<{
         skip_guest_setup: z.ZodOptional<z.ZodBoolean>;
