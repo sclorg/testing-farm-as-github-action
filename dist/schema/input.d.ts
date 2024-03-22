@@ -29,15 +29,30 @@ export declare const tmtArtifactsSchema: z.ZodDefault<z.ZodArray<z.ZodObject<{
 }>, "many">>;
 export declare const tmtContextSchema: z.ZodUnion<[z.ZodOptional<z.ZodObject<{
     distro: z.ZodOptional<z.ZodString>;
+    variant: z.ZodOptional<z.ZodString>;
     arch: z.ZodOptional<z.ZodString>;
+    component: z.ZodOptional<z.ZodString>;
+    collection: z.ZodOptional<z.ZodString>;
+    module: z.ZodOptional<z.ZodString>;
+    initiator: z.ZodOptional<z.ZodString>;
     trigger: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     distro?: string | undefined;
+    variant?: string | undefined;
     arch?: string | undefined;
+    component?: string | undefined;
+    collection?: string | undefined;
+    module?: string | undefined;
+    initiator?: string | undefined;
     trigger?: string | undefined;
 }, {
     distro?: string | undefined;
+    variant?: string | undefined;
     arch?: string | undefined;
+    component?: string | undefined;
+    collection?: string | undefined;
+    module?: string | undefined;
+    initiator?: string | undefined;
     trigger?: string | undefined;
 }>>, z.ZodEffects<z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>, undefined, {}>]>;
 export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
