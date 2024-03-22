@@ -27,3 +27,4 @@ jobs:
           tmt_plan_regex: "variables_plan"
           pull_request_status_name: "Variables test"
           variables: "SOME_DUMMY_VARIABLE=FOO_BAR_VARIABLE;OS_VARIABLE=DUMMY_OS"
+          update_pull_request_status: "true"
