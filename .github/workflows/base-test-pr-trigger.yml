@@ -1,0 +1,21 @@
+on: pull_request_target
+jobs:
+  container-tests:
+    runs-on: ubuntu-22.04
+    name: "Smoke test for tfaga - pull_request_target"
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run the tests
+        uses: ./
+        with:
+          api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
+          tmt_plan_regex: "smoke_plan"
+          pull_request_status_name: "Smoke test - pull_request_target"
+          update_pull_request_status: "true"
+          create_issue_comment: "true"
