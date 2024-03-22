@@ -40130,9 +40130,15 @@ const tmtArtifactsSchema = lib.z.array(lib.z.object({
 }))
     .default([]);
 // https://testing-farm.gitlab.io/api/#operation/requestsPost
+// https://tmt.readthedocs.io/en/stable/spec/context.html#dimension
 const tmtContextSchema = lib.z.object({
     distro: lib.z.string().min(1).optional(),
+    variant: lib.z.string().min(1).optional(),
     arch: lib.z.string().min(1).optional(),
+    component: lib.z.string().min(1).optional(),
+    collection: lib.z.string().min(1).optional(),
+    module: lib.z.string().min(1).optional(),
+    initiator: lib.z.string().min(1).optional(),
     trigger: lib.z.string().min(1).optional(),
 })
     .optional()

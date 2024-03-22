@@ -48,10 +48,16 @@ export const tmtArtifactsSchema = z
   .default([]);
 
 // https://testing-farm.gitlab.io/api/#operation/requestsPost
+// https://tmt.readthedocs.io/en/stable/spec/context.html#dimension
 export const tmtContextSchema = z
   .object({
     distro: z.string().min(1).optional(),
+    variant: z.string().min(1).optional(),
     arch: z.string().min(1).optional(),
+    component: z.string().min(1).optional(),
+    collection: z.string().min(1).optional(),
+    module: z.string().min(1).optional(),
+    initiator: z.string().min(1).optional(),
     trigger: z.string().min(1).optional(),
   })
   .optional()
