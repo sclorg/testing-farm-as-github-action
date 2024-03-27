@@ -7,7 +7,7 @@
 
 Testing Farm as GitHub Action is a GitHub Action for executing tests on the [Testing Farm Service](https://docs.testing-farm.io).
 
-The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs.io/en/latest/spec.html) by the user of this GitHub Action.
+The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs.io/en/stable/guide.html#plans) by the user of this GitHub Action.
 Pull Request status is automatically updated after the tests are executed,
 if this option is enabled with the `update_pull_request_status` user-defined input variable.
 
