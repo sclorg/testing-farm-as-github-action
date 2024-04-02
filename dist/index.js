@@ -17470,9 +17470,15 @@ const environmentSchema = lib.z.object({
     })
         .optional(),
     tmt: lib.z.object({
+        // https://tmt.readthedocs.io/en/stable/spec/context.html#dimension
         context: lib.z.object({
             distro: lib.z.string().min(1).optional(),
+            variant: lib.z.string().min(1).optional(),
             arch: lib.z.string().min(1).optional(),
+            component: lib.z.string().min(1).optional(),
+            collection: lib.z.string().min(1).optional(),
+            module: lib.z.string().min(1).optional(),
+            initiator: lib.z.string().min(1).optional(),
             trigger: lib.z.string().min(1).optional(),
         })
             .optional()
@@ -17617,6 +17623,9 @@ class TestingFarmAPI {
             return this.link.post('requests', data);
         }
         return newRequestResponseSchema.parse(await this.link.post('requests', data));
+    }
+    async unsafeNewRequest(request) {
+        return await this.link.post('requests', request);
     }
     async requestDetails(requestId, strict) {
         const id = requestIdSchema.parse(requestId);
@@ -40204,6 +40213,14 @@ async function action(pr) {
     const tmtArtifacts = tmtArtifactsParsed.success
         ? tmtArtifactsSchema.parse(tmtArtifactsParsed.data)
         : [];
+    // Generate tmt hardware specification
+    // See https://tmt.readthedocs.io/en/stable/spec/plans.html#hardware
+    // https://gitlab.com/testing-farm/docs/root/-/merge_requests/120/diffs?view=inline
+    const rawTmtHardware = (0,core.getInput)('tmt_hardware');
+    let tmtHardware;
+    if (rawTmtHardware) {
+        tmtHardware = JSON.parse(rawTmtHardware);
+    }
     // Generate tmt context
     const tmtContextParsed = tmtContextInputSchema.safeParse((0,core.getInput)('tmt_context'));
     const tmtContext = tmtContextParsed.success
@@ -40237,8 +40254,15 @@ async function action(pr) {
             },
         ],
     };
-    // The strict mode should be enabled once https://github.com/redhat-plumbers-in-action/testing-farm/issues/71 is fixed
-    const tfResponseRaw = await api.newRequest(request, false);
+    let tfResponseRaw;
+    if (!rawTmtHardware) {
+        // Use newRequest method in case tmt_hardware is not defined or parameter is not properly formatted
+        tfResponseRaw = await api.newRequest(request, false);
+    }
+    else {
+        // The strict mode should be enabled once https://github.com/redhat-plumbers-in-action/testing-farm/issues/71 is fixed
+        tfResponseRaw = await api.unsafeNewRequest(Object.assign(Object.assign({}, request), { environments: [Object.assign(Object.assign({}, request.environments[0]), { hardware: tmtHardware })] }));
+    }
     // Remove all secrets from request before printing it
     delete request.api_key;
     request.environments.map((env) => delete env.secrets);

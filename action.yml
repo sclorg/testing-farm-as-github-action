@@ -83,6 +83,9 @@ inputs:
     description: 'Action is waiting for testing farm to finish or until timeout is reached. Value is in minutes.'
     required: false
     default: '480'
+  tmt_hardware:
+    description: 'Define hardware requirements for the testing environment as a JSON string. See https://tmt.readthedocs.io/en/latest/spec/hardware.html'
+    required: false
 
 outputs:
   request_id:

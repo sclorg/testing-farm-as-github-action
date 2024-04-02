@@ -48,6 +48,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `arch` | Define an architecture for testing environment | x86_64 |
 | `variables` | Environment variables for test env, separated by ; | empty |
 | `secrets` | Environment secrets for test env, separated by ; | empty |
+| `tmt_hardware` | Hardware definition for test env | empty |
 
 ### Test Artifacts
 
