@@ -86,6 +86,10 @@ inputs:
   tmt_hardware:
     description: 'Define hardware requirements for the testing environment as a JSON string. See https://tmt.readthedocs.io/en/latest/spec/hardware.html'
     required: false
+  tmt_path:
+    description: 'A path in the repository with tmt metadata'
+    required: false
+    default: '.'
 
 outputs:
   request_id:

@@ -67,4 +67,5 @@ export const envSettingsSchema = z
     .optional();
 export const timeoutSchema = z.coerce.number();
 export const tmtPlanRegexSchema = z.string().min(1);
+export const tmtPathSchema = z.string().min(1);
 //# sourceMappingURL=input.js.map
