@@ -38,6 +38,8 @@ function setDefaultInputs() {
   vi.stubEnv('INPUT_COPR_ARTIFACTS', '');
   // tmt_context - A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;
   vi.stubEnv('INPUT_TMT_CONTEXT', '');
+  // tmt_path - A path in the repository with tmt metadata
+  vi.stubEnv('INPUT_TMT_PATH', '.');
   // tf_scope - Defines the scope of Testing Farm. Possible options are public and private
   vi.stubEnv('INPUT_TF_SCOPE', 'public');
   // environment_settings - Pass specific settings, like post-install-script, to the testing environment
