@@ -4,7 +4,7 @@ import { setTimeout } from 'timers/promises';
 import { TFError } from './error';
 import { setTfArtifactUrl, setTfRequestId } from './state';
 import { composeStatusDescription, getSummary } from './util';
-import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, } from './schema/input';
+import { envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPathSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
     const tfInstance = getInput('api_url');
@@ -39,6 +39,9 @@ async function action(pr) {
     if (rawTmtHardware) {
         tmtHardware = JSON.parse(rawTmtHardware);
     }
+    // Conditionally include the name attribute only if tmt_plan_regex is not null
+    const tmtPathParsed = tmtPathSchema.safeParse(getInput('tmt_path'));
+    const tmtPath = tmtPathParsed.success ? tmtPathParsed.data : '.';
     // Generate tmt context
     const tmtContextParsed = tmtContextInputSchema.safeParse(getInput('tmt_context'));
     const tmtContext = tmtContextParsed.success
@@ -56,7 +59,7 @@ async function action(pr) {
     const request = {
         api_key: getInput('api_key', { required: true }),
         test: {
-            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref: getInput('git_ref') }, tmtPlanRegex),
+            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref: getInput('git_ref'), path: tmtPath }, tmtPlanRegex),
         },
         environments: [
             {

@@ -39,6 +39,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `git_ref` | A tmt tests branch which will be used for tests | master |
 | `tmt_plan_regex` | A regular expression used to select tmt plans | all |
 | `tmt_context` | A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty |
+| `tmt_path` |  A path in the repository with tmt metadata | "." |
 
 ### Test Environment
 
