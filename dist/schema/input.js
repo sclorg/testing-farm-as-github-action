@@ -27,7 +27,7 @@ export const tmtArtifactsInputSchema = stringToArraySchema.transform(arr => {
     return artifacts;
 });
 export const tmtContextInputSchema = keyValueArrayToObjectSchema;
-// https://testing-farm.gitlab.io/api/#operation/requestsPost
+// https://api.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post
 export const tmtArtifactsSchema = z
     .array(z.object({
     id: z.string().min(1),
@@ -37,7 +37,7 @@ export const tmtArtifactsSchema = z
     order: z.number().optional(),
 }))
     .default([]);
-// https://testing-farm.gitlab.io/api/#operation/requestsPost
+// https://api.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post
 // https://tmt.readthedocs.io/en/stable/spec/context.html#dimension
 export const tmtContextSchema = z.object({
     distro: z.string().min(1).optional(),
@@ -62,6 +62,14 @@ export const envSettingsSchema = z
         tags: z.record(z.string()).optional(),
     })
         .optional(),
+})
+    .optional();
+export const pipelineSettingsSchema = z
+    .object({
+    timeout: z.number().min(1).optional(),
+    type: z.enum(['tmt-multihost']).optional(),
+    'provision-error-failed-result': z.boolean().optional(),
+    'parallel-limit': z.number().nonnegative().optional(),
 })
     .optional();
 export const timeoutSchema = z.coerce.number();

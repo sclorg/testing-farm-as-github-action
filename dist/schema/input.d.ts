@@ -17,15 +17,15 @@ export declare const tmtArtifactsSchema: z.ZodDefault<z.ZodArray<z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     type: string;
+    order?: number | undefined;
     packages?: string[] | undefined;
     install?: boolean | undefined;
-    order?: number | undefined;
 }, {
     id: string;
     type: string;
+    order?: number | undefined;
     packages?: string[] | undefined;
     install?: boolean | undefined;
-    order?: number | undefined;
 }>, "many">>;
 export declare const tmtContextSchema: z.ZodObject<{
     distro: z.ZodOptional<z.ZodString>;
@@ -89,6 +89,22 @@ export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
         post_install_script?: string | undefined;
         tags?: Record<string, string> | undefined;
     } | undefined;
+}>>;
+export declare const pipelineSettingsSchema: z.ZodOptional<z.ZodObject<{
+    timeout: z.ZodOptional<z.ZodNumber>;
+    type: z.ZodOptional<z.ZodEnum<["tmt-multihost"]>>;
+    'provision-error-failed-result': z.ZodOptional<z.ZodBoolean>;
+    'parallel-limit': z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    timeout?: number | undefined;
+    type?: "tmt-multihost" | undefined;
+    'provision-error-failed-result'?: boolean | undefined;
+    'parallel-limit'?: number | undefined;
+}, {
+    timeout?: number | undefined;
+    type?: "tmt-multihost" | undefined;
+    'provision-error-failed-result'?: boolean | undefined;
+    'parallel-limit'?: number | undefined;
 }>>;
 export declare const timeoutSchema: z.ZodNumber;
 export declare const tmtPlanRegexSchema: z.ZodString;
