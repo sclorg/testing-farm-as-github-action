@@ -16,6 +16,7 @@ import { setTfArtifactUrl, setTfRequestId } from './state';
 import { composeStatusDescription, getSummary } from './util';
 
 import {
+  pipelineSettingsSchema,
   envSettingsSchema,
   tfScopeSchema,
   timeoutSchema,
@@ -107,6 +108,10 @@ async function action(pr: PullRequest): Promise<void> {
   );
   const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
 
+  const pipelineSettings = pipelineSettingsSchema.parse(
+    JSON.parse(getInput('pipeline_settings'))
+  );
+
   // Schedule a test on Testing Farm
   const request = {
     api_key: getInput('api_key', { required: true }),
@@ -133,6 +138,9 @@ async function action(pr: PullRequest): Promise<void> {
         },
       },
     ],
+    settings: {
+      pipeline: pipelineSettings,
+    },
   };
 
   let tfResponseRaw: unknown;

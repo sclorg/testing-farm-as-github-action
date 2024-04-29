@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import action from '../src/action';
 import { NewRequest } from 'testing-farm';
 import { PullRequest } from '../src/pull-request';
+import { ZodError } from 'zod';
 
 /**
  * Function which sets default Action inputs using environment variables and vi.stubEnv()
@@ -44,6 +45,8 @@ function setDefaultInputs() {
   vi.stubEnv('INPUT_TF_SCOPE', 'public');
   // environment_settings - Pass specific settings, like post-install-script, to the testing environment
   vi.stubEnv('INPUT_ENVIRONMENT_SETTINGS', '{}');
+  // pipeline_settings - Pass specific settings for the testing farm pipeline, e.g. the type for multihost testing
+  vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{}');
   // pr_head_sha - HEAD SHA of a Pull Request. Used for posting statuses to the PR. The value is obtained from `git rev-parse HEAD` if this input is not set
   vi.stubEnv('INPUT_PR_HEAD_SHA', '');
   // Action is waiting for testing farm to finish or until timeout is reached
@@ -323,6 +326,128 @@ describe('Integration tests - action.ts', () => {
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
+  });
+
+  test('Pipeline settings test', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    // api_key - A testing farm server api key
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    // git_url - An url to the GIT repository
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{"type": "tmt-multihost"}');
+
+    // Mock Testing Farm API
+    vi.mocked(mocks.newRequest).mockImplementation(
+      async (_request: NewRequest, _strict: boolean) => {
+        return Promise.resolve({
+          id: '1',
+        });
+      }
+    );
+    vi.mocked(mocks.requestDetails)
+      .mockResolvedValueOnce({ state: 'new', result: null })
+      .mockResolvedValueOnce({ state: 'queued', result: null })
+      .mockResolvedValueOnce({ state: 'pending', result: null })
+      .mockResolvedValueOnce({ state: 'running', result: null })
+      .mockResolvedValueOnce({
+        state: 'complete',
+        result: { overall: 'passed', summary: '\\o/' },
+      });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(1, octokit);
+
+    await action(pr);
+
+    // hardware reguest has not been called
+    expect(mocks.unsafeNewRequest).not.toHaveBeenCalled();
+
+    // Check if we have waited for Testing Farm to finish
+    expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
+
+    // Test outputs
+    expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
+    expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
+      '"https://api.dev.testing-farm.io/requests/1"'
+    );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
+    );
+
+    // First call to request PR details, next two calls for setting the status
+    expect(mocks.request).toHaveBeenCalledTimes(1);
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
+      {
+        owner: 'sclorg',
+        pull_number: 1,
+        repo: 'testing-farm-as-github-action',
+      }
+    );
+
+    // Test summary
+    await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td>[pipeline.log](https://artifacts.dev.testing-farm.io/1/pipeline.log)</td></tr></table>
+`);
+
+    expect(mocks.TFError).not.toHaveBeenCalled();
+  });
+
+  test('Pipeline settings test - invalid input', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    // api_key - A testing farm server api key
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    // git_url - An url to the GIT repository
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{"type": "multihost"}');
+
+    vi.mocked(mocks.requestDetails)
+      .mockResolvedValueOnce({ state: 'new', result: null })
+      .mockResolvedValueOnce({ state: 'queued', result: null })
+      .mockResolvedValueOnce({ state: 'pending', result: null })
+      .mockResolvedValueOnce({ state: 'running', result: null })
+      .mockResolvedValueOnce({
+        state: 'complete',
+        result: { overall: 'passed', summary: '\\o/' },
+      });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(1, octokit);
+
+    try {
+      await action(pr);
+    } catch (error) {
+      expect(error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "received": "multihost",
+          "code": "invalid_enum_value",
+          "options": [
+            "tmt-multihost"
+          ],
+          "path": [
+            "type"
+          ],
+          "message": "Invalid enum value. Expected 'tmt-multihost', received 'multihost'"
+        }
+      ]]
+      `);
+    }
+
+    expect(mocks.unsafeNewRequest).not.toHaveBeenCalled();
+    expect(mocks.newRequest).not.toHaveBeenCalled();
   });
 
   test('Hardware test - wrong JSON', async () => {

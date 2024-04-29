@@ -79,6 +79,10 @@ inputs:
     description: 'Pass specific settings, like post-install-script, to the testing environment.'
     required: false
     default: '{}'
+  pipeline_settings:
+    description: 'Pass specific settings for the testing farm pipeline, e.g. the type for multihost testing.'
+    required: false
+    default: '{}'
   timeout:
     description: 'Action is waiting for testing farm to finish or until timeout is reached. Value is in minutes.'
     required: false
