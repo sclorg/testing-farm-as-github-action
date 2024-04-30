@@ -1281,14 +1281,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.7":
-  version: 1.6.7
-  resolution: "axios@npm:1.6.7"
+"axios@npm:1.6.8":
+  version: 1.6.8
+  resolution: "axios@npm:1.6.8"
   dependencies:
-    follow-redirects: ^1.15.4
+    follow-redirects: ^1.15.6
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 87d4d429927d09942771f3b3a6c13580c183e31d7be0ee12f09be6d5655304996bb033d85e54be81606f4e89684df43be7bf52d14becb73a12727bf33298a082
+  checksum: bf007fa4b207d102459300698620b3b0873503c6d47bf5a8f6e43c0c64c90035a4f698b55027ca1958f61ab43723df2781c38a99711848d232cad7accbcdfcdd
   languageName: node
   linkType: hard
 
@@ -1886,13 +1886,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.4":
-  version: 1.15.5
-  resolution: "follow-redirects@npm:1.15.5"
+"follow-redirects@npm:^1.15.6":
+  version: 1.15.6
+  resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 5ca49b5ce6f44338cbfc3546823357e7a70813cecc9b7b768158a1d32c1e62e7407c944402a918ea8c38ae2e78266312d617dc68783fac502cbb55e1047b34ec
+  checksum: a62c378dfc8c00f60b9c80cab158ba54e99ba0239a5dd7c81245e5a5b39d10f0c35e249c3379eae719ff0285fff88c365dd446fab19dee771f1d76252df1bbf5
   languageName: node
   linkType: hard
 
@@ -3188,7 +3188,7 @@ __metadata:
     "@vitest/coverage-v8": ^0.34.6
     eslint: ^8.56.0
     prettier: ^3.2.5
-    testing-farm: ^1.8.0
+    testing-farm: ^1.9.0
     ts-node: ^10.9.2
     typescript: ^5.4.5
     vitest: ^0.34.6
@@ -3196,13 +3196,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"testing-farm@npm:^1.8.0":
-  version: 1.8.0
-  resolution: "testing-farm@npm:1.8.0"
+"testing-farm@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "testing-farm@npm:1.9.0"
   dependencies:
-    axios: ^1.6.7
-    zod: ^3.22.4
-  checksum: df977cf4ae2340507353ac74a6071786a9797e01d34211ad0de051ac37f92f00082ca2f1f2f0154256c82b60cecf37b530ad601b38d7d5ec2d9c6c48b0f667fe
+    axios: 1.6.8
+    zod: 3.23.4
+  checksum: f73fd20325b13d0eb4249c3d1537b1d29203a8e29f78599dd03e72ba0bbfb29ccbabe121d4c09f39e885e67b84c984d090835ffedd40765e8276dd7a954e78d7
   languageName: node
   linkType: hard
 
@@ -3628,6 +3628,13 @@ __metadata:
   version: 1.0.0
   resolution: "yocto-queue@npm:1.0.0"
   checksum: 2cac84540f65c64ccc1683c267edce396b26b1e931aa429660aefac8fbe0188167b7aee815a3c22fa59a28a58d898d1a2b1825048f834d8d629f4c2a5d443801
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.23.4":
+  version: 3.23.4
+  resolution: "zod@npm:3.23.4"
+  checksum: 58f6e298c51d9ae01a1b1a1692ac7f00774b466d9a287a1ff8d61ff1fbe0ae9b0f050ae1cf1a8f71e4c6ccd0333a3cc340f339360fab5f5046cc954d10525a54
   languageName: node
   linkType: hard
 
