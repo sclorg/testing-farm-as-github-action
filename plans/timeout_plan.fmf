@@ -1,0 +1,10 @@
+summary: Basic timeout test
+execute:
+    how: tmt
+    duration: 10s
+    script: |
+        set +x
+        echo "Set sleep time to an hour for sure."
+        sleep 60
+        echo "this should never happened because of timeout"
+        exit 0
