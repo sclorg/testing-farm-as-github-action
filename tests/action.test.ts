@@ -533,7 +533,7 @@ describe('Integration tests - action.ts', () => {
     } catch (error) {
       expect(error).toMatchInlineSnapshot(`
         {
-          "message": "Build finished - \\\\o/",
+          "message": "Build finished - \\o/",
           "url": "https://artifacts.dev.testing-farm.io/1",
         }
       `);
