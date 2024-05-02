@@ -560,15 +560,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-throttling@npm:^8.1.3":
-  version: 8.2.0
-  resolution: "@octokit/plugin-throttling@npm:8.2.0"
+"@octokit/plugin-throttling@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "@octokit/plugin-throttling@npm:9.3.0"
   dependencies:
-    "@octokit/types": ^12.2.0
+    "@octokit/types": ^13.0.0
     bottleneck: ^2.15.3
   peerDependencies:
-    "@octokit/core": ^5.0.0
-  checksum: 12c357175783bcd0feea454ece57f033928948a0555dc97c79675b56d2cc79043d2a5e28a7554d3531f1de13583634df3b48fb9609f79e8bb3adad92820bd807
+    "@octokit/core": ^6.0.0
+  checksum: 0b651f8486132e22d5dfc7b2990e6e09378610d3d350ee2934272bc4c0bd5593a8a5aa4291d75707cb0289b0b1e0eebe18814bea40032105efe443fae2bf4cc3
   languageName: node
   linkType: hard
 
@@ -628,7 +628,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:^12.2.0, @octokit/types@npm:^12.6.0":
+"@octokit/types@npm:^12.6.0":
   version: 12.6.0
   resolution: "@octokit/types@npm:12.6.0"
   dependencies:
@@ -3147,7 +3147,7 @@ __metadata:
     "@actions/core": ^1.10.1
     "@actions/github": ^6.0.0
     "@octokit/core": ^6.1.2
-    "@octokit/plugin-throttling": ^8.1.3
+    "@octokit/plugin-throttling": ^9.3.0
     "@octokit/rest": ^20.1.0
     "@octokit/types": ^13.4.1
     "@total-typescript/ts-reset": ^0.5.1
