@@ -11,11 +11,10 @@
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
-    "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "vitest run --coverage",
     "update-snapshots": "vitest run --update",
-    "all": "yarn && yarn run build && yarn run format && yarn run lint && yarn run package && yarn test"
+    "all": "yarn && yarn run build && yarn run format && yarn run package && yarn test"
   },
   "packageManager": "yarn@3.6.4",
   "repository": {
@@ -41,11 +40,8 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "0.5.1",
     "@types/node": "20.12.8",
-    "@typescript-eslint/eslint-plugin": "7.8.0",
-    "@typescript-eslint/parser": "7.8.0",
     "@vercel/ncc": "0.38.1",
     "@vitest/coverage-v8": "1.5.3",
-    "eslint": "8.56.0",
     "prettier": "3.2.5",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
