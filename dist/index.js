@@ -40108,12 +40108,11 @@ const stringToArraySchema = lib.z.string().transform(str => str.split(';'));
 const keyValueArrayToObjectSchema = stringToArraySchema.transform(arr => {
     let obj = {};
     arr.forEach(item => {
-        const [key, value] = item.split('=');
+        const [key, ...values] = item.split('=');
         // ''.split('=') returns [''] ; we have to check for this case
-        if (key === '' && value === undefined)
+        if (key === '' && Array.isArray(values) && values.length === 0)
             return;
-        // 'abc'.split('=') returns ['abc'] ; we have to check for this case
-        obj[key] = value !== null && value !== void 0 ? value : '';
+        obj[key] = values.join('=');
     });
     return lib.z.record(lib.z.string(), lib.z.string()).parse(obj);
 });

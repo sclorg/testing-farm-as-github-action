@@ -10,11 +10,10 @@ const stringToArraySchema = z.string().transform(str => str.split(';'));
 const keyValueArrayToObjectSchema = stringToArraySchema.transform(arr => {
   let obj: { [key: string]: string } = {};
   arr.forEach(item => {
-    const [key, value] = item.split('=');
+    const [key, ...values] = item.split('=');
     // ''.split('=') returns [''] ; we have to check for this case
-    if (key === '' && value === undefined) return;
-    // 'abc'.split('=') returns ['abc'] ; we have to check for this case
-    obj[key] = value ?? '';
+    if (key === '' && Array.isArray(values) && values.length === 0) return;
+    obj[key] = values.join('=');
   });
   return z.record(z.string(), z.string()).parse(obj);
 });
