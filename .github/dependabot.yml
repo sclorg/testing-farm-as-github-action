@@ -4,7 +4,14 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    labels:
+      - 'type: dependencies'
+      - github_actions
+
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: monthly
+    labels:
+      - 'type: dependencies'
+      - 'javascript'
