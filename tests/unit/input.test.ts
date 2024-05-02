@@ -89,7 +89,7 @@ describe('tmt variables/secrets/context input', () => {
   });
 
   test('Corner case input', () => {
-    const input = 'A=a;B=;=c;D;=';
+    const input = 'A=a;B=;=c;D;E=base64=;=';
 
     expect(tmtEnvVarsSchema.parse(input)).toMatchInlineSnapshot(`
       {
@@ -97,6 +97,7 @@ describe('tmt variables/secrets/context input', () => {
         "A": "a",
         "B": "",
         "D": "",
+        "E": "base64=",
       }
     `);
     expect(tmtEnvSecretsSchema.parse(input)).toMatchInlineSnapshot(`
@@ -105,6 +106,7 @@ describe('tmt variables/secrets/context input', () => {
         "A": "a",
         "B": "",
         "D": "",
+        "E": "base64=",
       }
     `);
     expect(tmtContextInputSchema.parse(input)).toMatchInlineSnapshot(`
@@ -113,6 +115,7 @@ describe('tmt variables/secrets/context input', () => {
         "A": "a",
         "B": "",
         "D": "",
+        "E": "base64=",
       }
     `);
   });
