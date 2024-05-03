@@ -1,0 +1,30 @@
+name: Report an issue
+description: File a generic issue here
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thank you for taking the time to report this issue to us. We appreciate the
+        feedback and use reports such as this one to guide our efforts in improving the
+        testing-farm-as-github-action. That being said, our time resources are somewhat
+        limited, and we are not able to guarantee the timeliness or suitability of a
+        resolution.
+
+        Feature requests are being evaluated separately, and we welcome contribution
+        PRs for them after positive feedback for their incorporation into the
+        testing-farm-as-github-action is received from us.
+
+        For information on how to contribute to this GitHub repository, please visit
+        the [Development Guide](https://github.com/sclorg/testing-farm-as-github-action/blob/main/DEVELOPMENT.md).
+
+  - type: textarea
+    attributes:
+      label: Description
+      description: Here is a place to entry a description of the issue.
+
+  - type: textarea
+    attributes:
+      label: Reproducer
+      description: >
+        Providing a reproducer can speed up our issue resolution process.
+        Minimal reproducers are preferred.
