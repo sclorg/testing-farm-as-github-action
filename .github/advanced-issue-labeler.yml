@@ -1,0 +1,13 @@
+policy:
+  - section:
+      - id: ['type']
+        block-list: ['Other', 'None']
+        label:
+          - name: 'type: bug'
+            keys: ['Bug Report']
+
+          - name: 'type: feature'
+            keys: ['Feature Request']
+
+          - name: 'type: question'
+            keys: ['Question']
