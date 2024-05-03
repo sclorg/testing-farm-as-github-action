@@ -17,6 +17,19 @@ body:
         For information on how to contribute to this GitHub repository, please visit
         the [Development Guide](https://github.com/sclorg/testing-farm-as-github-action/blob/main/DEVELOPMENT.md).
 
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of issue
+      multiple: false
+      options:
+        - 'Bug Report'
+        - 'Feature Request'
+        - 'Question'
+        - 'Other'
+    validations:
+      required: false
+
   - type: textarea
     attributes:
       label: Description
