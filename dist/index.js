@@ -40914,7 +40914,7 @@ class PullRequest {
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)('Skipping setting Pull Request Status');
             return;
         }
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pull_request_status_name')}`, description, target_url: url }));
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
     }
     /**
