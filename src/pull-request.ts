@@ -48,7 +48,7 @@ export class PullRequest {
         sha: this.sha,
         state,
         context: `Testing Farm - ${getInput('pull_request_status_name')}`,
-        description,
+        description: description ? description.slice(0, 140) : description,
         target_url: url,
       }
     );
