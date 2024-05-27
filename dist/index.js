@@ -39418,7 +39418,8 @@ async function action(pr) {
                 (0,core.getInput)('arch'),
                 infraError ? 'Failed' : 'OK',
                 finalState,
-                `[pipeline.log](${tfArtifactUrl}/pipeline.log)`,
+                `<a href="${tfArtifactUrl}">test</a> ` +
+                    `<a href="${tfArtifactUrl}/pipeline.log">pipeline</a>`,
             ],
         ])
             .write();
