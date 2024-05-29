@@ -22,7 +22,6 @@ jobs:
         uses: ./
         with:
           api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
-          git_url: "https://github.com/sclorg/testing-farm-as-github-action"
           git_ref: "main"
           tmt_plan_regex: "smoke_plan"
           pull_request_status_name: "GitHub summary test"
