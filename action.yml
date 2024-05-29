@@ -15,7 +15,8 @@ inputs:
     required: true
   git_url:
     description: 'An url to the GIT repository with TMT plans'
-    required: true
+    required: false
+    default: '${{ github.server_url }}/${{ github.repository }}'
   git_ref:
     description: 'A TMT tests branch which will be used for tests'
     required: false
