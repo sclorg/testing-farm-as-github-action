@@ -112,13 +112,16 @@ async function action(pr: PullRequest): Promise<void> {
     JSON.parse(getInput('pipeline_settings'))
   );
 
+  const ref = getInput('git_ref') || 'master';
+  debug(`Using git_ref: '${ref}'`);
+
   // Schedule a test on Testing Farm
   const request = {
     api_key: getInput('api_key', { required: true }),
     test: {
       fmf: {
         url: getInput('git_url', { required: true }),
-        ref: getInput('git_ref'),
+        ref,
         path: tmtPath,
         ...tmtPlanRegex,
       },

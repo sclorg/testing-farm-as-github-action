@@ -56,11 +56,13 @@ async function action(pr) {
     const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse(getInput('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
     const pipelineSettings = pipelineSettingsSchema.parse(JSON.parse(getInput('pipeline_settings')));
+    const ref = getInput('git_ref') || 'master';
+    debug(`Using git_ref: '${ref}'`);
     // Schedule a test on Testing Farm
     const request = {
         api_key: getInput('api_key', { required: true }),
         test: {
-            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref: getInput('git_ref'), path: tmtPath }, tmtPlanRegex),
+            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref, path: tmtPath }, tmtPlanRegex),
         },
         environments: [
             {
