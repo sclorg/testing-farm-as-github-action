@@ -23,7 +23,6 @@ jobs:
         id: tf_results
         with:
           api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
-          git_ref: "main"
           tmt_plan_regex: "timeout_plan"
           pull_request_status_name: "Timeout test"
           update_pull_request_status: "true"
