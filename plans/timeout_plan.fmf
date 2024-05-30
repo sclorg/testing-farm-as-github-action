@@ -5,6 +5,6 @@ execute:
     script: |
         set +x
         echo "Set sleep time to an hour for sure."
-        sleep 60
+        sleep 30
         echo "this should never happened because of timeout"
         exit 0
