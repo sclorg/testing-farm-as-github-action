@@ -796,9 +796,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@vitest/coverage-v8@npm:1.5.3"
+"@vitest/coverage-v8@npm:1.6.0":
+  version: 1.6.0
+  resolution: "@vitest/coverage-v8@npm:1.6.0"
   dependencies:
     "@ampproject/remapping": ^2.2.1
     "@bcoe/v8-coverage": ^0.2.3
@@ -814,8 +814,8 @@ __metadata:
     strip-literal: ^2.0.0
     test-exclude: ^6.0.0
   peerDependencies:
-    vitest: 1.5.3
-  checksum: 9e43aed30ca29d1693ce91ce2c55b7445ae57b4fb016ecb5baea829407ba48c636e3627764a50b0807830b93dd9a069da39439d8c9f9bfb2ebbe38745f6578cc
+    vitest: 1.6.0
+  checksum: f5f29ec8768bc221f01f0183f7b326fc88113c6f1cdf215713f4ee00a47d01fd3ce446d1cd38935a005caab17f560490b351927e7e939669d39dbdf5ddf29360
   languageName: node
   linkType: hard
 
@@ -2444,7 +2444,7 @@ __metadata:
     "@total-typescript/ts-reset": 0.5.1
     "@types/node": 20.12.8
     "@vercel/ncc": 0.38.1
-    "@vitest/coverage-v8": 1.5.3
+    "@vitest/coverage-v8": 1.6.0
     prettier: 3.2.5
     testing-farm: 1.9.1
     ts-node: 10.9.2
