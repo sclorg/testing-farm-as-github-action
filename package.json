@@ -41,7 +41,7 @@
     "@total-typescript/ts-reset": "0.5.1",
     "@types/node": "20.12.8",
     "@vercel/ncc": "0.38.1",
-    "@vitest/coverage-v8": "1.5.3",
+    "@vitest/coverage-v8": "1.6.0",
     "prettier": "3.2.5",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
