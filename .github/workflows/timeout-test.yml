@@ -23,7 +23,6 @@ jobs:
         id: tf_results
         with:
           api_key: ${{ secrets.TF_PUBLIC_API_KEY }}
-          git_url: "https://github.com/sclorg/testing-farm-as-github-action"
           git_ref: "main"
           tmt_plan_regex: "timeout_plan"
           pull_request_status_name: "Timeout test"
