@@ -31,7 +31,7 @@ jobs:
 
       - name: Check if log contains exceed limit
         run: |
-          curl {{ steps.tf_results.outputs.test_log_url }} > results.log
+          curl ${{ steps.tf_results.outputs.test_log_url }} > results.log
           ret_val = $(grep 'duration \"10s\" exceeded' results.log)
           if [[ $ret_val != 0 ]]; then
             exit 1
