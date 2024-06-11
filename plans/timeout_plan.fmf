@@ -1,10 +1,10 @@
 summary: Basic timeout test
 execute:
     how: tmt
-    duration: 10s
+    duration: 150m
     script: |
         set +x
-        echo "Set sleep time to an hour for sure."
-        sleep 30
-        echo "this should never happened because of timeout"
+        echo "Set sleep time to 300s (more then timeout set on GHA)"
+        sleep 300
+        echo "This should never happened because of timeout set on GHA"
         exit 0
