@@ -18,9 +18,9 @@ inputs:
     required: false
     default: '${{ github.server_url }}/${{ github.repository }}'
   git_ref:
-    description: 'A TMT tests branch which will be used for tests'
+    description: 'A tmt tests branch, tag or commit specifying the desired git revision which will be used for tests.'
     required: false
-    default: 'master'
+    default: '${{ github.ref }}'
   github_token:
     description: 'GitHub TOKEN or PAT'
     required: false

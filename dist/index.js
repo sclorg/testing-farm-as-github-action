@@ -39300,11 +39300,13 @@ async function action(pr) {
     const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse((0,core.getInput)('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
     const pipelineSettings = pipelineSettingsSchema.parse(JSON.parse((0,core.getInput)('pipeline_settings')));
+    const ref = (0,core.getInput)('git_ref') || 'master';
+    (0,core.debug)(`Using git_ref: '${ref}'`);
     // Schedule a test on Testing Farm
     const request = {
         api_key: (0,core.getInput)('api_key', { required: true }),
         test: {
-            fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref: (0,core.getInput)('git_ref'), path: tmtPath }, tmtPlanRegex),
+            fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref, path: tmtPath }, tmtPlanRegex),
         },
         environments: [
             {

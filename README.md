@@ -36,7 +36,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
 | `git_url` | An url to the repository with tmt metadata | url of repo that runs GHA |
-| `git_ref` | A tmt tests branch which will be used for tests | master |
+| `git_ref` | A tmt tests branch, tag or commit specifying the desired git revision which will be used for tests | `github.ref` when available, otherwise `master` |
 | `tmt_plan_regex` | A regular expression used to select tmt plans | all |
 | `tmt_context` | A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty |
 | `tmt_path` |  A path in the repository with tmt metadata | "." |
@@ -72,14 +72,13 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `create_github_summary` | Create summary of the Testing Farm as GiHub Action job. Possible options: "false", "true", "key=value" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
 
-
 ## Action Outputs
+
 | Output Name | Description |
 |-------------|-------------|
 | `request_id` | An ID of a scheduled testing farm request. |
 | `request_url` | An URL of a scheduled testing farm request. |
 | `test_log_url` | An URL of a scheduled test logs. |
-
 
 > [!TIP]
 >
