@@ -51,7 +51,7 @@ async function action(pr: PullRequest): Promise<void> {
   const tfUrl =
     tfScope === 'public'
       ? 'https://artifacts.dev.testing-farm.io'
-      : 'http://artifacts.osci.redhat.com/testing-farm';
+      : 'https://artifacts.osci.redhat.com/testing-farm';
 
   // Generate tmt variables
   const tmtEnvVarsParsed = tmtEnvVarsSchema.safeParse(getInput('variables'));
