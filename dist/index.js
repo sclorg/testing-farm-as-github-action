@@ -39261,7 +39261,7 @@ async function action(pr) {
     const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
     const tfUrl = tfScope === 'public'
         ? 'https://artifacts.dev.testing-farm.io'
-        : 'http://artifacts.osci.redhat.com/testing-farm';
+        : 'https://artifacts.osci.redhat.com/testing-farm';
     // Generate tmt variables
     const tmtEnvVarsParsed = tmtEnvVarsSchema.safeParse((0,core.getInput)('variables'));
     const tmtEnvVars = tmtEnvVarsParsed.success ? tmtEnvVarsParsed.data : {};
