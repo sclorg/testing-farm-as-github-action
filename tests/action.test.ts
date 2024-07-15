@@ -790,13 +790,13 @@ describe('Integration tests - action.ts', () => {
         repo: 'testing-farm-as-github-action',
         sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a',
         state: 'success',
-        target_url: 'http://artifacts.osci.redhat.com/testing-farm/1',
+        target_url: 'https://artifacts.osci.redhat.com/testing-farm/1',
       }
     );
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="http://artifacts.osci.redhat.com/testing-farm/1">test</a> <a href="http://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.osci.redhat.com/testing-farm/1">test</a> <a href="https://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
