@@ -1,8 +1,8 @@
 import { Octokit } from '@octokit/core';
+import { NewRequest } from 'testing-farm';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import post from '../src/post';
-import { NewRequest } from 'testing-farm';
 import { PullRequest } from '../src/pull-request';
 
 /**
@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => {
   return {
     request: vi.fn(),
     cancelRequest: vi.fn(),
+    getState: vi.fn(),
   };
 });
 
@@ -46,14 +47,12 @@ vi.mock('@actions/core', async () => {
     saveState: vi.fn().mockImplementation((name, value) => {
       vi.stubEnv(`STATE_${name.toUpperCase()}`, value);
     }),
-    getState: vi.fn().mockImplementation(name => {
-      return process.env[`STATE_${name.toUpperCase()}`];
-    }),
+    getState: mocks.getState,
   };
 });
 
 describe('Integration tests - post.ts', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     // Mock Action environment
     vi.stubEnv('RUNNER_DEBUG', '1');
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
@@ -81,9 +80,21 @@ describe('Integration tests - post.ts', () => {
           throw new Error(`Unexpected endpoint: ${path}`);
       }
     });
+
+    // Mock Testing Farm API
+    vi.mocked(mocks.cancelRequest).mockImplementation(
+      async (_request: NewRequest, _strict: boolean) => {
+        return Promise.resolve();
+      }
+    );
+
+    // Mock getState
+    vi.mocked(mocks.getState).mockImplementation(name => {
+      return process.env[`STATE_${name.toUpperCase()}`];
+    });
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
   });
@@ -102,13 +113,6 @@ describe('Integration tests - post.ts', () => {
     vi.stubEnv(
       'STATE_ARTIFACTURL',
       'https://artifacts.dev.testing-farm.io/1/pipeline.log'
-    );
-
-    // Mock Testing Farm API
-    vi.mocked(mocks.cancelRequest).mockImplementation(
-      async (_request: NewRequest, _strict: boolean) => {
-        return Promise.resolve();
-      }
     );
 
     // Run post
@@ -134,6 +138,35 @@ describe('Integration tests - post.ts', () => {
         target_url: 'https://artifacts.dev.testing-farm.io/1/pipeline.log',
       }
     );
+  });
+
+  test('Running in non pull_request like context', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    // api_key - A testing farm server api key
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    // update_pull_request_status - Action will update pull request status. Default: false
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
+
+    // Mock States
+    vi.stubEnv('STATE_REQUESTID', '1');
+    vi.stubEnv(
+      'STATE_ARTIFACTURL',
+      'https://artifacts.dev.testing-farm.io/1/pipeline.log'
+    );
+
+    // Run post
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = new PullRequest(undefined, undefined, octokit);
+
+    await post(pr);
+
+    // Check if we have cancelled the TF test request
+    expect(mocks.cancelRequest).toHaveBeenCalledOnce();
+
+    // Since action doesn't have access to Pull Request context it won't set the status nor create a comment
+    expect(mocks.request).toHaveBeenCalledTimes(0);
   });
 
   test('Post run before TF test was requested', async () => {

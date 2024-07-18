@@ -4,8 +4,8 @@ import { CustomOctokit } from './octokit';
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
  */
 export declare class PullRequest {
-    readonly number: number;
-    readonly sha: string;
+    readonly number: number | undefined;
+    readonly sha: string | undefined;
     readonly octokit: CustomOctokit;
     /**
      * PullRequest constructor, it's not meant to be called directly, use the static initialize method instead.
@@ -13,7 +13,9 @@ export declare class PullRequest {
      * @param sha - The head sha of the Pull Request
      * @param octokit - The Octokit instance to use for interacting with the GitHub API
      */
-    private constructor();
+    constructor(number: undefined, sha: undefined, octokit: CustomOctokit);
+    constructor(number: number, sha: string, octokit: CustomOctokit);
+    isInitialized(): boolean;
     /**
      * Set the Pull Request status using the GitHub API.
      * @param state - The state of the status, can be one of error, failure, pending or success

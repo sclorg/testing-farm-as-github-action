@@ -40,10 +40,6 @@ async function action(pr: PullRequest): Promise<void> {
 
   const api = new TestingFarmAPI(tfInstance);
 
-  // Get commit SHA value
-  const sha = pr.sha;
-  debug(`SHA: '${sha}'`);
-
   // Set artifacts url
   const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
   const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
@@ -185,7 +181,8 @@ async function action(pr: PullRequest): Promise<void> {
   setTfArtifactUrl(tfArtifactUrl);
 
   // Create Pull Request status in state pending
-  await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`);
+  pr.isInitialized() &&
+    (await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`));
 
   // Interval of 30 seconds in milliseconds
   const interval = 30 * 1000;
@@ -250,14 +247,15 @@ async function action(pr: PullRequest): Promise<void> {
   notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
 
   // Switch Pull Request Status to final state
-  await pr.setStatus(
-    finalState,
-    composeStatusDescription(infraError, getSummary(tfResult.result)),
-    `${tfArtifactUrl}`
-  );
+  pr.isInitialized() &&
+    (await pr.setStatus(
+      finalState,
+      composeStatusDescription(infraError, getSummary(tfResult.result)),
+      `${tfArtifactUrl}`
+    ));
 
   // Add comment with Testing Farm request/result to Pull Request
-  if (getBooleanInput('create_issue_comment')) {
+  if (pr.isInitialized() && getBooleanInput('create_issue_comment')) {
     await pr.addComment(
       `Testing Farm [request](${tfInstance}/requests/${
         tfResponse.id

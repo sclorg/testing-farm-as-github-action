@@ -7,7 +7,6 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import action from '../src/action';
 import { NewRequest } from 'testing-farm';
 import { PullRequest } from '../src/pull-request';
-import { ZodError } from 'zod';
 
 /**
  * Function which sets default Action inputs using environment variables and vi.stubEnv()
@@ -869,6 +868,72 @@ describe('Integration tests - action.ts', () => {
         repo: 'testing-farm-as-github-action',
       }
     );
+
+    // Test summary
+    await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
+<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+`);
+
+    expect(mocks.TFError).not.toHaveBeenCalled();
+  });
+
+  test('Running in non pull_request like context', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    // api_key - A testing farm server api key
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    // git_url - An url to the GIT repository
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
+    vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
+
+    // Override default inputs
+    // create_issue_comment - It creates a github issue Comment
+    vi.stubEnv('INPUT_CREATE_ISSUE_COMMENT', 'true');
+
+    // Mock Testing Farm API
+    vi.mocked(mocks.newRequest).mockImplementation(
+      async (_request: NewRequest, _strict: boolean) => {
+        return Promise.resolve({
+          id: '1',
+        });
+      }
+    );
+    vi.mocked(mocks.requestDetails)
+      .mockResolvedValueOnce({ state: 'new', result: null })
+      .mockResolvedValueOnce({ state: 'queued', result: null })
+      .mockResolvedValueOnce({ state: 'pending', result: null })
+      .mockResolvedValueOnce({ state: 'running', result: null })
+      .mockResolvedValueOnce({
+        state: 'complete',
+        result: { overall: 'passed', summary: '\\o/' },
+      });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = new PullRequest(undefined, undefined, octokit);
+
+    await action(pr);
+
+    // Check if we have waited for Testing Farm to finish
+    expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
+
+    // Test outputs
+    expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
+    expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
+      '"https://api.dev.testing-farm.io/requests/1"'
+    );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
+    );
+
+    // Since action doesn't have access to Pull Request context it won't set the status nor create a comment
+    expect(mocks.request).toHaveBeenCalledTimes(0);
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
