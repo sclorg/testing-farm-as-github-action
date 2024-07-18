@@ -14,11 +14,17 @@ export class PullRequest {
    * @param sha - The head sha of the Pull Request
    * @param octokit - The Octokit instance to use for interacting with the GitHub API
    */
-  private constructor(
-    readonly number: number,
-    readonly sha: string,
+  constructor(number: undefined, sha: undefined, octokit: CustomOctokit);
+  constructor(number: number, sha: string, octokit: CustomOctokit);
+  constructor(
+    readonly number: number | undefined,
+    readonly sha: string | undefined,
     readonly octokit: CustomOctokit
   ) {}
+
+  isInitialized(): boolean {
+    return this.number !== undefined && this.sha !== undefined;
+  }
 
   /**
    * Set the Pull Request status using the GitHub API.
@@ -41,11 +47,18 @@ export class PullRequest {
       return;
     }
 
+    if (!this.isInitialized()) {
+      debug(
+        'Skipping setting Pull Request Status, Pull Request is not initialized'
+      );
+      return;
+    }
+
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
         ...context.repo,
-        sha: this.sha,
+        sha: this.sha as string,
         state,
         context: `Testing Farm - ${getInput('pull_request_status_name')}`,
         description: description ? description.slice(0, 140) : description,
@@ -63,11 +76,16 @@ export class PullRequest {
    * @param body - The body of the comment
    */
   async addComment(body: string) {
+    if (!this.isInitialized()) {
+      debug('Skipping adding Issue comment, Pull Request is not initialized');
+      return;
+    }
+
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
       {
         ...context.repo,
-        issue_number: this.number,
+        issue_number: this.number as number,
         body,
       }
     );

@@ -18,7 +18,8 @@ async function post(pr) {
     debug(`Request ${tfRequestId} was cancelled`);
     // Set status to success when the request was cancelled
     // It's not a test failure, the request was cancelled by the user
-    await pr.setStatus('success', 'Testing Farm request was cancelled', tfArtifactUrl !== null && tfArtifactUrl !== void 0 ? tfArtifactUrl : undefined);
+    pr.isInitialized() &&
+        (await pr.setStatus('success', 'Testing Farm request was cancelled', tfArtifactUrl !== null && tfArtifactUrl !== void 0 ? tfArtifactUrl : undefined));
 }
 export default post;
 //# sourceMappingURL=post.js.map

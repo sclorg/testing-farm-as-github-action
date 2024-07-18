@@ -26,11 +26,12 @@ async function post(pr: PullRequest): Promise<void> {
 
   // Set status to success when the request was cancelled
   // It's not a test failure, the request was cancelled by the user
-  await pr.setStatus(
-    'success',
-    'Testing Farm request was cancelled',
-    tfArtifactUrl ?? undefined
-  );
+  pr.isInitialized() &&
+    (await pr.setStatus(
+      'success',
+      'Testing Farm request was cancelled',
+      tfArtifactUrl ?? undefined
+    ));
 }
 
 export default post;

@@ -39253,9 +39253,6 @@ const requestDetailsSchema = lib.z.object({
 async function action(pr) {
     const tfInstance = (0,core.getInput)('api_url');
     const api = new dist/* default */.ZP(tfInstance);
-    // Get commit SHA value
-    const sha = pr.sha;
-    (0,core.debug)(`SHA: '${sha}'`);
     // Set artifacts url
     const tfScopeParsed = tfScopeSchema.safeParse((0,core.getInput)('tf_scope'));
     const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
@@ -39350,7 +39347,8 @@ async function action(pr) {
     (0,src_state/* setTfRequestId */.jR)(tfResponse.id);
     (0,src_state/* setTfArtifactUrl */.nQ)(tfArtifactUrl);
     // Create Pull Request status in state pending
-    await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`);
+    pr.isInitialized() &&
+        (await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`));
     // Interval of 30 seconds in milliseconds
     const interval = 30 * 1000;
     const parsedTimeout = timeoutSchema.safeParse((0,core.getInput)('timeout'));
@@ -39397,9 +39395,10 @@ async function action(pr) {
     (0,core.notice)(`Final state is: ${finalState}`);
     (0,core.notice)(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
     // Switch Pull Request Status to final state
-    await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}`);
+    pr.isInitialized() &&
+        (await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}`));
     // Add comment with Testing Farm request/result to Pull Request
-    if ((0,core.getBooleanInput)('create_issue_comment')) {
+    if (pr.isInitialized() && (0,core.getBooleanInput)('create_issue_comment')) {
         await pr.addComment(`Testing Farm [request](${tfInstance}/requests/${tfResponse.id}) for ${(0,core.getInput)('compose')}/${(0,core.getInput)('copr_artifacts')} regression testing has been created.` +
             `Once finished, results should be available [here](${tfArtifactUrl}/).\n` +
             `[Full pipeline log](${tfArtifactUrl}/pipeline.log).`);
@@ -39484,7 +39483,15 @@ let pr = undefined;
 // All the code should be inside this try block
 try {
     const octokit = (0,_octokit__WEBPACK_IMPORTED_MODULE_4__/* .getOctokit */ .P)((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }));
-    pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+    if (!_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue || !_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number) {
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)('Pull request statuses are not available in this context');
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)('No issue number found in the context');
+        // Create "empty" PullRequest object
+        pr = new _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest */ .i(undefined, undefined, octokit);
+    }
+    else {
+        pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+    }
     // Check if the script was invoked in the post step
     if (!_state__WEBPACK_IMPORTED_MODULE_7__/* .isPost */ .f5) {
         // Call the action function from action.ts
@@ -39503,7 +39510,7 @@ catch (error) {
         message = JSON.stringify(error);
     }
     // Set the Pull Request status to error when error occurs
-    if (pr) {
+    if (pr && pr.isInitialized()) {
         const url = error instanceof _error__WEBPACK_IMPORTED_MODULE_3__/* .TFError */ ._ ? error.url : undefined;
         await pr.setStatus('error', `${message}`, url);
     }
@@ -40870,7 +40877,8 @@ async function post(pr) {
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Request ${tfRequestId} was cancelled`);
     // Set status to success when the request was cancelled
     // It's not a test failure, the request was cancelled by the user
-    await pr.setStatus('success', 'Testing Farm request was cancelled', tfArtifactUrl !== null && tfArtifactUrl !== void 0 ? tfArtifactUrl : undefined);
+    pr.isInitialized() &&
+        (await pr.setStatus('success', 'Testing Farm request was cancelled', tfArtifactUrl !== null && tfArtifactUrl !== void 0 ? tfArtifactUrl : undefined));
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (post);
 
@@ -40893,16 +40901,13 @@ async function post(pr) {
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
  */
 class PullRequest {
-    /**
-     * PullRequest constructor, it's not meant to be called directly, use the static initialize method instead.
-     * @param number - The Pull Request number
-     * @param sha - The head sha of the Pull Request
-     * @param octokit - The Octokit instance to use for interacting with the GitHub API
-     */
     constructor(number, sha, octokit) {
         this.number = number;
         this.sha = sha;
         this.octokit = octokit;
+    }
+    isInitialized() {
+        return this.number !== undefined && this.sha !== undefined;
     }
     /**
      * Set the Pull Request status using the GitHub API.
@@ -40917,6 +40922,10 @@ class PullRequest {
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)('Skipping setting Pull Request Status');
             return;
         }
+        if (!this.isInitialized()) {
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)('Skipping setting Pull Request Status, Pull Request is not initialized');
+            return;
+        }
         const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
     }
@@ -40925,6 +40934,10 @@ class PullRequest {
      * @param body - The body of the comment
      */
     async addComment(body) {
+        if (!this.isInitialized()) {
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)('Skipping adding Issue comment, Pull Request is not initialized');
+            return;
+        }
         const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { issue_number: this.number, body }));
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
     }

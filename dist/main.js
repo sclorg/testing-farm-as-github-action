@@ -1,4 +1,4 @@
-import { getInput, setFailed } from '@actions/core';
+import { getInput, info, setFailed, warning } from '@actions/core';
 import { context } from '@actions/github';
 import '@total-typescript/ts-reset';
 import action from './action';
@@ -11,7 +11,15 @@ let pr = undefined;
 // All the code should be inside this try block
 try {
     const octokit = getOctokit(getInput('github_token', { required: true }));
-    pr = await PullRequest.initialize(context.issue.number, octokit);
+    if (!context.issue || !context.issue.number) {
+        warning('Pull request statuses are not available in this context');
+        info('No issue number found in the context');
+        // Create "empty" PullRequest object
+        pr = new PullRequest(undefined, undefined, octokit);
+    }
+    else {
+        pr = await PullRequest.initialize(context.issue.number, octokit);
+    }
     // Check if the script was invoked in the post step
     if (!isPost) {
         // Call the action function from action.ts
@@ -30,7 +38,7 @@ catch (error) {
         message = JSON.stringify(error);
     }
     // Set the Pull Request status to error when error occurs
-    if (pr) {
+    if (pr && pr.isInitialized()) {
         const url = error instanceof TFError ? error.url : undefined;
         await pr.setStatus('error', `${message}`, url);
     }

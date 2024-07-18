@@ -4,16 +4,13 @@ import { context } from '@actions/github';
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
  */
 export class PullRequest {
-    /**
-     * PullRequest constructor, it's not meant to be called directly, use the static initialize method instead.
-     * @param number - The Pull Request number
-     * @param sha - The head sha of the Pull Request
-     * @param octokit - The Octokit instance to use for interacting with the GitHub API
-     */
     constructor(number, sha, octokit) {
         this.number = number;
         this.sha = sha;
         this.octokit = octokit;
+    }
+    isInitialized() {
+        return this.number !== undefined && this.sha !== undefined;
     }
     /**
      * Set the Pull Request status using the GitHub API.
@@ -28,6 +25,10 @@ export class PullRequest {
             debug('Skipping setting Pull Request Status');
             return;
         }
+        if (!this.isInitialized()) {
+            debug('Skipping setting Pull Request Status, Pull Request is not initialized');
+            return;
+        }
         const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, context.repo), { sha: this.sha, state, context: `Testing Farm - ${getInput('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
         debug(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
     }
@@ -36,6 +37,10 @@ export class PullRequest {
      * @param body - The body of the comment
      */
     async addComment(body) {
+        if (!this.isInitialized()) {
+            debug('Skipping adding Issue comment, Pull Request is not initialized');
+            return;
+        }
         const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, context.repo), { issue_number: this.number, body }));
         debug(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
     }
