@@ -53,7 +53,7 @@ inputs:
     required: false
     default: 'false'
   create_github_summary:
-    description: 'Action will create github summary. Possible options: "false", "true", "key=value"'
+    description: 'Create GitHub Job Summary accessible from Workflow run Summary.. Possible options: "true" or "false"'
     required: false
     default: 'true'
   arch:
