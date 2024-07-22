@@ -1,6 +1,7 @@
 import { debug, getBooleanInput, getInput } from '@actions/core';
 import { context } from '@actions/github';
 import { Endpoints } from '@octokit/types';
+import { Metadata } from './metadata';
 
 import { CustomOctokit } from './octokit';
 
@@ -14,11 +15,32 @@ export class PullRequest {
    * @param sha - The head sha of the Pull Request
    * @param octokit - The Octokit instance to use for interacting with the GitHub API
    */
+  private _metadata: Metadata | undefined;
   private constructor(
     readonly number: number,
     readonly sha: string,
-    readonly octokit: CustomOctokit
+    readonly octokit: CustomOctokit,
   ) {}
+
+  set metadata(metadata: Metadata) {
+    this._metadata = metadata;
+  }
+
+  get metadata() {
+    if (!this._metadata) {
+      raise('Metadata is not set.');
+    }
+
+    return this._metadata;
+  }
+
+  isCommented(): boolean {
+    return !!this.metadata.commentID;
+  }
+
+  async setMetadata() {
+    this.metadata = await Metadata.getMetadata(this.id);
+  }
 
   /**
    * Set the Pull Request status using the GitHub API.
@@ -94,5 +116,68 @@ export class PullRequest {
     );
 
     return new this(data.number, data.head.sha, octokit);
+  }
+
+  async publishStatusComment(pull_request_status_name: string, compose: string, final_state: string): Promise<number | undefined> {
+    const table_row = '|${pull_request_status_name}|${compose}|$[final_state}|<a href="${tfArtifactUrl}">test</a>|';
+    let row_detected = false;
+    summary = this.metadata.summaryInfo
+    for (let sum in summary) {
+        if 'pull_request_status_name' in sum && pull_request_status_name == sum['pull_request_status_name'] {
+            row_detected = true;
+        }
+    }
+    this.metadata.summaryInfo.push(table_row)
+    if (this.metadata.commentID) {
+      this.updateStatusComment(table_row);
+      return;
+    }
+    const createTable = '### Testing Farm as a GitHub Action summary\n\n
+                        | Compose | Version | Test result | link to logs |\n
+                        |--------|--------|--------|--------|'
+    const commentPayload = await this.createStatusComment(createTable);
+
+    if (!commentPayload) {
+      warning(`Failed to create comment.`);
+      return;
+    }
+    this.metadata.commentID = id === undefined ? id : commentPayload.id.toString();
+    await this.metadata.setMetadata();
+  }
+
+  async createStatusComment(body: string) {
+    if (!body || body === '') return;
+
+    debug(`Creating comment for PR: #${this.id}`);
+
+    const { data } = await this.octokit.request(
+      'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
+      {
+        ...context.repo,
+        issue_number: this.id,
+        body,
+      }
+    );
+
+    return data;
+  }
+
+  private async updateStatusComment(body: string) {
+    if (!this.metadata.commentID) return;
+
+    debug(`Updating comment with ID: ${this.metadata.commentID}`);
+    const createTable = '### Testing Farm as a GitHub Action summary\n\n
+                        | Compose | Version | Test result | link to logs |\n
+                        |--------|--------|--------|--------|'
+    const { data } = await this.octokit.request(
+      'PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}',
+      {
+        ...context.repo,
+        comment_id: +this.metadata.commentID,
+        body,
+      }
+    );
+
+    return data;
   }
 }

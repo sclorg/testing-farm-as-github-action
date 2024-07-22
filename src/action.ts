@@ -269,6 +269,16 @@ async function action(pr: PullRequest): Promise<void> {
     );
   }
 
+  // Create comment summary with Testing Farm request/result to Pull Request
+  if (getBooleanInput('comment_summary')) {
+    await pr.publishStatusComment(
+        getInput('pull_request_status_name'),
+        getInput('compose'),
+        finalState,
+        ${tfArtifactUrl}
+    );
+  }
+
   // Create Github Summary
   if (getBooleanInput('create_github_summary')) {
     await summary
