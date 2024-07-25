@@ -26,7 +26,7 @@ try {
         await action(pr);
     }
     else {
-        await post(pr);
+        await post(pr, octokit);
     }
 }
 catch (error) {

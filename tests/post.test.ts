@@ -51,11 +51,27 @@ vi.mock('@actions/core', async () => {
   };
 });
 
+// Mock @actions/github module
+vi.mock('@actions/github', async () => {
+  const actual = await vi.importActual('@actions/github');
+  return {
+    ...(actual as any),
+    context: {
+      repo: {
+        owner: 'sclorg',
+        repo: 'testing-farm-as-github-action',
+      },
+      runId: 123456,
+    },
+  };
+});
+
 describe('Integration tests - post.ts', () => {
   beforeEach(() => {
     // Mock Action environment
     vi.stubEnv('RUNNER_DEBUG', '1');
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
+    vi.stubEnv('GITHUB_RUN_ID', '123456');
     vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock-token');
 
     // Mock GitHub API
@@ -74,6 +90,25 @@ describe('Integration tests - post.ts', () => {
           return {
             status: 200,
             data: {},
+          };
+
+        case 'GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs':
+          return {
+            status: 200,
+            data: {
+              jobs: [
+                {
+                  name: 'test-job',
+                  status: 'in_progress',
+                  started_at: new Date().toISOString(),
+                  steps: [
+                    {
+                      conclusion: 'cancelled',
+                    },
+                  ],
+                },
+              ],
+            },
           };
 
         default:
@@ -119,13 +154,13 @@ describe('Integration tests - post.ts', () => {
     const octokit = new Octokit({ auth: 'mock-token' });
     const pr = await PullRequest.initialize(1, octokit);
 
-    await post(pr);
+    await post(pr, octokit);
 
     // Check if we have cancelled the TF test request
     expect(mocks.cancelRequest).toHaveBeenCalledOnce();
 
-    // First call to request PR details, next call for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(2);
+    // First call to check if job was cancelled by Runner, then to request PR details and finally call for setting the status
+    expect(mocks.request).toHaveBeenCalledTimes(3);
     expect(mocks.request).toHaveBeenLastCalledWith(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
@@ -160,13 +195,21 @@ describe('Integration tests - post.ts', () => {
     const octokit = new Octokit({ auth: 'mock-token' });
     const pr = new PullRequest(undefined, undefined, octokit);
 
-    await post(pr);
+    await post(pr, octokit);
 
     // Check if we have cancelled the TF test request
     expect(mocks.cancelRequest).toHaveBeenCalledOnce();
 
-    // Since action doesn't have access to Pull Request context it won't set the status nor create a comment
-    expect(mocks.request).toHaveBeenCalledTimes(0);
+    // Only call to check if job was cancelled by Runner, since action doesn't have access to Pull Request context it won't set the status nor create a comment
+    expect(mocks.request).toHaveBeenCalledOnce();
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs',
+      {
+        owner: 'sclorg',
+        repo: 'testing-farm-as-github-action',
+        run_id: 123456,
+      }
+    );
   });
 
   test('Post run before TF test was requested', async () => {
@@ -190,21 +233,13 @@ describe('Integration tests - post.ts', () => {
     const pr = await PullRequest.initialize(1, octokit);
 
     try {
-      await post(pr);
+      await post(pr, octokit);
     } catch (error) {
       expect(error).toMatchInlineSnapshot(
         '[Error: POST: Missing Testing Farm request id]'
       );
     }
 
-    expect(mocks.request).toHaveBeenCalledOnce();
-    expect(mocks.request).toHaveBeenLastCalledWith(
-      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
-      {
-        pull_number: 1,
-        owner: 'sclorg',
-        repo: 'testing-farm-as-github-action',
-      }
-    );
+    expect(mocks.request).toHaveBeenCalledTimes(2);
   });
 });
