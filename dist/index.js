@@ -39385,9 +39385,12 @@ class TFError extends Error {
 /***/ }),
 
 /***/ 399:
-/***/ ((module, __unused_webpack___webpack_exports__, __nccwpck_require__) => {
+/***/ ((module, __webpack_exports__, __nccwpck_require__) => {
 
 __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
@@ -39407,44 +39410,49 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 
 
 
-let pr = undefined;
-// All the code should be inside this try block
-try {
-    const octokit = (0,_octokit__WEBPACK_IMPORTED_MODULE_4__/* .getOctokit */ .P)((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }));
-    if (!_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue || !_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number) {
-        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)('Pull request statuses are not available in this context');
-        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)('No issue number found in the context');
-        // Create "empty" PullRequest object
-        pr = new _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest */ .i(undefined, undefined, octokit);
+async function run() {
+    let pr = undefined;
+    // All the code should be inside this try block
+    try {
+        const octokit = (0,_octokit__WEBPACK_IMPORTED_MODULE_4__/* .getOctokit */ .P)((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }));
+        if (!_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue || !_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number) {
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)('Pull request statuses are not available in this context');
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)('No issue number found in the context');
+            // Create "empty" PullRequest object
+            pr = new _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest */ .i(undefined, undefined, octokit);
+        }
+        else {
+            pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+        }
+        // Check if the script was invoked in the post step
+        if (!_state__WEBPACK_IMPORTED_MODULE_7__/* .isPost */ .f5) {
+            // Call the action function from action.ts
+            await (0,_action__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Z)(pr);
+        }
+        else {
+            await (0,_post__WEBPACK_IMPORTED_MODULE_5__/* ["default"] */ .Z)(pr, octokit);
+        }
     }
-    else {
-        pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
-    }
-    // Check if the script was invoked in the post step
-    if (!_state__WEBPACK_IMPORTED_MODULE_7__/* .isPost */ .f5) {
-        // Call the action function from action.ts
-        await (0,_action__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Z)(pr);
-    }
-    else {
-        await (0,_post__WEBPACK_IMPORTED_MODULE_5__/* ["default"] */ .Z)(pr, octokit);
+    catch (error) {
+        let message;
+        if (error instanceof Error) {
+            message = error.message;
+        }
+        else {
+            message = JSON.stringify(error);
+        }
+        // Set the Pull Request status to error when error occurs
+        if (pr && pr.isInitialized()) {
+            const url = error instanceof _error__WEBPACK_IMPORTED_MODULE_3__/* .TFError */ ._ ? error.url : undefined;
+            await pr.setStatus('error', `${message}`, url);
+        }
+        // Log the error and set the action status to failed
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(message);
     }
 }
-catch (error) {
-    let message;
-    if (error instanceof Error) {
-        message = error.message;
-    }
-    else {
-        message = JSON.stringify(error);
-    }
-    // Set the Pull Request status to error when error occurs
-    if (pr && pr.isInitialized()) {
-        const url = error instanceof _error__WEBPACK_IMPORTED_MODULE_3__/* .TFError */ ._ ? error.url : undefined;
-        await pr.setStatus('error', `${message}`, url);
-    }
-    // Log the error and set the action status to failed
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(message);
-}
+// We have outsourced the main logic into the run function to make it testable
+await run();
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (run);
 
 __webpack_async_result__();
 } catch(e) { __webpack_async_result__(e); } }, 1);
@@ -40538,7 +40546,6 @@ class Octokit {
 var light = __nccwpck_require__(1174);
 ;// CONCATENATED MODULE: ./node_modules/@octokit/plugin-throttling/dist-bundle/index.js
 // pkg/dist-src/index.js
-
 
 
 // pkg/dist-src/version.js
@@ -47274,6 +47281,8 @@ module.exports = JSON.parse('{"application/1d-interleaved-parityfec":{"source":"
 /******/ // This entry module used 'module' so it can't be inlined
 /******/ var __webpack_exports__ = __nccwpck_require__(399);
 /******/ __webpack_exports__ = await __webpack_exports__;
+/******/ var __webpack_exports__default = __webpack_exports__.Z;
+/******/ export { __webpack_exports__default as default };
 /******/ 
 
 //# sourceMappingURL=index.js.map
