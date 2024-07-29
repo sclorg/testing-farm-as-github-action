@@ -65,7 +65,6 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `github_token` | GitHub token passed from secrets | `${{ github.token }}` |
 | `create_issue_comment` | If GitHub action will create a github issue comment | false |
 | `pull_request_status_name` | GitHub pull request status name | Fedora |
-| `debug` | Print debug logs when working with testing farm | true |
 | `update_pull_request_status` | Action will update pull request status. | false |
 | `environment_settings` | Pass custom settings to the test environment. | empty |
 | `pipeline_settings` | Pass specific settings for the testing farm pipeline. For example, `'{ "type": "tmt-multihost" }'`. For details, see `settings.pipeline` field in [Request new test](https://api.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post). | empty |
