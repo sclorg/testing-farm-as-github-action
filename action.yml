@@ -6,13 +6,19 @@ branding:
   color: red
 
 inputs:
+  api_key:
+    description: 'A testing farm API key'
+    required: true
   api_url:
     description: 'A testing farm server url'
     required: false
     default: 'https://api.dev.testing-farm.io/v0.1'
-  api_key:
-    description: 'A testing farm API key'
-    required: true
+  tf_scope:
+    description: 'Defines the scope of Testing Farm. Possible options are public and private'
+    required: false
+    default: 'public'
+
+  # Tmt Metadata
   git_url:
     description: 'An url to the GIT repository with TMT plans'
     required: false
@@ -21,25 +27,27 @@ inputs:
     description: 'A tmt tests branch, tag or commit specifying the desired git revision which will be used for tests.'
     required: false
     default: '${{ github.ref }}'
-  github_token:
-    description: 'GitHub TOKEN or PAT'
-    required: false
-    default: '${{ github.token }}'
   tmt_plan_regex:
     required: false
     description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
+  tmt_context:
+    description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
+    required: false
+    default: ''
+  tmt_path:
+    description: 'A path in the repository with tmt metadata'
+    required: false
+    default: '.'
+
+  # Test Environment
   compose:
     description: 'A compose to run tests against.'
     default: 'Fedora-latest'
     required: false
-  create_issue_comment:
-    description: 'It creates a github issue Comment'
+  arch:
+    description: 'Define an architecture for testing environment. Default: x86_64'
     required: false
-    default: 'false'
-  pull_request_status_name:
-    description: 'GitHub pull request status name'
-    required: false
-    default: 'Fedora'
+    default: 'x86_64'
   variables:
     description: 'Environment variables for test, separated by ;'
     required: false
@@ -48,18 +56,11 @@ inputs:
     description: 'Secret environment variables for test env, separated by ;'
     required: false
     default: ''
-  update_pull_request_status:
-    description: 'Action will update pull request status. Default: true'
+  tmt_hardware:
+    description: 'Define hardware requirements for the testing environment as a JSON string. See https://tmt.readthedocs.io/en/latest/spec/hardware.html'
     required: false
-    default: 'false'
-  create_github_summary:
-    description: 'Create GitHub Job Summary accessible from Workflow run Summary.. Possible options: "true" or "false"'
-    required: false
-    default: 'true'
-  arch:
-    description: 'Define an architecture for testing environment. Default: x86_64'
-    required: false
-    default: 'x86_64'
+
+  # Test Artifacts
   copr:
     description: 'Name of copr to use for the artifacts'
     required: false
@@ -68,14 +69,24 @@ inputs:
     description: '"fedora-copr-build" artifacts for testing environment. Separated by ;'
     required: false
     default: ''
-  tmt_context:
-    description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
+
+  # Miscellaneous
+  github_token:
+    description: 'GitHub TOKEN or PAT'
     required: false
-    default: ''
-  tf_scope:
-    description: 'Defines the scope of Testing Farm. Possible options are public and private'
+    default: '${{ github.token }}'
+  create_issue_comment:
+    description: 'It creates a github issue Comment'
     required: false
-    default: 'public'
+    default: 'false'
+  pull_request_status_name:
+    description: 'GitHub pull request status name'
+    required: false
+    default: 'Fedora'
+  update_pull_request_status:
+    description: 'Action will update pull request status. Default: true'
+    required: false
+    default: 'false'
   environment_settings:
     description: 'Pass specific settings, like post-install-script, to the testing environment.'
     required: false
@@ -84,17 +95,14 @@ inputs:
     description: 'Pass specific settings for the testing farm pipeline, e.g. the type for multihost testing.'
     required: false
     default: '{}'
+  create_github_summary:
+    description: 'Create GitHub Job Summary accessible from Workflow run Summary.. Possible options: "true" or "false"'
+    required: false
+    default: 'true'
   timeout:
     description: 'Action is waiting for testing farm to finish or until timeout is reached. Value is in minutes.'
     required: false
     default: '480'
-  tmt_hardware:
-    description: 'Define hardware requirements for the testing environment as a JSON string. See https://tmt.readthedocs.io/en/latest/spec/hardware.html'
-    required: false
-  tmt_path:
-    description: 'A path in the repository with tmt metadata'
-    required: false
-    default: '.'
 
 outputs:
   request_id:
