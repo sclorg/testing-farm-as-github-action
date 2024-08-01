@@ -1,12 +1,12 @@
 import { debug, getBooleanInput, getInput } from '@actions/core';
-import { context } from '@actions/github';
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
  */
 export class PullRequest {
-    constructor(number, sha, octokit) {
+    constructor(number, sha, context, octokit) {
         this.number = number;
         this.sha = sha;
+        this.context = context;
         this.octokit = octokit;
     }
     isInitialized() {
@@ -29,7 +29,7 @@ export class PullRequest {
             debug('Skipping setting Pull Request Status, Pull Request is not initialized');
             return;
         }
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, context.repo), { sha: this.sha, state, context: `Testing Farm - ${getInput('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, this.context.repo), { sha: this.sha, state, context: `Testing Farm - ${getInput('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
         debug(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
     }
     /**
@@ -41,7 +41,7 @@ export class PullRequest {
             debug('Skipping adding Issue comment, Pull Request is not initialized');
             return;
         }
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, context.repo), { issue_number: this.number, body }));
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, this.context.repo), { issue_number: this.number, body }));
         debug(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
     }
     /**
@@ -50,9 +50,13 @@ export class PullRequest {
      * @param octokit - The Octokit instance to use for interacting with the GitHub API
      * @returns A Promise that resolves to a PullRequest instance
      */
-    static async initialize(number, octokit) {
-        const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', Object.assign(Object.assign({}, context.repo), { pull_number: number }));
-        return new this(data.number, data.head.sha, octokit);
+    static async initialize(context, octokit) {
+        if (context.isShaAvailable()) {
+            // If the SHA was provided, use it to initialize the PullRequest
+            return new this(context.issue.number, context.sha, context, octokit);
+        }
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number }));
+        return new this(data.number, data.head.sha, context, octokit);
     }
 }
 //# sourceMappingURL=pull-request.js.map

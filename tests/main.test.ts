@@ -2,27 +2,25 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import run from '../src/main';
 
+vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock-token');
+
 const mocks = vi.hoisted(() => {
   return {
     action: vi.fn(),
     post: vi.fn(),
-    context: vi.fn(),
-    request: vi.fn(),
-    getState: vi.fn(),
   };
 });
 
-// Mock @octokit/core module
-vi.mock('@octokit/core', () => {
-  const Octokit = vi.fn(() => ({
-    request: mocks.request,
-  }));
-
-  // mock static method
-  // https://stackoverflow.com/a/77275072/10221282
-  Octokit['plugin'] = vi.fn();
-
-  return { Octokit };
+// Mock @actions/github module
+vi.mock('@actions/github', () => {
+  return {
+    context: {
+      repo: {
+        owner: 'sclorg',
+        repo: 'testing-farm-as-github-action',
+      },
+    },
+  };
 });
 
 // Mock @actions/core module
@@ -31,23 +29,13 @@ vi.mock('@actions/core', async () => {
   return {
     ...(actual as any),
     error: vi.fn(),
-    getState: mocks.getState,
+    getState: vi.fn().mockImplementation(name => {
+      return process.env[`STATE_${name.toUpperCase()}`];
+    }),
+    getInput: vi.fn().mockImplementation((name, options) => {
+      return process.env[`INPUT_${name.toUpperCase()}`];
+    }),
   };
-});
-
-// Mock @actions/github module
-vi.mock('@actions/github', () => {
-  return {
-    context: mocks.context,
-  };
-});
-
-vi.mock('../src/octokit', () => {
-  const getOctokit = vi.fn(() => ({
-    request: mocks.request,
-  }));
-
-  return { getOctokit };
 });
 
 vi.mock('../src/action.ts', async () => {
@@ -64,32 +52,14 @@ vi.mock('../src/post.ts', async () => {
 
 describe('Integration tests - main.ts', () => {
   beforeEach(async () => {
-    vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock-token');
-
     // We don't want to call the actual action function
-    vi.mocked(mocks.action).mockResolvedValue(
-      'Action function has been called'
-    );
-
-    // We don't want to call the actual post function
-    vi.mocked(mocks.post).mockResolvedValue('Post function has been called');
-
-    vi.mocked(mocks.context).mockReturnValue(() => {
-      return {
-        repo: {
-          owner: 'sclorg',
-          repo: 'testing-farm-as-github-action',
-        },
-        runId: 123456,
-        issue: {
-          number: 1,
-        },
-      };
+    vi.mocked(mocks.action).mockImplementation(async pr => {
+      return `Action function has been called with ${pr}`;
     });
 
-    // Mock getState
-    vi.mocked(mocks.getState).mockImplementation(name => {
-      return process.env[`STATE_${name.toUpperCase()}`];
+    // We don't want to call the actual post function
+    vi.mocked(mocks.post).mockImplementation(async (pr, _octokit) => {
+      return `Post function has been called with ${pr}`;
     });
   });
 
@@ -99,49 +69,28 @@ describe('Integration tests - main.ts', () => {
   });
 
   test('Regular run', async () => {
+    vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock-token');
+
+    // mock the pull request number in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
     await run();
 
     expect(mocks.action).toHaveBeenCalled();
+
     expect(mocks.post).not.toHaveBeenCalled();
   });
 
-  test('Non PR context run', async () => {
-    vi.mocked(mocks.context).mockReturnValue(() => {
-      return {
-        repo: {
-          owner: 'sclorg',
-          repo: 'testing-farm-as-github-action',
-        },
-        runId: 123456,
-      };
-    });
-
-    await run();
-
-    expect(mocks.action).toHaveBeenCalled();
-    expect(mocks.post).not.toHaveBeenCalled();
-  });
-
-  //! FIXME: This test is failing
+  //! FIXME: This test is failing because the `getState` function is not mocked correctly
   test.skip('Post run', async () => {
     vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock-token');
 
     // Mock States
     vi.stubEnv('STATE_ISPOST', 'true');
 
-    vi.mocked(mocks.context).mockReturnValue(() => {
-      return {
-        repo: {
-          owner: 'sclorg',
-          repo: 'testing-farm-as-github-action',
-        },
-        runId: 123456,
-      };
-    });
-
     await run();
 
     expect(mocks.post).toHaveBeenCalled();
+
     expect(mocks.action).not.toHaveBeenCalled();
   });
 

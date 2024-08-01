@@ -1,11 +1,13 @@
 import { Endpoints } from '@octokit/types';
 import { CustomOctokit } from './octokit';
+import { CustomContext } from './context';
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
  */
 export declare class PullRequest {
     readonly number: number | undefined;
     readonly sha: string | undefined;
+    readonly context: CustomContext;
     readonly octokit: CustomOctokit;
     /**
      * PullRequest constructor, it's not meant to be called directly, use the static initialize method instead.
@@ -13,8 +15,8 @@ export declare class PullRequest {
      * @param sha - The head sha of the Pull Request
      * @param octokit - The Octokit instance to use for interacting with the GitHub API
      */
-    constructor(number: undefined, sha: undefined, octokit: CustomOctokit);
-    constructor(number: number, sha: string, octokit: CustomOctokit);
+    constructor(number: undefined, sha: undefined, context: CustomContext, octokit: CustomOctokit);
+    constructor(number: number, sha: string, context: CustomContext, octokit: CustomOctokit);
     isInitialized(): boolean;
     /**
      * Set the Pull Request status using the GitHub API.
@@ -34,5 +36,5 @@ export declare class PullRequest {
      * @param octokit - The Octokit instance to use for interacting with the GitHub API
      * @returns A Promise that resolves to a PullRequest instance
      */
-    static initialize(number: number, octokit: CustomOctokit): Promise<PullRequest>;
+    static initialize(context: CustomContext, octokit: CustomOctokit): Promise<PullRequest>;
 }

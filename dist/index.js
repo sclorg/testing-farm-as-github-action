@@ -39363,6 +39363,59 @@ async function action(pr) {
 
 /***/ }),
 
+/***/ 8954:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "D": () => (/* binding */ CustomContext)
+/* harmony export */ });
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
+
+
+class CustomContext {
+    constructor() {
+        var _a;
+        const repoOwnerInput = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('repo_owner');
+        const repoNameInput = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('repo_name');
+        const prNumberInput = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pr_number');
+        const commitShaInput = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('commit_sha');
+        this.repo = {
+            owner: this.isInputAvailable(repoOwnerInput)
+                ? repoOwnerInput
+                : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+            repo: this.isInputAvailable(repoNameInput)
+                ? repoNameInput
+                : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        };
+        this.issue = {
+            number: this.isInputAvailable(prNumberInput)
+                ? +prNumberInput
+                : (_a = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue) === null || _a === void 0 ? void 0 : _a.number,
+        };
+        this.sha = this.isInputAvailable(commitShaInput)
+            ? commitShaInput
+            : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha;
+    }
+    isRepoAvailable() {
+        return !!this.repo.owner && !!this.repo.repo;
+    }
+    isIssueNumberAvailable() {
+        return !!this.issue.number;
+    }
+    isShaAvailable() {
+        return !!this.sha;
+    }
+    isInputAvailable(input) {
+        return !!input;
+    }
+}
+
+
+/***/ }),
+
 /***/ 6388:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
@@ -39393,9 +39446,8 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 /* harmony export */ });
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(434);
+/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(434);
+/* harmony import */ var _context__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(8954);
 /* harmony import */ var _error__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6388);
 /* harmony import */ var _octokit__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(9267);
 /* harmony import */ var _post__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(7051);
@@ -39412,22 +39464,24 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 
 async function run() {
     let pr = undefined;
+    const customContext = new _context__WEBPACK_IMPORTED_MODULE_2__/* .CustomContext */ .D();
     // All the code should be inside this try block
     try {
         const octokit = (0,_octokit__WEBPACK_IMPORTED_MODULE_4__/* .getOctokit */ .P)((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_token', { required: true }));
-        if (!_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue || !_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number) {
+        if (!customContext.isIssueNumberAvailable() ||
+            !customContext.isRepoAvailable()) {
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)('Pull request statuses are not available in this context');
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)('No issue number found in the context');
             // Create "empty" PullRequest object
-            pr = new _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest */ .i(undefined, undefined, octokit);
+            pr = new _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest */ .i(undefined, undefined, customContext, octokit);
         }
         else {
-            pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number, octokit);
+            pr = await _pull_request__WEBPACK_IMPORTED_MODULE_6__/* .PullRequest.initialize */ .i.initialize(customContext, octokit);
         }
         // Check if the script was invoked in the post step
         if (!_state__WEBPACK_IMPORTED_MODULE_7__/* .isPost */ .f5) {
             // Call the action function from action.ts
-            await (0,_action__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Z)(pr);
+            await (0,_action__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .Z)(pr);
         }
         else {
             await (0,_post__WEBPACK_IMPORTED_MODULE_5__/* ["default"] */ .Z)(pr, octokit);
@@ -40811,7 +40865,7 @@ async function post(pr, octokit) {
     const parsedTimeout = _schema_input__WEBPACK_IMPORTED_MODULE_4__/* .timeoutSchema.safeParse */ .bJ.safeParse((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('timeout'));
     let timeout = parsedTimeout.success ? parsedTimeout.data * 2 : 960;
     // Inspired by GitHub Discussion: https://github.com/orgs/community/discussions/8945
-    const jobsData = (await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { run_id: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.runId }))).data;
+    const jobsData = (await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs', Object.assign(Object.assign({}, pr.context.repo), { run_id: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.runId }))).data;
     // Find the running job with a cancelled step
     const tooLongRunningJob = jobsData.jobs.find(job => {
         var _a;
@@ -40868,17 +40922,15 @@ function getJobRunningTime(startedAt) {
 /* harmony export */ });
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-
 
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
  */
 class PullRequest {
-    constructor(number, sha, octokit) {
+    constructor(number, sha, context, octokit) {
         this.number = number;
         this.sha = sha;
+        this.context = context;
         this.octokit = octokit;
     }
     isInitialized() {
@@ -40901,7 +40953,7 @@ class PullRequest {
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)('Skipping setting Pull Request Status, Pull Request is not initialized');
             return;
         }
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', Object.assign(Object.assign({}, this.context.repo), { sha: this.sha, state, context: `Testing Farm - ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('pull_request_status_name')}`, description: description ? description.slice(0, 140) : description, target_url: url }));
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Setting Pull Request Status response: ${JSON.stringify(data, null, 2)}`);
     }
     /**
@@ -40913,7 +40965,7 @@ class PullRequest {
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)('Skipping adding Issue comment, Pull Request is not initialized');
             return;
         }
-        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { issue_number: this.number, body }));
+        const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', Object.assign(Object.assign({}, this.context.repo), { issue_number: this.number, body }));
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.debug)(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
     }
     /**
@@ -40922,9 +40974,13 @@ class PullRequest {
      * @param octokit - The Octokit instance to use for interacting with the GitHub API
      * @returns A Promise that resolves to a PullRequest instance
      */
-    static async initialize(number, octokit) {
-        const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { pull_number: number }));
-        return new this(data.number, data.head.sha, octokit);
+    static async initialize(context, octokit) {
+        if (context.isShaAvailable()) {
+            // If the SHA was provided, use it to initialize the PullRequest
+            return new this(context.issue.number, context.sha, context, octokit);
+        }
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number }));
+        return new this(data.number, data.head.sha, context, octokit);
     }
 }
 

@@ -5,6 +5,7 @@ import path from 'path';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import action from '../src/action';
+import { CustomContext } from '../src/context';
 import { NewRequest } from 'testing-farm';
 import { PullRequest } from '../src/pull-request';
 
@@ -46,8 +47,6 @@ function setDefaultInputs() {
   vi.stubEnv('INPUT_ENVIRONMENT_SETTINGS', '{}');
   // pipeline_settings - Pass specific settings for the testing farm pipeline, e.g. the type for multihost testing
   vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{}');
-  // pr_head_sha - HEAD SHA of a Pull Request. Used for posting statuses to the PR. The value is obtained from `git rev-parse HEAD` if this input is not set
-  vi.stubEnv('INPUT_PR_HEAD_SHA', '');
   // Action is waiting for testing farm to finish or until timeout is reached
   vi.stubEnv('INPUT_TIMEOUT', '480');
 }
@@ -196,6 +195,10 @@ describe('Integration tests - action.ts', () => {
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -216,7 +219,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     await action(pr);
 
@@ -235,16 +238,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(1);
-    expect(mocks.request).toHaveBeenLastCalledWith(
-      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
-      {
-        owner: 'sclorg',
-        pull_number: 1,
-        repo: 'testing-farm-as-github-action',
-      }
-    );
+    // All data are provided via context and statuses are disabled by default, no need to call GitHub API
+    expect(mocks.request).toHaveBeenCalledTimes(0);
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
@@ -269,6 +264,10 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
     vi.stubEnv('INPUT_TMT_HARDWARE', '{"memory": ">= 8 GB"}');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.unsafeNewRequest).mockImplementation(
       async (_request: unknown) => {
@@ -289,7 +288,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     await action(pr);
 
@@ -308,16 +307,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(1);
-    expect(mocks.request).toHaveBeenLastCalledWith(
-      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
-      {
-        owner: 'sclorg',
-        pull_number: 1,
-        repo: 'testing-farm-as-github-action',
-      }
-    );
+    // All data are provided via context and statuses are disabled by default, no need to call GitHub API
+    expect(mocks.request).toHaveBeenCalledTimes(0);
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
@@ -340,6 +331,10 @@ describe('Integration tests - action.ts', () => {
     );
     vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{"type": "tmt-multihost"}');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -360,7 +355,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     await action(pr);
 
@@ -379,16 +374,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(1);
-    expect(mocks.request).toHaveBeenLastCalledWith(
-      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
-      {
-        owner: 'sclorg',
-        pull_number: 1,
-        repo: 'testing-farm-as-github-action',
-      }
-    );
+    // All data are provided via context and statuses are disabled by default, no need to call GitHub API
+    expect(mocks.request).toHaveBeenCalledTimes(0);
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
@@ -411,6 +398,10 @@ describe('Integration tests - action.ts', () => {
     );
     vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{"type": "multihost"}');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     vi.mocked(mocks.requestDetails)
       .mockResolvedValueOnce({ state: 'new', result: null })
       .mockResolvedValueOnce({ state: 'queued', result: null })
@@ -423,7 +414,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     try {
       await action(pr);
@@ -464,6 +455,10 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
     vi.stubEnv('INPUT_TMT_HARDWARE', '{"memory":}');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     vi.mocked(mocks.requestDetails)
       .mockResolvedValueOnce({ state: 'new', result: null })
       .mockResolvedValueOnce({ state: 'queued', result: null })
@@ -476,7 +471,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     try {
       await action(pr);
@@ -505,6 +500,10 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
     vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -525,7 +524,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     try {
       await action(pr);
@@ -552,8 +551,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(3);
+    // Two calls for setting the status
+    expect(mocks.request).toHaveBeenCalledTimes(2);
     expect(mocks.request).toHaveBeenLastCalledWith(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
@@ -588,6 +587,10 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
     vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -608,7 +611,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     try {
       await action(pr);
@@ -635,8 +638,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(3);
+    // Two calls for setting the status
+    expect(mocks.request).toHaveBeenCalledTimes(2);
     expect(mocks.request).toHaveBeenLastCalledWith(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
@@ -676,6 +679,10 @@ describe('Integration tests - action.ts', () => {
     // set timeout to 1 to trigger timeout error after 2 requests
     vi.stubEnv('INPUT_TIMEOUT', '1');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -696,7 +703,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     try {
       await action(pr);
@@ -714,9 +721,8 @@ describe('Integration tests - action.ts', () => {
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(2);
 
-    // First call to request PR details, next call for setting the status to pending
-    // TODO: Check if we set the status to error (it's done in main.ts)
-    expect(mocks.request).toHaveBeenCalledTimes(2);
+    // Call for setting the status to pending
+    expect(mocks.request).toHaveBeenCalledTimes(1);
 
     // Test summary
     // When timeout is reached, the summary is currently empty
@@ -742,6 +748,10 @@ describe('Integration tests - action.ts', () => {
     // tf_scope - Defines the scope of Testing Farm. Possible options are public and private
     vi.stubEnv('INPUT_TF_SCOPE', 'private');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -762,7 +772,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     await action(pr);
 
@@ -778,8 +788,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status
-    expect(mocks.request).toHaveBeenCalledTimes(3);
+    // Two calls for setting the status
+    expect(mocks.request).toHaveBeenCalledTimes(2);
     expect(mocks.request).toHaveBeenLastCalledWith(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
@@ -820,6 +830,10 @@ describe('Integration tests - action.ts', () => {
     // create_issue_comment - It creates a github issue Comment
     vi.stubEnv('INPUT_CREATE_ISSUE_COMMENT', 'true');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -840,7 +854,7 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     await action(pr);
 
@@ -856,8 +870,8 @@ describe('Integration tests - action.ts', () => {
       '"https://artifacts.dev.testing-farm.io/1"'
     );
 
-    // First call to request PR details, next two calls for setting the status, the last call is for issue comment
-    expect(mocks.request).toHaveBeenCalledTimes(4);
+    // Two calls for setting the status, the last call is for issue comment
+    expect(mocks.request).toHaveBeenCalledTimes(3);
     expect(mocks.request).toHaveBeenCalledWith(
       'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
       {
@@ -896,6 +910,10 @@ describe('Integration tests - action.ts', () => {
     // create_issue_comment - It creates a github issue Comment
     vi.stubEnv('INPUT_CREATE_ISSUE_COMMENT', 'true');
 
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -916,7 +934,12 @@ describe('Integration tests - action.ts', () => {
 
     // Run action
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = new PullRequest(undefined, undefined, octokit);
+    const pr = new PullRequest(
+      undefined,
+      undefined,
+      new CustomContext(),
+      octokit
+    );
 
     await action(pr);
 

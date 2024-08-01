@@ -70,6 +70,10 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `pipeline_settings` | Pass specific settings for the testing farm pipeline. For example, `'{ "type": "tmt-multihost" }'`. For details, see `settings.pipeline` field in [Request new test](https://api.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post). | empty |
 | `create_github_summary` | Create GitHub Job Summary accessible from Workflow run Summary. Possible options: "true" or "false" | true |
 | `timeout` | Timeout for the Testing Farm job in minutes. | 480 |
+| `repo_owner` | Owner of the repository | `${{ github.repository_owner }}` |
+| `repo_name` | Name of the repository | undefined |
+| `pr_number` | Pull request number for showing the results | undefined |
+| `commit_sha` | Sha of the commit triggering the action | `${{ github.sha }}` |
 
 ## Action Outputs
 

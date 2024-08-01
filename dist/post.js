@@ -14,7 +14,7 @@ async function post(pr, octokit) {
     const parsedTimeout = timeoutSchema.safeParse(getInput('timeout'));
     let timeout = parsedTimeout.success ? parsedTimeout.data * 2 : 960;
     // Inspired by GitHub Discussion: https://github.com/orgs/community/discussions/8945
-    const jobsData = (await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs', Object.assign(Object.assign({}, context.repo), { run_id: context.runId }))).data;
+    const jobsData = (await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs', Object.assign(Object.assign({}, pr.context.repo), { run_id: context.runId }))).data;
     // Find the running job with a cancelled step
     const tooLongRunningJob = jobsData.jobs.find(job => {
         var _a;
