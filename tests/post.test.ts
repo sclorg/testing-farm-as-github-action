@@ -2,6 +2,7 @@ import { Octokit } from '@octokit/core';
 import { NewRequest } from 'testing-farm';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { CustomContext } from '../src/context';
 import post from '../src/post';
 import { PullRequest } from '../src/pull-request';
 
@@ -152,7 +153,7 @@ describe('Integration tests - post.ts', () => {
 
     // Run post
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     await post(pr, octokit);
 
@@ -193,7 +194,12 @@ describe('Integration tests - post.ts', () => {
 
     // Run post
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = new PullRequest(undefined, undefined, octokit);
+    const pr = new PullRequest(
+      undefined,
+      undefined,
+      new CustomContext(),
+      octokit
+    );
 
     await post(pr, octokit);
 
@@ -230,7 +236,7 @@ describe('Integration tests - post.ts', () => {
 
     // Run post
     const octokit = new Octokit({ auth: 'mock-token' });
-    const pr = await PullRequest.initialize(1, octokit);
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
     try {
       await post(pr, octokit);

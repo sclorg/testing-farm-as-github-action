@@ -26,7 +26,8 @@ async function post(pr: PullRequest, octokit: CustomOctokit): Promise<void> {
     await octokit.request(
       'GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs',
       {
-        ...context.repo,
+        // use Custom Context to take into account `repo_owner` and `repo_name` inputs
+        ...pr.context.repo,
         run_id: context.runId,
       }
     )

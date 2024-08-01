@@ -104,6 +104,22 @@ inputs:
     required: false
     default: '480'
 
+  # GitHub Metadata to provide/override the default values
+  repo_owner:
+    description: 'Owner of the repository'
+    required: false
+    default: '${{ github.repository_owner }}'
+  repo_name:
+    description: 'Name of the repository'
+    required: false
+  pr_number:
+    description: 'Pull request number for showing the results'
+    required: false
+  commit_sha:
+    description: 'Sha of the commit triggering the action'
+    required: false
+    default: '${{ github.sha }}'
+
 outputs:
   request_id:
     description: 'An ID of a scheduled testing farm request'

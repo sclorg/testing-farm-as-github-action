@@ -1,9 +1,9 @@
 import { getInput, info, setFailed, warning } from '@actions/core';
-import { context } from '@actions/github';
 
 import '@total-typescript/ts-reset';
 
 import action from './action';
+import { CustomContext } from './context';
 import { TFError } from './error';
 import { getOctokit } from './octokit';
 import post from './post';
@@ -13,18 +13,23 @@ import { isPost } from './state';
 async function run(): Promise<void> {
   let pr: PullRequest | undefined = undefined;
 
+  const customContext = new CustomContext();
+
   // All the code should be inside this try block
   try {
     const octokit = getOctokit(getInput('github_token', { required: true }));
 
-    if (!context.issue || !context.issue.number) {
+    if (
+      !customContext.isIssueNumberAvailable() ||
+      !customContext.isRepoAvailable()
+    ) {
       warning('Pull request statuses are not available in this context');
       info('No issue number found in the context');
 
       // Create "empty" PullRequest object
-      pr = new PullRequest(undefined, undefined, octokit);
+      pr = new PullRequest(undefined, undefined, customContext, octokit);
     } else {
-      pr = await PullRequest.initialize(context.issue.number, octokit);
+      pr = await PullRequest.initialize(customContext, octokit);
     }
 
     // Check if the script was invoked in the post step

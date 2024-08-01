@@ -3,10 +3,10 @@
  * vi API documentation (mocking) - https://vitest.dev/api/vi.html#vi
  */
 import { Octokit } from '@octokit/core';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PullRequest } from '../../src/pull-request';
-import { afterEach } from 'node:test';
+import { CustomContext } from '../../src/context';
 
 const octokit = {
   request: (
@@ -89,7 +89,11 @@ describe('Pull Request class', () => {
     // simulate update_pull_request_status
     vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
 
-    context.pr = await PullRequest.initialize(1, octokit);
+    // mock the pull request number in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    context.pr = await PullRequest.initialize(new CustomContext(), octokit);
   });
 
   afterEach(() => {

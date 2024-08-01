@@ -1,8 +1,8 @@
 import { debug, getBooleanInput, getInput } from '@actions/core';
-import { context } from '@actions/github';
 import { Endpoints } from '@octokit/types';
 
 import { CustomOctokit } from './octokit';
+import { CustomContext } from './context';
 
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
@@ -14,11 +14,22 @@ export class PullRequest {
    * @param sha - The head sha of the Pull Request
    * @param octokit - The Octokit instance to use for interacting with the GitHub API
    */
-  constructor(number: undefined, sha: undefined, octokit: CustomOctokit);
-  constructor(number: number, sha: string, octokit: CustomOctokit);
+  constructor(
+    number: undefined,
+    sha: undefined,
+    context: CustomContext,
+    octokit: CustomOctokit
+  );
+  constructor(
+    number: number,
+    sha: string,
+    context: CustomContext,
+    octokit: CustomOctokit
+  );
   constructor(
     readonly number: number | undefined,
     readonly sha: string | undefined,
+    readonly context: CustomContext,
     readonly octokit: CustomOctokit
   ) {}
 
@@ -57,7 +68,7 @@ export class PullRequest {
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/statuses/{sha}',
       {
-        ...context.repo,
+        ...this.context.repo,
         sha: this.sha as string,
         state,
         context: `Testing Farm - ${getInput('pull_request_status_name')}`,
@@ -84,7 +95,7 @@ export class PullRequest {
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
       {
-        ...context.repo,
+        ...this.context.repo,
         issue_number: this.number as number,
         body,
       }
@@ -100,17 +111,22 @@ export class PullRequest {
    * @returns A Promise that resolves to a PullRequest instance
    */
   static async initialize(
-    number: number,
+    context: CustomContext,
     octokit: CustomOctokit
   ): Promise<PullRequest> {
+    if (context.isShaAvailable()) {
+      // If the SHA was provided, use it to initialize the PullRequest
+      return new this(context.issue.number, context.sha, context, octokit);
+    }
+
     const { data } = await octokit.request(
       'GET /repos/{owner}/{repo}/pulls/{pull_number}',
       {
         ...context.repo,
-        pull_number: number,
+        pull_number: context.issue.number,
       }
     );
 
-    return new this(data.number, data.head.sha, octokit);
+    return new this(data.number, data.head.sha, context, octokit);
   }
 }
