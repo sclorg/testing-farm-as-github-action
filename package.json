@@ -35,7 +35,6 @@
     "@octokit/rest": "21.0.1",
     "@octokit/types": "13.5.0",
     "testing-farm": "1.9.1",
-    "yarn": "^1.22.22",
     "zod": "3.23.5"
   },
   "devDependencies": {
