@@ -118,7 +118,6 @@ inputs:
   commit_sha:
     description: 'Sha of the commit triggering the action'
     required: false
-    default: '${{ github.sha }}'
 
 outputs:
   request_id:

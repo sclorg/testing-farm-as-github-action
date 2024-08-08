@@ -39397,7 +39397,7 @@ class CustomContext {
         };
         this.sha = this.isInputAvailable(commitShaInput)
             ? commitShaInput
-            : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha;
+            : undefined;
     }
     isRepoAvailable() {
         return !!this.repo.owner && !!this.repo.repo;

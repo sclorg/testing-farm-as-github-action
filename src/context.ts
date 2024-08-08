@@ -4,7 +4,7 @@ import { context } from '@actions/github';
 export class CustomContext {
   readonly repo: typeof context.repo;
   readonly issue: Pick<typeof context.issue, 'number'>;
-  readonly sha: string;
+  readonly sha: string | undefined;
 
   constructor() {
     const repoOwnerInput = getInput('repo_owner');
@@ -29,7 +29,7 @@ export class CustomContext {
 
     this.sha = this.isInputAvailable(commitShaInput)
       ? commitShaInput
-      : context.sha;
+      : undefined;
   }
 
   isRepoAvailable(): boolean {
