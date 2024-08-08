@@ -27,6 +27,7 @@ import {
   tmtEnvSecretsSchema,
   tmtEnvVarsSchema,
   tmtPlanRegexSchema,
+  tmtPlanFilterSchema,
   tmtPathSchema,
 } from './schema/input';
 import {
@@ -98,6 +99,14 @@ async function action(pr: PullRequest): Promise<void> {
     ? { name: tmtPlanRegexParsed.data }
     : {};
 
+  // Conditionally include the name attribute only if tmt_plan_Filter is not null
+  const tmtPlanFilterParsed = tmtPlanFilterSchema.safeParse(
+    getInput('tmt_plan_filter')
+  );
+  const tmtPlanFilter = tmtPlanFilterParsed.success
+    ? { name: tmtPlanFilterParsed.data }
+    : {};
+
   // Generate environment settings
   const envSettingsParsed = envSettingsSchema.safeParse(
     JSON.parse(getInput('environment_settings'))
@@ -119,6 +128,7 @@ async function action(pr: PullRequest): Promise<void> {
         url: getInput('git_url', { required: true }),
         ref,
         path: tmtPath,
+        plan_filter: tmtPlanFilter,
         ...tmtPlanRegex,
       },
     },

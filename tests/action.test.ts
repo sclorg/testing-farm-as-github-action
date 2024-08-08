@@ -825,6 +825,7 @@ describe('Integration tests - action.ts', () => {
     // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
     vi.stubEnv('INPUT_UPDATE_PULL_REQUEST_STATUS', 'true');
+    vi.stubEnv('INPUT_TMT_PLAN_FILTER', 'tier:foobar');
 
     // Override default inputs
     // create_issue_comment - It creates a github issue Comment

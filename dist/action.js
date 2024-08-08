@@ -4,7 +4,7 @@ import { setTimeout } from 'timers/promises';
 import { TFError } from './error';
 import { setTfArtifactUrl, setTfRequestId } from './state';
 import { composeStatusDescription, getSummary } from './util';
-import { pipelineSettingsSchema, envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPathSchema, } from './schema/input';
+import { pipelineSettingsSchema, envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPlanFilterSchema, tmtPathSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
     const tfInstance = getInput('api_url');
@@ -49,6 +49,11 @@ async function action(pr) {
     const tmtPlanRegex = tmtPlanRegexParsed.success
         ? { name: tmtPlanRegexParsed.data }
         : {};
+    // Conditionally include the name attribute only if tmt_plan_Filter is not null
+    const tmtPlanFilterParsed = tmtPlanFilterSchema.safeParse(getInput('tmt_plan_filter'));
+    const tmtPlanFilter = tmtPlanFilterParsed.success
+        ? { name: tmtPlanFilterParsed.data }
+        : {};
     // Generate environment settings
     const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse(getInput('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
@@ -59,7 +64,7 @@ async function action(pr) {
     const request = {
         api_key: getInput('api_key', { required: true }),
         test: {
-            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref, path: tmtPath }, tmtPlanRegex),
+            fmf: Object.assign({ url: getInput('git_url', { required: true }), ref, path: tmtPath, plan_filter: tmtPlanFilter }, tmtPlanRegex),
         },
         environments: [
             {
