@@ -22,7 +22,7 @@ export class CustomContext {
         };
         this.sha = this.isInputAvailable(commitShaInput)
             ? commitShaInput
-            : context.sha;
+            : undefined;
     }
     isRepoAvailable() {
         return !!this.repo.owner && !!this.repo.repo;

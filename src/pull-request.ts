@@ -116,7 +116,12 @@ export class PullRequest {
   ): Promise<PullRequest> {
     if (context.isShaAvailable()) {
       // If the SHA was provided, use it to initialize the PullRequest
-      return new this(context.issue.number, context.sha, context, octokit);
+      return new this(
+        context.issue.number,
+        context.sha as string,
+        context,
+        octokit
+      );
     }
 
     const { data } = await octokit.request(

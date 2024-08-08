@@ -73,7 +73,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `repo_owner` | Owner of the repository | `${{ github.repository_owner }}` |
 | `repo_name` | Name of the repository | undefined |
 | `pr_number` | Pull request number for showing the results | undefined |
-| `commit_sha` | Sha of the commit triggering the action | `${{ github.sha }}` |
+| `commit_sha` | Sha of the commit triggering the action | undefined |
 
 ## Action Outputs
 
