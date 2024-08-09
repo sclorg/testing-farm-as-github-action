@@ -52,8 +52,8 @@ async function action(pr) {
     // Conditionally include the name attribute only if tmt_plan_Filter is not null
     const tmtPlanFilterParsed = tmtPlanFilterSchema.safeParse(getInput('tmt_plan_filter'));
     const tmtPlanFilter = tmtPlanFilterParsed.success
-        ? { name: tmtPlanFilterParsed.data }
-        : {};
+        ? tmtPlanFilterParsed.data
+        : '';
     // Generate environment settings
     const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse(getInput('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};

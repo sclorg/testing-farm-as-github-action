@@ -38,7 +38,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 | `git_url` | An url to the repository with tmt metadata | url of repo that runs GHA |
 | `git_ref` | A tmt tests branch, tag or commit specifying the desired git revision which will be used for tests | `github.ref` when available, otherwise `master` |
 | `tmt_plan_regex` | A regular expression used to select tmt plans | all |
-| `tmt_plan_filter` | A filter used to select tmt plans | "" |
+| `tmt_plan_filter` | A filter used to select tmt plans [plan_filter](https://docs.testing-farm.io/Testing%20Farm/0.1/test-request.html#plan-filter) | "" |
 | `tmt_context` | A mapping of tmt context variable [tmt-context](https://tmt.readthedocs.io/en/latest/spec/context.html), variables separated by ; | empty |
 | `tmt_path` |  A path in the repository with tmt metadata | "." |
 
