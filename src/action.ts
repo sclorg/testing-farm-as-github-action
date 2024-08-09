@@ -104,7 +104,7 @@ async function action(pr: PullRequest): Promise<void> {
     getInput('tmt_plan_filter')
   );
   const tmtPlanFilter = tmtPlanFilterParsed.success
-    ? { name: tmtPlanFilterParsed.data }
+    ? tmtPlanFilterParsed.data
     : {};
 
   // Generate environment settings
