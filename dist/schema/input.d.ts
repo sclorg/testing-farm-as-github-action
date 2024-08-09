@@ -108,4 +108,5 @@ export declare const pipelineSettingsSchema: z.ZodOptional<z.ZodObject<{
 }>>;
 export declare const timeoutSchema: z.ZodNumber;
 export declare const tmtPlanRegexSchema: z.ZodString;
+export declare const tmtPlanFilterSchema: z.ZodString;
 export declare const tmtPathSchema: z.ZodString;
