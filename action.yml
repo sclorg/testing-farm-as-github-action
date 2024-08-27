@@ -30,6 +30,9 @@ inputs:
   tmt_plan_regex:
     required: false
     description: 'A tmt plan regex which will be used for selecting plans. By default all plans are selected.'
+  tmt_plan_filter:
+    required: false
+    description: 'A filter used to select tmt plans plan_filter. See https://docs.testing-farm.io/Testing%20Farm/0.1/test-request.html#plan-filter.'
   tmt_context:
     description: 'A value of tmt.context variable https://tmt.readthedocs.io/en/latest/spec/context.html, variables separated by ;'
     required: false
