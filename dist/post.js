@@ -6,7 +6,7 @@ import { timeoutSchema } from './schema/input';
 //! We assume that the job is running on GitHub Public Runner
 // GitHub Public Runner has a limit of 6 hours
 // https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration#usage-limits
-const RUNNER_TIMEOUT_SEC = 6 * 60 * 60;
+const RUNNER_TIMEOUT_SEC = 6 * 60 * 60 - 30; // job usually doesn't run for the full 6 hours since runner is reserving some time for cleanup (and there might be also some preparation time)
 async function post(pr, octokit) {
     const tfInstance = getInput('api_url');
     const tfRequestId = getTfRequestId();
