@@ -34,7 +34,7 @@
     "@octokit/plugin-throttling": "9.3.1",
     "@octokit/rest": "21.0.2",
     "@octokit/types": "13.5.0",
-    "testing-farm": "1.9.1",
+    "testing-farm": "^1.9.2",
     "zod": "3.23.5"
   },
   "devDependencies": {
