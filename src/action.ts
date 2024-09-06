@@ -105,7 +105,7 @@ async function action(pr: PullRequest): Promise<void> {
   );
   const tmtPlanFilter = tmtPlanFilterParsed.success
     ? tmtPlanFilterParsed.data
-    : '';
+    : undefined;
 
   // Generate environment settings
   const envSettingsParsed = envSettingsSchema.safeParse(
