@@ -53,7 +53,7 @@ async function action(pr) {
     const tmtPlanFilterParsed = tmtPlanFilterSchema.safeParse(getInput('tmt_plan_filter'));
     const tmtPlanFilter = tmtPlanFilterParsed.success
         ? tmtPlanFilterParsed.data
-        : '';
+        : undefined;
     // Generate environment settings
     const envSettingsParsed = envSettingsSchema.safeParse(JSON.parse(getInput('environment_settings')));
     const envSettings = envSettingsParsed.success ? envSettingsParsed.data : {};
