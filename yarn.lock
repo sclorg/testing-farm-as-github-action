@@ -2258,7 +2258,7 @@ __metadata:
     "@vercel/ncc": 0.38.1
     "@vitest/coverage-v8": 2.0.5
     prettier: 3.3.3
-    testing-farm: ^1.9.2
+    testing-farm: 1.10.0
     ts-node: 10.9.2
     typescript: 5.5.4
     vitest: 2.0.5
@@ -2266,13 +2266,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"testing-farm@npm:^1.9.2":
-  version: 1.9.2
-  resolution: "testing-farm@npm:1.9.2"
+"testing-farm@npm:1.10.0":
+  version: 1.10.0
+  resolution: "testing-farm@npm:1.10.0"
   dependencies:
     axios: 1.7.4
     zod: 3.23.8
-  checksum: 363c48ea2e0eb239860ce8fcc0de1fbc9d104296dbcc3c02f49f8e1831265d990b47239b299db358dec8f5cf2036725130224de7e311ee86f56f3138e0864f35
+  checksum: 3da1086e749a78a70a0da2acfa89d50642202a32f8191e01a20ab0671a9378185de2d0ee916c6c11d02cb32b16520cace95177b5f43c7b42751a6b01cb922776
   languageName: node
   linkType: hard
 

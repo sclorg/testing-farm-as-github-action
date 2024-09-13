@@ -39,7 +39,11 @@ import {
 async function action(pr: PullRequest): Promise<void> {
   const tfInstance = getInput('api_url');
 
-  const api = new TestingFarmAPI(tfInstance);
+  // https://github.com/redhat-plumbers-in-action/testing-farm?tab=readme-ov-file#creating-the-api-instance
+  const api = new TestingFarmAPI(
+    tfInstance,
+    getInput('api_key', { required: true })
+  );
 
   // Set artifacts url
   const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
@@ -122,7 +126,6 @@ async function action(pr: PullRequest): Promise<void> {
 
   // Schedule a test on Testing Farm
   const request = {
-    api_key: getInput('api_key', { required: true }),
     test: {
       fmf: {
         url: getInput('git_url', { required: true }),
@@ -165,12 +168,11 @@ async function action(pr: PullRequest): Promise<void> {
   }
 
   // Remove all secrets from request before printing it
-  delete (request as Partial<typeof request>).api_key;
   request.environments.map(
     (env: Partial<(typeof request.environments)[number]>) => delete env.secrets
   );
   debug(
-    `Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(
+    `Testing Farm request (except environment[].secrets): ${JSON.stringify(
       request,
       null,
       2
