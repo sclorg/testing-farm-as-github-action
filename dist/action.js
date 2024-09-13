@@ -8,7 +8,8 @@ import { pipelineSettingsSchema, envSettingsSchema, tfScopeSchema, timeoutSchema
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
     const tfInstance = getInput('api_url');
-    const api = new TestingFarmAPI(tfInstance);
+    // https://github.com/redhat-plumbers-in-action/testing-farm?tab=readme-ov-file#creating-the-api-instance
+    const api = new TestingFarmAPI(tfInstance, getInput('api_key', { required: true }));
     // Set artifacts url
     const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
     const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
@@ -62,7 +63,6 @@ async function action(pr) {
     debug(`Using git_ref: '${ref}'`);
     // Schedule a test on Testing Farm
     const request = {
-        api_key: getInput('api_key', { required: true }),
         test: {
             fmf: Object.assign({ url: getInput('git_url', { required: true }), ref, path: tmtPath, plan_filter: tmtPlanFilter }, tmtPlanRegex),
         },
@@ -93,9 +93,8 @@ async function action(pr) {
         tfResponseRaw = await api.unsafeNewRequest(Object.assign(Object.assign({}, request), { environments: [Object.assign(Object.assign({}, request.environments[0]), { hardware: tmtHardware })] }));
     }
     // Remove all secrets from request before printing it
-    delete request.api_key;
     request.environments.map((env) => delete env.secrets);
-    debug(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
+    debug(`Testing Farm request (except environment[].secrets): ${JSON.stringify(request, null, 2)}`);
     debug(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
     const tfResponse = requestSchema.parse(tfResponseRaw);
     const tfArtifactUrl = `${tfUrl}/${tfResponse.id}`;

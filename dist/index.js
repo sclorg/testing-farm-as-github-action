@@ -11049,7 +11049,7 @@ __nccwpck_require__.d(__webpack_exports__, {
   "ZP": () => (/* binding */ TestingFarmAPI)
 });
 
-// UNUSED EXPORTS: aboutSchema, composesSchema, isError, newRequestResponseSchema, newRequestSchema, ranchSchema, requestIdSchema, requestSchema, urlSchema
+// UNUSED EXPORTS: aboutSchema, composesSchema, isError, newRequestResponseSchema, newRequestSchema, ranchSchema, requestIdSchema, requestSchema
 
 // NAMESPACE OBJECT: ./node_modules/axios/lib/platform/common/utils.js
 var common_utils_namespaceObject = {};
@@ -16155,7 +16155,7 @@ async function performRequest(config) {
 }
 class TestingFarmLink {
     constructor(instance) {
-        this.instance = new external_url_.URL(instance);
+        this.instance = instance;
     }
     buildURL(path, searchParams) {
         let url = new external_url_.URL(`${this.instance.pathname}/${path}`, this.instance);
@@ -16200,6 +16200,25 @@ class TestingFarmLink {
 class PublicLink extends TestingFarmLink {
     async request(config) {
         return performRequest(config);
+    }
+}
+/**
+ * Handles authentication using an API key.
+ */
+class ApiKeyLink extends TestingFarmLink {
+    constructor(instance, apiKey) {
+        super(instance);
+        this.apiKey = apiKey;
+    }
+    async request(config) {
+        var _a;
+        return performRequest(Object.assign(Object.assign({}, config), { headers: Object.assign(Object.assign({}, ((_a = config.headers) !== null && _a !== void 0 ? _a : {})), { 
+                // https://api.dev.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post
+                // OAuth2: OAuth2PasswordBearer
+                // The API key for authentication.
+                // Flow type: password
+                // Token URL: token
+                Authorization: `Bearer ${this.apiKey}` }) }));
     }
 }
 //# sourceMappingURL=link.js.map
@@ -20553,7 +20572,7 @@ const requestsFilterSchema = z.object({
     created_after: z.string(),
 });
 const newRequestSchema = z.object({
-    api_key: z.any(),
+    api_key: z.any().optional(),
     test: testObjectSchema,
     environments: z.array(environmentSchema).optional(),
     notification: notificationSchema.optional().nullable(),
@@ -20612,7 +20631,7 @@ const requestSchema = z.object({
     settings: z.any(),
 });
 const cancelRequestSchema = z.object({
-    api_key: z.any(),
+    api_key: z.any().optional(),
 });
 // TODO: make
 const cancelRequestResponseSchema = z.object({
@@ -20650,8 +20669,14 @@ function isError(response) {
 
 
 class TestingFarmAPI {
-    constructor(instance) {
-        this.link = new PublicLink(urlSchema.parse(instance));
+    constructor(instance, apiKey) {
+        // Use PublicLink only for endpoints that don't require authentication
+        if (!apiKey) {
+            this.link = new PublicLink(new URL(instance));
+        }
+        else {
+            this.link = new ApiKeyLink(new URL(instance), apiKey);
+        }
     }
     async requests(filter, strict) {
         if (!this.isStrict(strict)) {
@@ -43838,7 +43863,8 @@ const requestDetailsSchema = lib.z.object({
 
 async function action(pr) {
     const tfInstance = (0,core.getInput)('api_url');
-    const api = new dist/* default */.ZP(tfInstance);
+    // https://github.com/redhat-plumbers-in-action/testing-farm?tab=readme-ov-file#creating-the-api-instance
+    const api = new dist/* default */.ZP(tfInstance, (0,core.getInput)('api_key', { required: true }));
     // Set artifacts url
     const tfScopeParsed = input/* tfScopeSchema.safeParse */.ky.safeParse((0,core.getInput)('tf_scope'));
     const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
@@ -43892,7 +43918,6 @@ async function action(pr) {
     (0,core.debug)(`Using git_ref: '${ref}'`);
     // Schedule a test on Testing Farm
     const request = {
-        api_key: (0,core.getInput)('api_key', { required: true }),
         test: {
             fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref, path: tmtPath, plan_filter: tmtPlanFilter }, tmtPlanRegex),
         },
@@ -43923,9 +43948,8 @@ async function action(pr) {
         tfResponseRaw = await api.unsafeNewRequest(Object.assign(Object.assign({}, request), { environments: [Object.assign(Object.assign({}, request.environments[0]), { hardware: tmtHardware })] }));
     }
     // Remove all secrets from request before printing it
-    delete request.api_key;
     request.environments.map((env) => delete env.secrets);
-    (0,core.debug)(`Testing Farm request (except api_key and environment[].secrets): ${JSON.stringify(request, null, 2)}`);
+    (0,core.debug)(`Testing Farm request (except environment[].secrets): ${JSON.stringify(request, null, 2)}`);
     (0,core.debug)(`Testing Farm response: ${JSON.stringify(tfResponseRaw, null, 2)}`);
     const tfResponse = requestSchema.parse(tfResponseRaw);
     const tfArtifactUrl = `${tfUrl}/${tfResponse.id}`;
