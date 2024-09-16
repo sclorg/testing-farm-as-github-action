@@ -5,7 +5,7 @@
 [codecov]: https://codecov.io/github/sclorg/testing-farm-as-github-action
 [codecov-status]: https://codecov.io/github/sclorg/testing-farm-as-github-action/graph/badge.svg
 
-Testing Farm as GitHub Action is a GitHub Action for executing tests on the [Testing Farm Service](https://docs.testing-farm.io).
+Testing Farm as GitHub Action is a GitHub Action for executing tests on the [Testing Farm Service](https://docs.testing-farm.io). Action using Node.js Library [testing-farm](https://www.npmjs.com/package/testing-farm) for communication with Testing Farm API.
 
 The tests to run are to be described with a [`tmt` plan](https://tmt.readthedocs.io/en/stable/guide.html#plans) by the user of this GitHub Action.
 Pull Request status is automatically updated after the tests are executed,
