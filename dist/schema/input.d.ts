@@ -37,18 +37,18 @@ export declare const tmtContextSchema: z.ZodObject<{
     initiator: z.ZodOptional<z.ZodString>;
     trigger: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    arch?: string | undefined;
     distro?: string | undefined;
     variant?: string | undefined;
-    arch?: string | undefined;
     component?: string | undefined;
     collection?: string | undefined;
     module?: string | undefined;
     initiator?: string | undefined;
     trigger?: string | undefined;
 }, {
+    arch?: string | undefined;
     distro?: string | undefined;
     variant?: string | undefined;
-    arch?: string | undefined;
     component?: string | undefined;
     collection?: string | undefined;
     module?: string | undefined;

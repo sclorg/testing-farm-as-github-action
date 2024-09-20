@@ -1,8 +1,9 @@
-import { debug, getBooleanInput, getInput, notice, setOutput, summary, } from '@actions/core';
+import { debug, getBooleanInput, getInput, notice, setOutput, } from '@actions/core';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 import { TFError } from './error';
 import { setTfArtifactUrl, setTfRequestId } from './state';
+import { Summary } from './summary';
 import { composeStatusDescription, getSummary } from './util';
 import { pipelineSettingsSchema, envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPlanFilterSchema, tmtPathSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
@@ -154,37 +155,41 @@ async function action(pr) {
     }
     notice(`Final state is: ${finalState}`);
     notice(`Infra state is: ${infraError ? 'Failed' : 'OK'}`);
+    const summary = new Summary([], {
+        id: tfResponse.id,
+        name: getInput('pull_request_status_name'),
+        runTime: tfResult.run_time || 0,
+        created: tfResponse.created,
+        updated: tfResponse.updated,
+        compose: getInput('compose'),
+        arch: getInput('arch'),
+        infrastructureFailure: infraError,
+        status: state,
+        outcome: result,
+        results: [
+            `<a href="${tfArtifactUrl}">test</a> `,
+            `<a href="${tfArtifactUrl}/pipeline.log">pipeline</a>`,
+        ],
+    });
     // Switch Pull Request Status to final state
     pr.isInitialized() &&
         (await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}`));
     // Add comment with Testing Farm request/result to Pull Request
     if (pr.isInitialized() && getBooleanInput('create_issue_comment')) {
-        await pr.addComment(`Testing Farm [request](${tfInstance}/requests/${tfResponse.id}) for ${getInput('compose')}/${getInput('copr_artifacts')} regression testing has been created.` +
-            `Once finished, results should be available [here](${tfArtifactUrl}/).\n` +
-            `[Full pipeline log](${tfArtifactUrl}/pipeline.log).`);
+        // Since metadata are fetched at the beginning of the action, we need to refresh them
+        do {
+            await setTimeout(Math.floor(Math.random() * 10000));
+            await pr.metadata.refresh();
+        } while (pr.metadata.lock === 'true');
+        await pr.metadata.controller.setMetadata(pr.number, 'lock', 'true');
+        summary.refreshData(pr.metadata.data);
+        await pr.publishComment(`### Testing Farm results
+${summary.getTableSummary()}`, summary.data);
+        await pr.metadata.setMetadata(summary.data, 'false');
     }
     // Create Github Summary
     if (getBooleanInput('create_github_summary')) {
-        await summary
-            .addHeading('Testing Farm as a GitHub Action summary')
-            .addTable([
-            [
-                { data: 'Compose', header: true },
-                { data: 'Arch', header: true },
-                { data: 'Infrastructure State', header: true },
-                { data: 'Test result', header: true },
-                { data: 'Link to logs', header: true },
-            ],
-            [
-                getInput('compose'),
-                getInput('arch'),
-                infraError ? 'Failed' : 'OK',
-                finalState,
-                `<a href="${tfArtifactUrl}">test</a> ` +
-                    `<a href="${tfArtifactUrl}/pipeline.log">pipeline</a>`,
-            ],
-        ])
-            .write();
+        await summary.setJobSummary();
     }
     // Exit with error in case of failure in test
     if (finalState === 'failure') {

@@ -65,7 +65,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 |------------|-------------|---------------|
 | `github_token` | GitHub token passed from secrets | `${{ github.token }}` |
 | `create_issue_comment` | If GitHub action will create a github issue comment | false |
-| `pull_request_status_name` | GitHub pull request status name | Fedora |
+| `pull_request_status_name` | GitHub pull request status name is also used as the name of the test in the Job Summary and in comments. | Fedora |
 | `update_pull_request_status` | Action will update pull request status. | false |
 | `environment_settings` | Pass custom settings to the test environment. | empty |
 | `pipeline_settings` | Pass specific settings for the testing farm pipeline. For example, `'{ "type": "tmt-multihost" }'`. For details, see `settings.pipeline` field in [Request new test](https://api.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post). | empty |
@@ -97,7 +97,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 >   statuses: write
 > ```
 
-## Example
+## Examples
 
 ### Pull request example
 
@@ -162,3 +162,16 @@ jobs:
         with:
           api_key: ${{ secrets.TF_API_KEY }}
 ```
+
+### How to setup Pull Request summary comments
+
+Set the following inputs:
+
+- `create_issue_comment: 'true'`
+- `pull_request_status_name: 'Test name'`
+
+Action uses the `pull_request_status_name` as the name of the test. Also it is used to distinguish between different tests when running multiple tests in parallel.
+
+<p align="center">
+  <img src="images/summary-comment.png" width="600" alt="Summary comment example" />
+</p>

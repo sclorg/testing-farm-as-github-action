@@ -27,6 +27,7 @@ jobs:
           pull_request_status_name: "Timeout test"
           update_pull_request_status: "true"
           timeout: 60
+          create_issue_comment: "true"
 
       - name: Check if testing farm test reached past the timeout limit
         if: ${{ !cancelled() }}

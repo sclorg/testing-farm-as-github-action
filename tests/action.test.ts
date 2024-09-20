@@ -8,6 +8,7 @@ import action from '../src/action';
 import { CustomContext } from '../src/context';
 import { NewRequest } from 'testing-farm';
 import { PullRequest } from '../src/pull-request';
+import { Metadata } from '../src/metadata';
 
 /**
  * Function which sets default Action inputs using environment variables and vi.stubEnv()
@@ -111,6 +112,23 @@ vi.mock('@actions/core', async () => {
   };
 });
 
+vi.mock('issue-metadata', () => {
+  const MetadataController = vi.fn(() => {
+    return {
+      setMetadata: vi.fn(),
+      getMetadata: vi.fn(() => {
+        return {
+          commentID: undefined,
+          data: [],
+          lock: 'false',
+        };
+      }),
+    };
+  });
+
+  return { default: MetadataController };
+});
+
 vi.mock('../src/error.ts', async () => {
   return {
     TFError: mocks.TFError,
@@ -153,7 +171,9 @@ describe('Integration tests - action.ts', () => {
         case 'POST /repos/{owner}/{repo}/issues/{issue_number}/comments':
           return {
             status: 200,
-            data: {},
+            data: {
+              id: 1,
+            },
           };
 
         case 'POST /repos/{owner}/{repo}/statuses/{sha}':
@@ -204,17 +224,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -243,7 +298,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -273,17 +328,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: unknown) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -312,7 +402,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -340,17 +430,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -379,7 +504,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -403,13 +528,45 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
 
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -460,13 +617,45 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
 
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -509,17 +698,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'error', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -568,7 +792,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>failure</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>❌ error</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
   });
 
@@ -596,17 +820,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'infra-error',
         result: null,
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -655,7 +914,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>Failed</td><td>failure</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>⛔ infra error</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
   });
 
@@ -688,17 +947,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -757,17 +1051,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -805,7 +1134,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.osci.redhat.com/testing-farm/1">test</a> <a href="https://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.osci.redhat.com/testing-farm/1">test</a>  <a href="https://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -840,17 +1169,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -876,8 +1240,9 @@ describe('Integration tests - action.ts', () => {
     expect(mocks.request).toHaveBeenCalledWith(
       'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
       {
-        body: `Testing Farm [request](https://api.dev.testing-farm.io/requests/1) for Fedora-latest/ regression testing has been created.Once finished, results should be available [here](https://artifacts.dev.testing-farm.io/1/).
-[Full pipeline log](https://artifacts.dev.testing-farm.io/1/pipeline.log).`,
+        body: `### Testing Farm results
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>Fedora-latest</td><td>x86_64</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href=\"https://artifacts.dev.testing-farm.io/1\">test</a>  <a href=\"https://artifacts.dev.testing-farm.io/1/pipeline.log\">pipeline</a></td></tr></table>
+`,
         issue_number: 1,
         owner: 'sclorg',
         repo: 'testing-farm-as-github-action',
@@ -886,7 +1251,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -920,17 +1285,52 @@ describe('Integration tests - action.ts', () => {
       async (_request: NewRequest, _strict: boolean) => {
         return Promise.resolve({
           id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
         });
       }
     );
     vi.mocked(mocks.requestDetails)
-      .mockResolvedValueOnce({ state: 'new', result: null })
-      .mockResolvedValueOnce({ state: 'queued', result: null })
-      .mockResolvedValueOnce({ state: 'pending', result: null })
-      .mockResolvedValueOnce({ state: 'running', result: null })
       .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
         state: 'complete',
         result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
       });
 
     // Run action
@@ -939,7 +1339,12 @@ describe('Integration tests - action.ts', () => {
       undefined,
       undefined,
       new CustomContext(),
-      octokit
+      octokit,
+      {
+        commentID: 1,
+        data: [],
+        context: new CustomContext(),
+      } as unknown as Metadata
     );
 
     await action(pr);
@@ -948,12 +1353,12 @@ describe('Integration tests - action.ts', () => {
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
 
     // Test outputs
-    expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
+    expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot(`"1"`);
     expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
-      '"https://api.dev.testing-farm.io/requests/1"'
+      `"https://api.dev.testing-farm.io/requests/1"`
     );
     expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
-      '"https://artifacts.dev.testing-farm.io/1"'
+      `"https://artifacts.dev.testing-farm.io/1"`
     );
 
     // Since action doesn't have access to Pull Request context it won't set the status nor create a comment
@@ -961,7 +1366,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>Compose</th><th>Arch</th><th>Infrastructure State</th><th>Test result</th><th>Link to logs</th></tr><tr><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>OK</td><td>success</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a> <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();

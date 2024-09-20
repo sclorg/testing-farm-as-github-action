@@ -5,6 +5,7 @@ import '@total-typescript/ts-reset';
 import action from './action';
 import { CustomContext } from './context';
 import { TFError } from './error';
+import { Metadata } from './metadata';
 import { getOctokit } from './octokit';
 import post from './post';
 import { PullRequest } from './pull-request';
@@ -27,7 +28,19 @@ async function run(): Promise<void> {
       info('No issue number found in the context');
 
       // Create "empty" PullRequest object
-      pr = new PullRequest(undefined, undefined, customContext, octokit);
+      pr = new PullRequest(
+        undefined,
+        undefined,
+        customContext,
+        octokit,
+        //! FIXME:
+        // This is very ugly hack, but I haven't had idea how to fix it in a better way. I would need greater refactoring to fix it.
+        // It is OK to do it like this, because we don't have access to PR metadata so we wouldn't be trying to access metadata anyway.
+        {
+          commentID: undefined,
+          data: [],
+        } as unknown as Metadata
+      );
     } else {
       pr = await PullRequest.initialize(customContext, octokit);
     }
