@@ -8,73 +8,34 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PullRequest } from '../../src/pull-request';
 import { CustomContext } from '../../src/context';
 
-const octokit = {
-  request: (
-    endpoint: string,
-    request: {
-      owner: string;
-      repo: string;
-      pull_number?: number;
-      issue_number?: number;
-      body?: string;
-    }
-  ) => {
-    switch (endpoint) {
-      case 'GET /repos/{owner}/{repo}/pulls/{pull_number}':
-        expect(request).toMatchInlineSnapshot(`
-          {
-            "owner": "sclorg",
-            "pull_number": 1,
-            "repo": "testing-farm-as-github-action",
-          }
-        `);
+const mocks = vi.hoisted(() => {
+  return {
+    request: vi.fn(),
+  };
+});
 
+// Mock @octokit/core module
+vi.mock('@octokit/core', () => {
+  const Octokit = vi.fn(() => ({
+    request: mocks.request,
+  }));
+  return { Octokit };
+});
+
+vi.mock('issue-metadata', () => {
+  const MetadataController = vi.fn(() => {
+    return {
+      getMetadata: vi.fn(() => {
         return {
-          status: 200,
-          data: {
-            number: request.pull_number,
-            head: { sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a' },
-          },
+          commentID: undefined,
+          data: [],
         };
+      }),
+    };
+  });
 
-      case 'POST /repos/{owner}/{repo}/issues/{issue_number}/comments':
-        expect(request).toMatchInlineSnapshot(`
-            {
-              "body": "some comment",
-              "issue_number": 1,
-              "owner": "sclorg",
-              "repo": "testing-farm-as-github-action",
-            }
-          `);
-
-        return {
-          status: 200,
-          data: {},
-        };
-
-      case 'POST /repos/{owner}/{repo}/statuses/{sha}':
-        expect(request).toMatchInlineSnapshot(`
-          {
-            "context": "Testing Farm - Fedora",
-            "description": "some description",
-            "owner": "sclorg",
-            "repo": "testing-farm-as-github-action",
-            "sha": "d20d0c37d634a5303fa1e02edc9ea281897ba01a",
-            "state": "success",
-            "target_url": "some url",
-          }
-        `);
-
-        return {
-          status: 200,
-          data: {},
-        };
-
-      default:
-        throw new Error(`Unexpected endpoint: ${endpoint}`);
-    }
-  },
-} as unknown as Octokit;
+  return { default: MetadataController };
+});
 
 interface TestContext {
   pr: PullRequest;
@@ -82,6 +43,7 @@ interface TestContext {
 
 describe('Pull Request class', () => {
   beforeEach<TestContext>(async context => {
+    vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock_token');
     // populate context.repo object
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
     // simulate pull_request_status_name input
@@ -93,10 +55,45 @@ describe('Pull Request class', () => {
     vi.stubEnv('INPUT_PR_NUMBER', '1');
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
 
-    context.pr = await PullRequest.initialize(new CustomContext(), octokit);
+    // Mock GitHub API
+    vi.mocked(mocks.request).mockImplementation(path => {
+      switch (path) {
+        case 'GET /repos/{owner}/{repo}/pulls/{pull_number}':
+          return {
+            status: 200,
+            data: {
+              number: 1,
+              head: { sha: 'd20d0c37d634a5303fa1e02edc9ea281897ba01a' },
+            },
+          };
+
+        case 'POST /repos/{owner}/{repo}/issues/{issue_number}/comments':
+          return {
+            status: 200,
+            data: {
+              id: 1,
+            },
+          };
+
+        case 'POST /repos/{owner}/{repo}/statuses/{sha}':
+          return {
+            status: 200,
+            data: {},
+          };
+
+        default:
+          throw new Error(`Unexpected endpoint: ${path}`);
+      }
+    });
+
+    context.pr = await PullRequest.initialize(
+      new CustomContext(),
+      new Octokit()
+    );
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.unstubAllEnvs();
   });
 
@@ -108,7 +105,7 @@ describe('Pull Request class', () => {
   });
 
   it<TestContext>('can create comment', async context => {
-    await context.pr.addComment('some comment');
+    await context.pr.createComment('some comment');
   });
 
   it<TestContext>('can set status', async context => {

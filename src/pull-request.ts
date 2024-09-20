@@ -1,8 +1,11 @@
-import { debug, getBooleanInput, getInput } from '@actions/core';
+import { debug, getBooleanInput, getInput, warning } from '@actions/core';
 import { Endpoints } from '@octokit/types';
 
 import { CustomOctokit } from './octokit';
 import { CustomContext } from './context';
+import { Metadata } from './metadata';
+
+import { Data } from './schema/metadata';
 
 /**
  * Class for holding information about a Pull Request and interacting with it via the GitHub API.
@@ -18,19 +21,22 @@ export class PullRequest {
     number: undefined,
     sha: undefined,
     context: CustomContext,
-    octokit: CustomOctokit
+    octokit: CustomOctokit,
+    metadata: Metadata
   );
   constructor(
     number: number,
     sha: string,
     context: CustomContext,
-    octokit: CustomOctokit
+    octokit: CustomOctokit,
+    metadata: Metadata
   );
   constructor(
     readonly number: number | undefined,
     readonly sha: string | undefined,
     readonly context: CustomContext,
-    readonly octokit: CustomOctokit
+    readonly octokit: CustomOctokit,
+    readonly metadata: Metadata
   ) {}
 
   isInitialized(): boolean {
@@ -82,15 +88,59 @@ export class PullRequest {
     );
   }
 
+  // TODO: update content to match DATA schema
+  async publishComment(content: string, rawData: Data[]) {
+    if (this.metadata.commentID) {
+      // Check if the comment is already up to date
+      const currentComment = await this.getComment();
+      if (JSON.stringify(currentComment) === JSON.stringify(content)) return;
+      // Update the comment
+      this.updateComment(content);
+      // Store new metadata
+      await this.metadata.setMetadata(rawData);
+      return;
+    }
+
+    const newCommentID = await this.createComment(content);
+
+    if (!newCommentID) {
+      warning(`Failed to create comment.`);
+      return;
+    }
+
+    this.metadata.commentID = newCommentID;
+    // Store metadata
+    await this.metadata.setMetadata(rawData);
+  }
+
+  async getComment(): Promise<string> {
+    if (!this.metadata.commentID) return '';
+
+    const comment =
+      (
+        await this.octokit.request(
+          'GET /repos/{owner}/{repo}/issues/comments/{comment_id}',
+          {
+            ...this.context.repo,
+            comment_id: +this.metadata.commentID,
+          }
+        )
+      ).data.body ?? '';
+
+    return comment;
+  }
+
   /**
    * Comment on the Pull Request using the GitHub API.
    * @param body - The body of the comment
    */
-  async addComment(body: string) {
+  async createComment(body: string): Promise<string | undefined> {
     if (!this.isInitialized()) {
       debug('Skipping adding Issue comment, Pull Request is not initialized');
       return;
     }
+
+    if (!body || body === '') return;
 
     const { data } = await this.octokit.request(
       'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
@@ -102,6 +152,20 @@ export class PullRequest {
     );
 
     debug(`Adding Issue comment response: ${JSON.stringify(data, null, 2)}`);
+    return data.id.toString();
+  }
+
+  async updateComment(body: string): Promise<void> {
+    if (!this.metadata.commentID) return;
+
+    await this.octokit.request(
+      'PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}',
+      {
+        ...this.context.repo,
+        comment_id: +this.metadata.commentID,
+        body,
+      }
+    );
   }
 
   /**
@@ -120,7 +184,8 @@ export class PullRequest {
         context.issue.number,
         context.sha as string,
         context,
-        octokit
+        octokit,
+        await Metadata.getMetadata(context.issue.number, context)
       );
     }
 
@@ -132,6 +197,12 @@ export class PullRequest {
       }
     );
 
-    return new this(data.number, data.head.sha, context, octokit);
+    return new this(
+      data.number,
+      data.head.sha,
+      context,
+      octokit,
+      await Metadata.getMetadata(data.number, context)
+    );
   }
 }

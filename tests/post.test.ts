@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { CustomContext } from '../src/context';
 import post from '../src/post';
 import { PullRequest } from '../src/pull-request';
+import { Metadata } from '../src/metadata';
 
 /**
  * Function which sets default Action inputs using environment variables and vi.stubEnv()
@@ -65,6 +66,21 @@ vi.mock('@actions/github', async () => {
       runId: 123456,
     },
   };
+});
+
+vi.mock('issue-metadata', () => {
+  const MetadataController = vi.fn(() => {
+    return {
+      getMetadata: vi.fn(() => {
+        return {
+          commentID: undefined,
+          data: [],
+        };
+      }),
+    };
+  });
+
+  return { default: MetadataController };
 });
 
 describe('Integration tests - post.ts', () => {
@@ -198,7 +214,12 @@ describe('Integration tests - post.ts', () => {
       undefined,
       undefined,
       new CustomContext(),
-      octokit
+      octokit,
+      {
+        commentID: 1,
+        data: [],
+        context: new CustomContext(),
+      } as unknown as Metadata
     );
 
     await post(pr, octokit);

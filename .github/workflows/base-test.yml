@@ -25,3 +25,4 @@ jobs:
           tmt_plan_regex: "smoke_plan"
           pull_request_status_name: "Smoke test"
           update_pull_request_status: "true"
+          create_issue_comment: "true"

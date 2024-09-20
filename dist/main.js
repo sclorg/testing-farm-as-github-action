@@ -18,7 +18,14 @@ async function run() {
             warning('Pull request statuses are not available in this context');
             info('No issue number found in the context');
             // Create "empty" PullRequest object
-            pr = new PullRequest(undefined, undefined, customContext, octokit);
+            pr = new PullRequest(undefined, undefined, customContext, octokit, 
+            //! FIXME:
+            // This is very ugly hack, but I haven't had idea how to fix it in a better way. I would need greater refactoring to fix it.
+            // It is OK to do it like this, because we don't have access to PR metadata so we wouldn't be trying to access metadata anyway.
+            {
+                commentID: undefined,
+                data: [],
+            });
         }
         else {
             pr = await PullRequest.initialize(customContext, octokit);
