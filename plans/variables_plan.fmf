@@ -16,7 +16,7 @@ execute:
         if [ "$OS_VARIABLE" != "DUMMY_OS" ]; then
             echo "$OS_VARIABLE does not equal to DUMMY_OS"
             final_result=1
-        fi.
+        fi
         # Add small sleep to avoid race condition when showing summary in comment
         sleep 1
         echo "Final result is $final_result."
