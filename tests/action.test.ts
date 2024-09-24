@@ -50,6 +50,9 @@ function setDefaultInputs() {
   vi.stubEnv('INPUT_PIPELINE_SETTINGS', '{}');
   // Action is waiting for testing farm to finish or until timeout is reached
   vi.stubEnv('INPUT_TIMEOUT', '480');
+
+  // Set default timezone to UTC - used by GitHub Runners
+  vi.stubEnv('TZ', 'UTC');
 }
 
 const mocks = vi.hoisted(() => {
@@ -298,7 +301,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -402,7 +405,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -504,7 +507,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -792,7 +795,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>❌ error</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>❌ error</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
   });
 
@@ -914,7 +917,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>⛔ infra error</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>⛔ infra error</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
   });
 
@@ -1134,7 +1137,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.osci.redhat.com/testing-farm/1">test</a>  <a href="https://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.osci.redhat.com/testing-farm/1">test</a>  <a href="https://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -1241,7 +1244,7 @@ describe('Integration tests - action.ts', () => {
       'POST /repos/{owner}/{repo}/issues/{issue_number}/comments',
       {
         body: `### Testing Farm results
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>Fedora-latest</td><td>x86_64</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href=\"https://artifacts.dev.testing-farm.io/1\">test</a>  <a href=\"https://artifacts.dev.testing-farm.io/1/pipeline.log\">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>Fedora-latest</td><td>x86_64</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href=\"https://artifacts.dev.testing-farm.io/1\">test</a>  <a href=\"https://artifacts.dev.testing-farm.io/1/pipeline.log\">pipeline</a></td></tr></table>
 `,
         issue_number: 1,
         owner: 'sclorg',
@@ -1251,7 +1254,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
@@ -1366,7 +1369,7 @@ describe('Integration tests - action.ts', () => {
 
     // Test summary
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
-<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
