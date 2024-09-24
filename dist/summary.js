@@ -1,4 +1,5 @@
 import { summary } from '@actions/core';
+import { format } from 'date-fns';
 export class Summary {
     /**
      * Summary constructor
@@ -30,6 +31,7 @@ export class Summary {
             { data: 'compose', header: true },
             { data: 'arch', header: true },
             { data: 'status', header: true },
+            { data: 'started (UTC)', header: true },
             { data: 'time', header: true },
             { data: 'logs', header: true },
         ];
@@ -72,6 +74,7 @@ export class Summary {
             data.compose,
             data.arch,
             this.getStatusIcon(data.status, data.outcome, data.infrastructureFailure),
+            format(new Date(data.created), 'dd.MM.yyyy HH:mm:ss'),
             this.getTime(data.runTime),
             data.results.join(' '),
         ];

@@ -2,7 +2,7 @@
  * vitest general documentation - https://vitest.dev/
  * vi API documentation (mocking) - https://vitest.dev/api/vi.html#vi
  */
-import { beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Summary } from '../../src/summary';
 import { Data } from '../../src/schema/metadata';
@@ -11,6 +11,8 @@ let currentData: Data[] = [];
 
 describe('Summary class', () => {
   beforeEach(() => {
+    vi.stubEnv('TZ', 'UTC');
+
     currentData = [
       {
         id: '1',
@@ -61,6 +63,10 @@ describe('Summary class', () => {
         results: ['test', 'pipeline'],
       },
     ];
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   test('can be instantiated', () => {
@@ -300,6 +306,10 @@ describe('Summary class', () => {
           "header": true,
         },
         {
+          "data": "started (UTC)",
+          "header": true,
+        },
+        {
           "data": "time",
           "header": true,
         },
@@ -320,6 +330,7 @@ describe('Summary class', () => {
         "Fedora-latest",
         "x86_64",
         "⏳ pending",
+        "24.08.2019 14:15:22",
         "35s",
         "test pipeline",
       ]
@@ -330,7 +341,7 @@ describe('Summary class', () => {
     const summary = new Summary(currentData, currentData[0]);
 
     expect(summary.getTableSummary()).toMatchInlineSnapshot(`
-      "<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>time</th><th>logs</th></tr><tr><td>test1</td><td>Fedora-latest</td><td>x86_64</td><td>⏳ pending</td><td>35s</td><td>test pipeline</td></tr><tr><td>test2</td><td>CentOS-Stream-9</td><td>x86_64</td><td>✅ success</td><td>10min </td><td>test pipeline</td></tr><tr><td>test3</td><td>Fedora-latest</td><td>x86_64</td><td>❌ failure</td><td>1h </td><td>test pipeline</td></tr><tr><td>test4</td><td>Fedora-latest</td><td>x86_64</td><td>⛔ infra error</td><td>1h 35min 1s</td><td>test pipeline</td></tr></table>
+      "<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>test1</td><td>Fedora-latest</td><td>x86_64</td><td>⏳ pending</td><td>24.08.2019 14:15:22</td><td>35s</td><td>test pipeline</td></tr><tr><td>test2</td><td>CentOS-Stream-9</td><td>x86_64</td><td>✅ success</td><td>24.08.2019 14:15:22</td><td>10min </td><td>test pipeline</td></tr><tr><td>test3</td><td>Fedora-latest</td><td>x86_64</td><td>❌ failure</td><td>24.08.2019 14:15:22</td><td>1h </td><td>test pipeline</td></tr><tr><td>test4</td><td>Fedora-latest</td><td>x86_64</td><td>⛔ infra error</td><td>24.08.2019 14:15:22</td><td>1h 35min 1s</td><td>test pipeline</td></tr></table>
       "
     `);
   });
