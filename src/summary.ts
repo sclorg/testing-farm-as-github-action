@@ -63,6 +63,7 @@ export class Summary {
       case 'success':
       case 'passed':
         return `✅ ${switchValue}`;
+      case 'failed':
       case 'failure':
       case 'error':
         return `❌ ${switchValue}`;
