@@ -129,13 +129,15 @@ jobs:
         uses: sclorg/testing-farm-as-github-action@v3
         with:
           api_key: ${{ secrets.TF_API_KEY }}
-          tmt_plan_regex: "centos"
-          pull_request_status_name: "CentOS 7"
+          tmt_plan_regex: "smoke"
+          pull_request_status_name: "Smoke test"
 ```
 
 and as soon as the job is finished you will see the test results in the pull request status:
 
-✅ | ❌ Testing Farm - CentOS 7 - Build finished
+<p align="center">
+  <img src="images/statuses.png" width="600" alt="Statuses example" />
+</p>
 
 ### Run workflow at push to the main branch
 
