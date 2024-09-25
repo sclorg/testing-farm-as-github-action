@@ -175,3 +175,7 @@ Action uses the `pull_request_status_name` as the name of the test. Also it is u
 <p align="center">
   <img src="images/summary-comment.png" width="600" alt="Summary comment example" />
 </p>
+
+> [!WARNING]
+>
+> When running multiple tests in parallel, you can encounter race conditions when updating the summary comment. We have implemented a locking mechanism to prevent this issue, but currently there is no proper way how to synchronize independent workflow jobs. Statuses are updated independently so they don't have this issue and are always up to date.
