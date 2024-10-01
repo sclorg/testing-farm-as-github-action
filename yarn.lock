@@ -729,10 +729,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@total-typescript/ts-reset@npm:0.6.0":
-  version: 0.6.0
-  resolution: "@total-typescript/ts-reset@npm:0.6.0"
-  checksum: 4e7d4ef4e8d80ca02100735b3021e27f8b48c9fc856928aa1b48c684010bbfac1067a88187fb315c86f7a707bdfcd3f1aeb76cf8ed9a0af7a97edf4cf8d61a26
+"@total-typescript/ts-reset@npm:0.6.1":
+  version: 0.6.1
+  resolution: "@total-typescript/ts-reset@npm:0.6.1"
+  checksum: 42481486822274ea9e3a5a6e82b384d8540ee6a7454bca658b73897b939905d0226266e6a13933e568a9c1684ee9cddf29ff47b341a2a8ca9876478100739b1a
   languageName: node
   linkType: hard
 
@@ -2279,7 +2279,7 @@ __metadata:
     "@octokit/plugin-throttling": 9.3.1
     "@octokit/rest": 21.0.2
     "@octokit/types": 13.6.0
-    "@total-typescript/ts-reset": 0.6.0
+    "@total-typescript/ts-reset": 0.6.1
     "@types/node": 22.5.2
     "@vercel/ncc": 0.38.1
     "@vitest/coverage-v8": 2.0.5
