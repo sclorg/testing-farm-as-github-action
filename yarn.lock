@@ -582,12 +582,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:13.6.0":
-  version: 13.6.0
-  resolution: "@octokit/types@npm:13.6.0"
+"@octokit/types@npm:13.6.1":
+  version: 13.6.1
+  resolution: "@octokit/types@npm:13.6.1"
   dependencies:
     "@octokit/openapi-types": ^22.2.0
-  checksum: 6e8b2bd27a92b407025867e50b28acc698d19f11d71d54da07ca028d0b56fb95c5831e6091ed29a16160d7148f825d54aaae78e46b83c91d364ceccc372cb9a0
+  checksum: 05bb427bc3c84088e2367b8d1b7a9834732116bb3d35ef51d1aae34b3919027159dd496b9362dab1cb047918da15be1dc1cafc512c97f9b77458bd273b5a2ba9
   languageName: node
   linkType: hard
 
@@ -2244,7 +2244,7 @@ __metadata:
     "@octokit/core": 6.1.2
     "@octokit/plugin-throttling": 9.3.1
     "@octokit/rest": 21.0.2
-    "@octokit/types": 13.6.0
+    "@octokit/types": 13.6.1
     "@total-typescript/ts-reset": 0.6.1
     "@types/node": 22.8.6
     "@vercel/ncc": 0.38.2
