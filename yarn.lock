@@ -790,9 +790,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:2.1.4":
-  version: 2.1.4
-  resolution: "@vitest/coverage-v8@npm:2.1.4"
+"@vitest/coverage-v8@npm:2.1.6":
+  version: 2.1.6
+  resolution: "@vitest/coverage-v8@npm:2.1.6"
   dependencies:
     "@ampproject/remapping": ^2.3.0
     "@bcoe/v8-coverage": ^0.2.3
@@ -803,16 +803,16 @@ __metadata:
     istanbul-reports: ^3.1.7
     magic-string: ^0.30.12
     magicast: ^0.3.5
-    std-env: ^3.7.0
+    std-env: ^3.8.0
     test-exclude: ^7.0.1
     tinyrainbow: ^1.2.0
   peerDependencies:
-    "@vitest/browser": 2.1.4
-    vitest: 2.1.4
+    "@vitest/browser": 2.1.6
+    vitest: 2.1.6
   peerDependenciesMeta:
     "@vitest/browser":
       optional: true
-  checksum: 29ad6800afd93fa36d86b0df45d1a108395501743f9248c6a46baa35ea4d74cafbd6f0a29d897460c81eb4f4bbe96bfd915458d0160b5a45b9cab5c565db9f2f
+  checksum: 01d9408541679edadcd0cedd21b0f95f1b6cc66760e985944b90d7796918763880af813e87081f04154f550a6884ad01e51f800251700f0daa11f153b78574e8
   languageName: node
   linkType: hard
 
@@ -2165,6 +2165,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"std-env@npm:^3.8.0":
+  version: 3.8.0
+  resolution: "std-env@npm:3.8.0"
+  checksum: ad4554485c2d09138a1d0f03944245e169510e6f5200b7d30fcdd4536e27a2a9a2fd934caff7ef58ebbe21993fa0e2b9e5b1979f431743c925305863b7ff36d5
+  languageName: node
+  linkType: hard
+
 "string-width-cjs@npm:string-width@^4.2.0, string-width@npm:^4.1.0":
   version: 4.2.3
   resolution: "string-width@npm:4.2.3"
@@ -2252,7 +2259,7 @@ __metadata:
     "@total-typescript/ts-reset": 0.6.1
     "@types/node": 22.8.6
     "@vercel/ncc": 0.38.2
-    "@vitest/coverage-v8": 2.1.4
+    "@vitest/coverage-v8": 2.1.6
     date-fns: 4.1.0
     issue-metadata: 0.2.3
     prettier: 3.3.3
