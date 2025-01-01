@@ -37,7 +37,7 @@
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.3",
     "testing-farm": "1.10.0",
-    "zod": "3.23.5"
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "0.6.1",
