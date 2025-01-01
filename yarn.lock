@@ -786,12 +786,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.8.6":
-  version: 22.8.6
-  resolution: "@types/node@npm:22.8.6"
+"@types/node@npm:22.10.3":
+  version: 22.10.3
+  resolution: "@types/node@npm:22.10.3"
   dependencies:
-    undici-types: ~6.19.8
-  checksum: 3699b6582c433323ed0d6c2f3e9245f0848946e0b4b3b26b11a069ab2ac2c02d3300d544a17dbf4e28899c41afe89811843e41ef5945c98d28561e8abfeb40b1
+    undici-types: ~6.20.0
+  checksum: f42264d5afadb7eece4f068a9028cf752174796fe424f5f7385b6f700037240dc7bc6acd8ab11641424c39452dcf4d85be229f51dcc73ccd931eaa29924ffda7
   languageName: node
   linkType: hard
 
@@ -2273,7 +2273,7 @@ __metadata:
     "@octokit/rest": 21.0.2
     "@octokit/types": 13.6.1
     "@total-typescript/ts-reset": 0.6.1
-    "@types/node": 22.8.6
+    "@types/node": 22.10.3
     "@vercel/ncc": 0.38.3
     "@vitest/coverage-v8": 2.1.6
     date-fns: 4.1.0
@@ -2397,10 +2397,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.19.8":
-  version: 6.19.8
-  resolution: "undici-types@npm:6.19.8"
-  checksum: de51f1b447d22571cf155dfe14ff6d12c5bdaec237c765085b439c38ca8518fc360e88c70f99469162bf2e14188a7b0bcb06e1ed2dc031042b984b0bb9544017
+"undici-types@npm:~6.20.0":
+  version: 6.20.0
+  resolution: "undici-types@npm:6.20.0"
+  checksum: b7bc50f012dc6afbcce56c9fd62d7e86b20a62ff21f12b7b5cbf1973b9578d90f22a9c7fe50e638e96905d33893bf2f9f16d98929c4673c2480de05c6c96ea8b
   languageName: node
   linkType: hard
 
