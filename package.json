@@ -33,20 +33,20 @@
     "@octokit/core": "6.1.2",
     "@octokit/plugin-throttling": "9.3.2",
     "@octokit/rest": "21.0.2",
-    "@octokit/types": "13.6.1",
+    "@octokit/types": "13.6.2",
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.3",
     "testing-farm": "1.10.0",
-    "zod": "3.23.5"
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "0.6.1",
-    "@types/node": "22.8.6",
+    "@types/node": "22.10.3",
     "@vercel/ncc": "0.38.3",
-    "@vitest/coverage-v8": "2.1.6",
-    "prettier": "3.3.3",
+    "@vitest/coverage-v8": "2.1.8",
+    "prettier": "3.4.2",
     "ts-node": "10.9.2",
     "typescript": "5.7.2",
-    "vitest": "2.1.4"
+    "vitest": "2.1.8"
   }
 }
