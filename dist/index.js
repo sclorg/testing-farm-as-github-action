@@ -52814,23 +52814,29 @@ async function action(pr) {
         ],
     });
     // Switch Pull Request Status to final state
+    (0,core.debug)(`Set PR status to ${finalState} with result" ${tfResult.result}`);
     pr.isInitialized() &&
         (await pr.setStatus(finalState, composeStatusDescription(infraError, getSummary(tfResult.result)), `${tfArtifactUrl}`));
     // Add comment with Testing Farm request/result to Pull Request
     if (pr.isInitialized() && (0,core.getBooleanInput)('create_issue_comment')) {
         // Since metadata are fetched at the beginning of the action, we need to refresh them
         do {
-            await (0,promises_namespaceObject.setTimeout)(Math.floor(Math.random() * 10000));
+            const issue_comment_timeout = Math.floor(Math.random() * 10000);
+            (0,core.debug)(`setTimeout to ${issue_comment_timeout}`);
+            await (0,promises_namespaceObject.setTimeout)(issue_comment_timeout);
             await pr.metadata.refresh();
         } while (pr.metadata.lock === 'true');
+        (0,core.debug)(`create_issue_comment: metadata unlocked`);
         await pr.metadata.controller.setMetadata(pr.number, 'lock', 'true');
         summary.refreshData(pr.metadata.data);
+        (0,core.debug)(`Publish Comment: ${summary.data}`);
         await pr.publishComment(`### Testing Farm results
 ${summary.getTableSummary()}`, summary.data);
         await pr.metadata.setMetadata(summary.data, 'false');
     }
     // Create Github Summary
     if ((0,core.getBooleanInput)('create_github_summary')) {
+        (0,core.debug)(`GitHub summary does not exist. Let's create it.`);
         await summary.setJobSummary();
     }
     // Exit with error in case of failure in test
