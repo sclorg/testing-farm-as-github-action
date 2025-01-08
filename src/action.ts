@@ -276,6 +276,7 @@ async function action(pr: PullRequest): Promise<void> {
   });
 
   // Switch Pull Request Status to final state
+  debug(`Set PR status to ${finalState} with result" ${tfResult.result}`);
   pr.isInitialized() &&
     (await pr.setStatus(
       finalState,
@@ -288,9 +289,12 @@ async function action(pr: PullRequest): Promise<void> {
     // Since metadata are fetched at the beginning of the action, we need to refresh them
 
     do {
-      await setTimeout(Math.floor(Math.random() * 10000));
+      const timeout = Math.floor(Math.random() * 10000);
+      debug(`set timeout to ${timeout}`);
+      await setTimeout(timeout);
       await pr.metadata.refresh();
     } while (pr.metadata.lock === 'true');
+    debug(`metadata unlocked`);
 
     await pr.metadata.controller.setMetadata(
       pr.number as number,
@@ -299,6 +303,7 @@ async function action(pr: PullRequest): Promise<void> {
     );
     summary.refreshData(pr.metadata.data);
 
+    debug(`Publish Comment: ${summary.data}`);
     await pr.publishComment(
       `### Testing Farm results
 ${summary.getTableSummary()}`,
@@ -310,6 +315,7 @@ ${summary.getTableSummary()}`,
 
   // Create Github Summary
   if (getBooleanInput('create_github_summary')) {
+    debug(`Creating GitHub Summary`);
     await summary.setJobSummary();
   }
 
