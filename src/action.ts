@@ -294,7 +294,7 @@ async function action(pr: PullRequest): Promise<void> {
       await setTimeout(issue_comment_timeout);
       await pr.metadata.refresh();
     } while (pr.metadata.lock === 'true');
-    debug(`create_issue_comment: metadata unlocked`);
+    debug(`metadata unlocked`);
 
     await pr.metadata.controller.setMetadata(
       pr.number as number,
