@@ -315,7 +315,7 @@ ${summary.getTableSummary()}`,
 
   // Create Github Summary
   if (getBooleanInput('create_github_summary')) {
-    debug(`GitHub summary does not exist. Let's create it.`);
+    debug(`Creating GitHub Summary`);
     await summary.setJobSummary();
   }
 
