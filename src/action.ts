@@ -289,7 +289,7 @@ async function action(pr: PullRequest): Promise<void> {
     // Since metadata are fetched at the beginning of the action, we need to refresh them
 
     do {
-      const issue_comment_timeout = Math.floor(Math.random() * 10000);
+      const timeout = Math.floor(Math.random() * 10000);
       debug(`set timeout to ${timeout}`);
       await setTimeout(timeout);
       await pr.metadata.refresh();
