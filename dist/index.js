@@ -52821,12 +52821,12 @@ async function action(pr) {
     if (pr.isInitialized() && (0,core.getBooleanInput)('create_issue_comment')) {
         // Since metadata are fetched at the beginning of the action, we need to refresh them
         do {
-            const issue_comment_timeout = Math.floor(Math.random() * 10000);
-            (0,core.debug)(`setTimeout to ${issue_comment_timeout}`);
-            await (0,promises_namespaceObject.setTimeout)(issue_comment_timeout);
+            const timeout = Math.floor(Math.random() * 10000);
+            (0,core.debug)(`set timeout to ${timeout}`);
+            await (0,promises_namespaceObject.setTimeout)(timeout);
             await pr.metadata.refresh();
         } while (pr.metadata.lock === 'true');
-        (0,core.debug)(`create_issue_comment: metadata unlocked`);
+        (0,core.debug)(`metadata unlocked`);
         await pr.metadata.controller.setMetadata(pr.number, 'lock', 'true');
         summary.refreshData(pr.metadata.data);
         (0,core.debug)(`Publish Comment: ${summary.data}`);
@@ -52836,7 +52836,7 @@ ${summary.getTableSummary()}`, summary.data);
     }
     // Create Github Summary
     if ((0,core.getBooleanInput)('create_github_summary')) {
-        (0,core.debug)(`GitHub summary does not exist. Let's create it.`);
+        (0,core.debug)(`Creating GitHub Summary`);
         await summary.setJobSummary();
     }
     // Exit with error in case of failure in test
