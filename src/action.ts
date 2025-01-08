@@ -290,7 +290,7 @@ async function action(pr: PullRequest): Promise<void> {
 
     do {
       const issue_comment_timeout = Math.floor(Math.random() * 10000);
-      debug(`setTimeout to ${issue_comment_timeout}`);
+      debug(`set timeout to ${timeout}`);
       await setTimeout(issue_comment_timeout);
       await pr.metadata.refresh();
     } while (pr.metadata.lock === 'true');
