@@ -32,7 +32,7 @@
     "@actions/github": "6.0.0",
     "@octokit/core": "6.1.2",
     "@octokit/plugin-throttling": "9.3.2",
-    "@octokit/rest": "21.0.2",
+    "@octokit/rest": "21.1.0",
     "@octokit/types": "13.6.2",
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.3",
