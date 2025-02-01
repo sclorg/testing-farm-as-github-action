@@ -477,6 +477,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@octokit/openapi-types@npm:^23.0.1":
+  version: 23.0.1
+  resolution: "@octokit/openapi-types@npm:23.0.1"
+  checksum: 1e6766c60375375d85ecabded67d9ee313cf9401c18a44534b942717cf840d41b5a9d42035522efffe6b811ee2204d4615f72c333e984e81b25545926eb77989
+  languageName: node
+  linkType: hard
+
 "@octokit/plugin-paginate-rest@npm:^11.0.0":
   version: 11.3.3
   resolution: "@octokit/plugin-paginate-rest@npm:11.3.3"
@@ -598,12 +605,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:13.6.2":
-  version: 13.6.2
-  resolution: "@octokit/types@npm:13.6.2"
+"@octokit/types@npm:13.8.0":
+  version: 13.8.0
+  resolution: "@octokit/types@npm:13.8.0"
   dependencies:
-    "@octokit/openapi-types": ^22.2.0
-  checksum: c4e51da1ccabc028b70fc90ca58d65091862a7fe3a65ec2692681f473a0aee4c355abfd15fd547bce3a9800d07c1592603fe84b4223e7beea0d493e4fcc1a65e
+    "@octokit/openapi-types": ^23.0.1
+  checksum: be5fb327d0e39765e06f5a314556a273ff2bfb9ce4fd5a6e52c237d2f20a4c329493a8bde2c595cb82a5022f07ee6495dfff07ce24e3de4660c9ead913e3db0d
   languageName: node
   linkType: hard
 
@@ -2271,7 +2278,7 @@ __metadata:
     "@octokit/core": 6.1.2
     "@octokit/plugin-throttling": 9.3.2
     "@octokit/rest": 21.0.2
-    "@octokit/types": 13.6.2
+    "@octokit/types": 13.8.0
     "@total-typescript/ts-reset": 0.6.1
     "@types/node": 22.10.3
     "@vercel/ncc": 0.38.3
