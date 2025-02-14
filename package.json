@@ -16,7 +16,7 @@
     "update-snapshots": "vitest run --update",
     "all": "yarn && yarn run build && yarn run format && yarn run package && yarn test"
   },
-  "packageManager": "yarn@3.6.4",
+  "packageManager": "yarn@4.6.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sclorg/testing-farm-as-github-action.git"
@@ -30,23 +30,23 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
-    "@octokit/core": "6.1.2",
-    "@octokit/plugin-throttling": "9.3.2",
-    "@octokit/rest": "21.0.2",
-    "@octokit/types": "13.6.2",
+    "@octokit/core": "6.1.4",
+    "@octokit/plugin-throttling": "9.4.0",
+    "@octokit/rest": "21.1.0",
+    "@octokit/types": "13.8.0",
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.3",
     "testing-farm": "1.10.0",
-    "zod": "3.24.1"
+    "zod": "3.24.2"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "0.6.1",
-    "@types/node": "22.10.3",
+    "@types/node": "22.13.4",
     "@vercel/ncc": "0.38.3",
-    "@vitest/coverage-v8": "2.1.8",
-    "prettier": "3.4.2",
+    "@vitest/coverage-v8": "3.0.5",
+    "prettier": "3.5.1",
     "ts-node": "10.9.2",
-    "typescript": "5.7.2",
-    "vitest": "2.1.8"
+    "typescript": "5.7.3",
+    "vitest": "3.0.5"
   }
 }
