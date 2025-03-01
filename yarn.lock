@@ -435,16 +435,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/endpoint@npm:^10.0.0":
-  version: 10.1.1
-  resolution: "@octokit/endpoint@npm:10.1.1"
-  dependencies:
-    "@octokit/types": "npm:^13.0.0"
-    universal-user-agent: "npm:^7.0.2"
-  checksum: 10/6b8991b278ba7e63ddf95e7396f54e5f1347237f11fb845322ec25101764336ed0994ccb197c449b4fd4bc00ec5b78780ccbc3a0b48ba0620dcc115027a3add1
-  languageName: node
-  linkType: hard
-
 "@octokit/endpoint@npm:^10.1.3":
   version: 10.1.3
   resolution: "@octokit/endpoint@npm:10.1.3"
@@ -584,15 +574,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request-error@npm:^6.0.1":
-  version: 6.1.4
-  resolution: "@octokit/request-error@npm:6.1.4"
-  dependencies:
-    "@octokit/types": "npm:^13.0.0"
-  checksum: 10/e4e475ec50cef8e271f39e69667d0f8eaccb2367aa56b81638c629b5bbfa2b697b40207301e5c797a63051a82d8698e7c792b4050b84e383c54300a49a01304a
-  languageName: node
-  linkType: hard
-
 "@octokit/request-error@npm:^6.1.6, @octokit/request-error@npm:^6.1.7":
   version: 6.1.7
   resolution: "@octokit/request-error@npm:6.1.7"
@@ -614,18 +595,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request@npm:^9.1.3":
-  version: 9.1.3
-  resolution: "@octokit/request@npm:9.1.3"
-  dependencies:
-    "@octokit/endpoint": "npm:^10.0.0"
-    "@octokit/request-error": "npm:^6.0.1"
-    "@octokit/types": "npm:^13.1.0"
-    universal-user-agent: "npm:^7.0.2"
-  checksum: 10/b445f263157a2c608d8cfa89162be5f5d39551607d0ec973c3fdf9d3fd3753e33861c4e34942f5dbf47576ac91a99238ed482f2d6c6af3f9070e0b190b3f07a2
-  languageName: node
-  linkType: hard
-
 "@octokit/request@npm:^9.1.4, @octokit/request@npm:^9.2.1":
   version: 9.2.1
   resolution: "@octokit/request@npm:9.2.1"
@@ -636,6 +605,19 @@ __metadata:
     fast-content-type-parse: "npm:^2.0.0"
     universal-user-agent: "npm:^7.0.2"
   checksum: 10/a01d23cf28402a3169e937e1d179b9ebd93638ef30be9c5bb016ed9e541d66dec20c46c129b1fc4dace018f731c9eed187936299998a00dae7eb74fc4e530fa9
+  languageName: node
+  linkType: hard
+
+"@octokit/request@npm:^9.2.2":
+  version: 9.2.2
+  resolution: "@octokit/request@npm:9.2.2"
+  dependencies:
+    "@octokit/endpoint": "npm:^10.1.3"
+    "@octokit/request-error": "npm:^6.1.7"
+    "@octokit/types": "npm:^13.6.2"
+    fast-content-type-parse: "npm:^2.0.0"
+    universal-user-agent: "npm:^7.0.2"
+  checksum: 10/32d393de86c1a4cc58b605e74fefc0284837c01eca7c4cb1e56e5cf71b3f1b27c76acaae7d333fb43f5478a967c05e9861bc405ce85eaacd158942911adb7943
   languageName: node
   linkType: hard
 
@@ -1667,13 +1649,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"issue-metadata@npm:0.2.3":
-  version: 0.2.3
-  resolution: "issue-metadata@npm:0.2.3"
+"issue-metadata@npm:0.2.4":
+  version: 0.2.4
+  resolution: "issue-metadata@npm:0.2.4"
   dependencies:
-    "@octokit/request": "npm:^9.1.3"
-    zod: "npm:^3.23.8"
-  checksum: 10/93057b76f76c7d8584d1fd6ef31f3591137ed705ea173869c3bfd39618a6cc9977f133a3966b0394bb85531d18c34c3f42cf79d79972abc0f51d482f35706d34
+    "@octokit/request": "npm:^9.2.2"
+    zod: "npm:^3.24.2"
+  checksum: 10/e10f5f69eeaacdc570bb45415085132ad375fedf6f88ee70920ea67ead72da753e610c394ce8b255afbde753b2e3d0a79f31afec2f4e49c1661d563b09aacb21
   languageName: node
   linkType: hard
 
@@ -2387,7 +2369,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.3"
     "@vitest/coverage-v8": "npm:3.0.5"
     date-fns: "npm:4.1.0"
-    issue-metadata: "npm:0.2.3"
+    issue-metadata: "npm:0.2.4"
     prettier: "npm:3.5.1"
     testing-farm: "npm:1.10.0"
     ts-node: "npm:10.9.2"
@@ -2759,14 +2741,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.8, zod@npm:^3.23.8":
+"zod@npm:3.23.8":
   version: 3.23.8
   resolution: "zod@npm:3.23.8"
   checksum: 10/846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1
   languageName: node
   linkType: hard
 
-"zod@npm:3.24.2":
+"zod@npm:3.24.2, zod@npm:^3.24.2":
   version: 3.24.2
   resolution: "zod@npm:3.24.2"
   checksum: 10/604c62a8cf8e330d78b106a557f4b44f5d14845d20b1360a423ccc09b58cb8525ccf7e4b40cf1bd4852d22393d2c67774b5817ec5a2fedab25f543b36ed15943
