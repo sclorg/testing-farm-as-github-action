@@ -500,6 +500,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@octokit/openapi-types@npm:^24.2.0":
+  version: 24.2.0
+  resolution: "@octokit/openapi-types@npm:24.2.0"
+  checksum: 10/000897ebc6e247c2591049d6081e95eb5636f73798dadd695ee6048496772b58065df88823e74a760201828545a7ac601dd3c1bcd2e00079a62a9ee9d389409c
+  languageName: node
+  linkType: hard
+
 "@octokit/plugin-paginate-rest@npm:^11.4.2":
   version: 11.4.3
   resolution: "@octokit/plugin-paginate-rest@npm:11.4.3"
@@ -622,12 +629,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:13.8.0, @octokit/types@npm:^13.0.0, @octokit/types@npm:^13.1.0, @octokit/types@npm:^13.6.2, @octokit/types@npm:^13.7.0, @octokit/types@npm:^13.8.0":
-  version: 13.8.0
-  resolution: "@octokit/types@npm:13.8.0"
+"@octokit/types@npm:13.10.0":
+  version: 13.10.0
+  resolution: "@octokit/types@npm:13.10.0"
   dependencies:
-    "@octokit/openapi-types": "npm:^23.0.1"
-  checksum: 10/7f260cd3f98887626e791cc0e71ae718b689f359ff6546ed0343364bb213c70807f71135956659470ecdf2b4a5a0c32b6437bd5a3af412883ef3a62f41e811f8
+    "@octokit/openapi-types": "npm:^24.2.0"
+  checksum: 10/32f8f5010d7faae128b0cdd0c221f0ca8c3781fe44483ecd87162b3da507db667f7369acda81340f6e2c9c374d9a938803409c6085c2c01d98210b6c58efb99a
   languageName: node
   linkType: hard
 
@@ -637,6 +644,15 @@ __metadata:
   dependencies:
     "@octokit/openapi-types": "npm:^20.0.0"
   checksum: 10/19b77a8d25af2a5df4561f8750f807edfc9fca5b07cfa9fb21dce4665e1b188c966688f5ed5e08089404428100dfe44ad353f8d8532f1d30fe47e61c5faa1440
+  languageName: node
+  linkType: hard
+
+"@octokit/types@npm:^13.0.0, @octokit/types@npm:^13.1.0, @octokit/types@npm:^13.6.2, @octokit/types@npm:^13.7.0, @octokit/types@npm:^13.8.0":
+  version: 13.8.0
+  resolution: "@octokit/types@npm:13.8.0"
+  dependencies:
+    "@octokit/openapi-types": "npm:^23.0.1"
+  checksum: 10/7f260cd3f98887626e791cc0e71ae718b689f359ff6546ed0343364bb213c70807f71135956659470ecdf2b4a5a0c32b6437bd5a3af412883ef3a62f41e811f8
   languageName: node
   linkType: hard
 
@@ -2384,7 +2400,7 @@ __metadata:
     "@octokit/core": "npm:6.1.4"
     "@octokit/plugin-throttling": "npm:9.4.0"
     "@octokit/rest": "npm:21.1.1"
-    "@octokit/types": "npm:13.8.0"
+    "@octokit/types": "npm:13.10.0"
     "@total-typescript/ts-reset": "npm:0.6.1"
     "@types/node": "npm:22.13.10"
     "@vercel/ncc": "npm:0.38.3"

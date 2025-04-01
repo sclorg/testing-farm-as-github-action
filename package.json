@@ -33,7 +33,7 @@
     "@octokit/core": "6.1.4",
     "@octokit/plugin-throttling": "9.4.0",
     "@octokit/rest": "21.1.1",
-    "@octokit/types": "13.8.0",
+    "@octokit/types": "13.10.0",
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.4",
     "testing-farm": "1.10.0",
