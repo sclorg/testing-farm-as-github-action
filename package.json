@@ -16,7 +16,7 @@
     "update-snapshots": "vitest run --update",
     "all": "yarn && yarn run build && yarn run format && yarn run package && yarn test"
   },
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.8.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sclorg/testing-farm-as-github-action.git"
