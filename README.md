@@ -126,7 +126,7 @@ jobs:
       && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
     steps:
       - name: Schedule test on Testing Farm
-        uses: sclorg/testing-farm-as-github-action@v3
+        uses: sclorg/testing-farm-as-github-action@v4
         with:
           api_key: ${{ secrets.TF_API_KEY }}
           tmt_plan_regex: "smoke"
@@ -160,7 +160,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Schedule test on Testing Farm
-        uses: sclorg/testing-farm-as-github-action@v3
+        uses: sclorg/testing-farm-as-github-action@v4
         with:
           api_key: ${{ secrets.TF_API_KEY }}
 ```
