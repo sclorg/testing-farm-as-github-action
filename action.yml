@@ -87,7 +87,7 @@ inputs:
     required: false
     default: 'Fedora'
   update_pull_request_status:
-    description: 'Action will update pull request status. Default: true'
+    description: 'Action will update pull request status.'
     required: false
     default: 'false'
   environment_settings:
