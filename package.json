@@ -30,7 +30,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
-    "@octokit/core": "6.1.4",
+    "@octokit/core": "6.1.5",
     "@octokit/plugin-throttling": "9.6.1",
     "@octokit/rest": "21.1.1",
     "@octokit/types": "13.10.0",
