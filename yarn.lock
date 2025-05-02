@@ -1039,14 +1039,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.7.4":
-  version: 1.7.4
-  resolution: "axios@npm:1.7.4"
+"axios@npm:1.9.0":
+  version: 1.9.0
+  resolution: "axios@npm:1.9.0"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10/7a1429be1e3d0c2e1b96d4bba4d113efbfabc7c724bed107beb535c782c7bea447ff634886b0c7c43395a264d085450d009eb1154b5f38a8bae49d469fdcbc61
+  checksum: 10/a2f90bba56820883879f32a237e2b9ff25c250365dcafd41cec41b3406a3df334a148f90010182dfdadb4b41dc59f6f0b3e8898ff41b666d1157b5f3f4523497
   languageName: node
   linkType: hard
 
@@ -2421,7 +2421,7 @@ __metadata:
     date-fns: "npm:4.1.0"
     issue-metadata: "npm:0.2.4"
     prettier: "npm:3.5.3"
-    testing-farm: "npm:1.10.0"
+    testing-farm: "npm:1.10.1"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.8.3"
     vitest: "npm:3.1.2"
@@ -2429,13 +2429,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"testing-farm@npm:1.10.0":
-  version: 1.10.0
-  resolution: "testing-farm@npm:1.10.0"
+"testing-farm@npm:1.10.1":
+  version: 1.10.1
+  resolution: "testing-farm@npm:1.10.1"
   dependencies:
-    axios: "npm:1.7.4"
-    zod: "npm:3.23.8"
-  checksum: 10/8678711135467aeba7743f1701b8f4cb787cec31a2cf3a4aa12e7b0b936e7f9a2ccabb31cf730a86fc970a02191c2b61517bc90af9896a1b5b1484302e81d671
+    axios: "npm:1.9.0"
+    zod: "npm:3.24.3"
+  checksum: 10/ef15d82f7935c257608d0d5fef7cc2957c619f874901c52e8a365d4c74eca3d9f381e18c3e0dde3c3c19e01452e38f1147230ee88e9c6079768d168702b0f508
   languageName: node
   linkType: hard
 
@@ -2819,16 +2819,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.8":
-  version: 3.23.8
-  resolution: "zod@npm:3.23.8"
-  checksum: 10/846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1
-  languageName: node
-  linkType: hard
-
 "zod@npm:3.24.2, zod@npm:^3.24.2":
   version: 3.24.2
   resolution: "zod@npm:3.24.2"
   checksum: 10/604c62a8cf8e330d78b106a557f4b44f5d14845d20b1360a423ccc09b58cb8525ccf7e4b40cf1bd4852d22393d2c67774b5817ec5a2fedab25f543b36ed15943
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.24.3":
+  version: 3.24.3
+  resolution: "zod@npm:3.24.3"
+  checksum: 10/1b15db625ca633324084f3a8587bfb907043bbca407a09f7d5da6a9781b3838c68e9312b49e91e479d2f8bf04cdda5810803ac9504e3b7ccbec3adf2de625fb8
   languageName: node
   linkType: hard
