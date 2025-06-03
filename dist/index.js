@@ -54373,8 +54373,8 @@ async function action(pr) {
     // Create Pull Request status in state pending
     pr.isInitialized() &&
         (await pr.setStatus('pending', 'Build started', `${tfArtifactUrl}`));
-    // Interval of 30 seconds in milliseconds
-    const interval = 30 * 1000;
+    // Interval of 120 seconds in milliseconds
+    const interval = 120 * 1000;
     const parsedTimeout = input/* timeoutSchema */.fw.safeParse((0,core.getInput)('timeout'));
     // set timeout to 960 * 30 seconds ~ 8 hours ; timeout from input is in minutes (hence * 2)
     let timeout = parsedTimeout.success ? parsedTimeout.data * 2 : 960;
