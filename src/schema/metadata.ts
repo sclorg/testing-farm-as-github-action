@@ -11,7 +11,7 @@ export const dataSchema = z.object({
   runTime: z.number(),
   created: z.string(),
   updated: z.string(),
-  compose: z.string(),
+  compose: z.string().nullable(),
   arch: z.string(),
   infrastructureFailure: z.boolean(),
   results: z.array(z.string()),

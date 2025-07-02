@@ -8,7 +8,7 @@ export declare const dataSchema: z.ZodObject<{
     runTime: z.ZodNumber;
     created: z.ZodString;
     updated: z.ZodString;
-    compose: z.ZodString;
+    compose: z.ZodNullable<z.ZodString>;
     arch: z.ZodString;
     infrastructureFailure: z.ZodBoolean;
     results: z.ZodArray<z.ZodString, "many">;
@@ -19,7 +19,7 @@ export declare const dataSchema: z.ZodObject<{
     runTime: number;
     created: string;
     updated: string;
-    compose: string;
+    compose: string | null;
     arch: string;
     infrastructureFailure: boolean;
     results: string[];
@@ -31,7 +31,7 @@ export declare const dataSchema: z.ZodObject<{
     runTime: number;
     created: string;
     updated: string;
-    compose: string;
+    compose: string | null;
     arch: string;
     infrastructureFailure: boolean;
     results: string[];
@@ -49,7 +49,7 @@ export declare const issueMetadataObjectSchema: z.ZodObject<{
         runTime: z.ZodNumber;
         created: z.ZodString;
         updated: z.ZodString;
-        compose: z.ZodString;
+        compose: z.ZodNullable<z.ZodString>;
         arch: z.ZodString;
         infrastructureFailure: z.ZodBoolean;
         results: z.ZodArray<z.ZodString, "many">;
@@ -60,7 +60,7 @@ export declare const issueMetadataObjectSchema: z.ZodObject<{
         runTime: number;
         created: string;
         updated: string;
-        compose: string;
+        compose: string | null;
         arch: string;
         infrastructureFailure: boolean;
         results: string[];
@@ -72,7 +72,7 @@ export declare const issueMetadataObjectSchema: z.ZodObject<{
         runTime: number;
         created: string;
         updated: string;
-        compose: string;
+        compose: string | null;
         arch: string;
         infrastructureFailure: boolean;
         results: string[];
@@ -87,7 +87,7 @@ export declare const issueMetadataObjectSchema: z.ZodObject<{
         runTime: number;
         created: string;
         updated: string;
-        compose: string;
+        compose: string | null;
         arch: string;
         infrastructureFailure: boolean;
         results: string[];
@@ -103,7 +103,7 @@ export declare const issueMetadataObjectSchema: z.ZodObject<{
         runTime: number;
         created: string;
         updated: string;
-        compose: string;
+        compose: string | null;
         arch: string;
         infrastructureFailure: boolean;
         results: string[];

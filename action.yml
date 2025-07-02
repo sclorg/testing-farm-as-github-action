@@ -44,7 +44,7 @@ inputs:
 
   # Test Environment
   compose:
-    description: 'A compose to run tests against.'
+    description: 'A compose to run tests against. Use "null" to skip compose specification - needed for container provisioner with image specified in plan.'
     default: 'Fedora-latest'
     required: false
   arch:

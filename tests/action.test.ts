@@ -1374,4 +1374,117 @@ describe('Integration tests - action.ts', () => {
 
     expect(mocks.TFError).not.toHaveBeenCalled();
   });
+
+  test('Compose null test', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    // api_key - A testing farm server api key
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    // git_url - An url to the GIT repository
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    // tmt_plan_regex - A tmt plan regex which will be used for selecting plans. By default all plans are selected
+    vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+
+    // Override default inputs
+    // compose - Set to empty string to simulate null/undefined input
+    vi.stubEnv('INPUT_COMPOSE', '');
+
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    // Mock Testing Farm API
+    let capturedRequest: any;
+    vi.mocked(mocks.newRequest).mockImplementation(
+      async (request: NewRequest, _strict: boolean) => {
+        capturedRequest = request;
+        return Promise.resolve({
+          id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
+        });
+      }
+    );
+    vi.mocked(mocks.requestDetails)
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'complete',
+        result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
+
+    await action(pr);
+
+    // hardware request has not been called
+    expect(mocks.unsafeNewRequest).not.toHaveBeenCalled();
+
+    // Check if we have waited for Testing Farm to finish
+    expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
+
+    // Test that the request contains the 'os' field set to null
+    expect(capturedRequest.environments[0]).toHaveProperty('os', null);
+    expect(capturedRequest.environments[0]).toHaveProperty('arch');
+
+    // Test outputs
+    expect(process.env['OUTPUT_REQUEST_ID']).toMatchInlineSnapshot('"1"');
+    expect(process.env['OUTPUT_REQUEST_URL']).toMatchInlineSnapshot(
+      '"https://api.dev.testing-farm.io/requests/1"'
+    );
+    expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
+      '"https://artifacts.dev.testing-farm.io/1"'
+    );
+
+    // All data are provided via context and statuses are disabled by default, no need to call GitHub API
+    expect(mocks.request).toHaveBeenCalledTimes(0);
+
+    // Test summary - compose should show placeholder when null
+    await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
+<table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>&lt;container image from plan&gt;</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
+`);
+
+    expect(mocks.TFError).not.toHaveBeenCalled();
+  });
 });
