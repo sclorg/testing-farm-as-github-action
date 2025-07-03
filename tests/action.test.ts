@@ -1461,6 +1461,18 @@ describe('Integration tests - action.ts', () => {
     // hardware request has not been called
     expect(mocks.unsafeNewRequest).not.toHaveBeenCalled();
 
+    expect(mocks.newRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        environments: [
+          expect.objectContaining({
+            os: null, // os should be null
+            arch: process.env['INPUT_ARCH'], // arch should be set
+          }),
+        ],
+      }),
+      false
+    );
+
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
 
