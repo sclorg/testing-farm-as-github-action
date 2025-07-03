@@ -53984,7 +53984,7 @@ class Summary {
     getTableRow(data) {
         return [
             data.name,
-            data.compose,
+            data.compose || '&lt;container image from plan&gt;',
             data.arch,
             this.getStatusIcon(data.status, data.outcome, data.infrastructureFailure),
             format(new Date(data.created), 'dd.MM.yyyy HH:mm:ss'),
@@ -54123,23 +54123,29 @@ async function action(pr) {
     const ref = (0,core.getInput)('git_ref') || 'master';
     (0,core.debug)(`Using git_ref: '${ref}'`);
     // Schedule a test on Testing Farm
+    const composeInput = (0,core.getInput)('compose');
+    const environment = {
+        arch: (0,core.getInput)('arch'),
+        variables: tmtEnvVars,
+        settings: envSettings,
+        secrets: tmtEnvSecrets,
+        artifacts: tmtArtifacts,
+        tmt: Object.assign({}, (tmtContext ? { context: tmtContext } : {})),
+    };
+    // Always include os field, but set to null if compose input is empty/null
+    if (composeInput) {
+        environment.os = {
+            compose: composeInput,
+        };
+    }
+    else {
+        environment.os = null;
+    }
     const request = {
         test: {
             fmf: Object.assign({ url: (0,core.getInput)('git_url', { required: true }), ref, path: tmtPath, plan_filter: tmtPlanFilter }, tmtPlanRegex),
         },
-        environments: [
-            {
-                arch: (0,core.getInput)('arch'),
-                os: {
-                    compose: (0,core.getInput)('compose'),
-                },
-                variables: tmtEnvVars,
-                settings: envSettings,
-                secrets: tmtEnvSecrets,
-                artifacts: tmtArtifacts,
-                tmt: Object.assign({}, (tmtContext ? { context: tmtContext } : {})),
-            },
-        ],
+        environments: [environment],
         settings: {
             pipeline: pipelineSettings,
         },
@@ -54221,7 +54227,7 @@ async function action(pr) {
         runTime: tfResult.run_time || 0,
         created: tfResponse.created,
         updated: tfResponse.updated,
-        compose: (0,core.getInput)('compose'),
+        compose: composeInput || null,
         arch: (0,core.getInput)('arch'),
         infrastructureFailure: infraError,
         status: state,
@@ -55863,7 +55869,7 @@ const dataSchema = lib.z.object({
     runTime: lib.z.number(),
     created: lib.z.string(),
     updated: lib.z.string(),
-    compose: lib.z.string(),
+    compose: lib.z.string().nullable(),
     arch: lib.z.string(),
     infrastructureFailure: lib.z.boolean(),
     results: lib.z.array(lib.z.string()),

@@ -125,6 +125,27 @@ async function action(pr: PullRequest): Promise<void> {
   debug(`Using git_ref: '${ref}'`);
 
   // Schedule a test on Testing Farm
+  const composeInput = getInput('compose');
+  const environment: any = {
+    arch: getInput('arch'),
+    variables: tmtEnvVars,
+    settings: envSettings,
+    secrets: tmtEnvSecrets,
+    artifacts: tmtArtifacts,
+    tmt: {
+      ...(tmtContext ? { context: tmtContext } : {}),
+    },
+  };
+
+  // Always include os field, but set to null if compose input is empty/null
+  if (composeInput) {
+    environment.os = {
+      compose: composeInput,
+    };
+  } else {
+    environment.os = null;
+  }
+
   const request = {
     test: {
       fmf: {
@@ -135,21 +156,7 @@ async function action(pr: PullRequest): Promise<void> {
         ...tmtPlanRegex,
       },
     },
-    environments: [
-      {
-        arch: getInput('arch'),
-        os: {
-          compose: getInput('compose'),
-        },
-        variables: tmtEnvVars,
-        settings: envSettings,
-        secrets: tmtEnvSecrets,
-        artifacts: tmtArtifacts,
-        tmt: {
-          ...(tmtContext ? { context: tmtContext } : {}),
-        },
-      },
-    ],
+    environments: [environment],
     settings: {
       pipeline: pipelineSettings,
     },
@@ -264,7 +271,7 @@ async function action(pr: PullRequest): Promise<void> {
     runTime: tfResult.run_time || 0,
     created: tfResponse.created,
     updated: tfResponse.updated,
-    compose: getInput('compose'),
+    compose: composeInput || null,
     arch: getInput('arch'),
     infrastructureFailure: infraError,
     status: state,

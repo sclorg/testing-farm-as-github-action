@@ -71,7 +71,7 @@ export class Summary {
     getTableRow(data) {
         return [
             data.name,
-            data.compose,
+            data.compose || '&lt;container image from plan&gt;',
             data.arch,
             this.getStatusIcon(data.status, data.outcome, data.infrastructureFailure),
             format(new Date(data.created), 'dd.MM.yyyy HH:mm:ss'),
