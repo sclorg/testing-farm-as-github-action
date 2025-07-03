@@ -271,7 +271,7 @@ async function action(pr: PullRequest): Promise<void> {
     runTime: tfResult.run_time || 0,
     created: tfResponse.created,
     updated: tfResponse.updated,
-    compose: getInput('compose') || null,
+    compose: composeInput || null,
     arch: getInput('arch'),
     infrastructureFailure: infraError,
     status: state,
