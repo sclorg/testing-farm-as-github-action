@@ -69,7 +69,7 @@ export const envSettingsSchema = z
     provisioning: z
       .object({
         post_install_script: z.string().min(1).optional(),
-        tags: z.record(z.string()).optional(),
+        tags: z.record(z.string(), z.string()).optional(),
       })
       .optional(),
   })

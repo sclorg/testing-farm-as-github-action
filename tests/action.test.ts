@@ -580,19 +580,18 @@ describe('Integration tests - action.ts', () => {
       await action(pr);
     } catch (error) {
       expect(error).toMatchInlineSnapshot(`
-      [ZodError: [
-        {
-          "received": "multihost",
-          "code": "invalid_enum_value",
-          "options": [
-            "tmt-multihost"
-          ],
-          "path": [
-            "type"
-          ],
-          "message": "Invalid enum value. Expected 'tmt-multihost', received 'multihost'"
-        }
-      ]]
+        [ZodError: [
+          {
+            "code": "invalid_value",
+            "values": [
+              "tmt-multihost"
+            ],
+            "path": [
+              "type"
+            ],
+            "message": "Invalid input: expected \\"tmt-multihost\\""
+          }
+        ]]
       `);
     }
 
