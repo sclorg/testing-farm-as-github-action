@@ -1,15 +1,11 @@
 import { z } from 'zod';
 export declare const tfScopeSchema: z.ZodEnum<{
-    private: "private";
     public: "public";
+    private: "private";
 }>;
 export declare const tmtEnvVarsSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<Record<string, string>, string[]>>;
 export declare const tmtEnvSecretsSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<Record<string, string>, string[]>>;
-export declare const tmtArtifactsInputSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<{
-    type: string;
-    id: string;
-    packages?: string[] | undefined;
-}[], string[]>>;
+export declare const tmtArtifactsInputSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<any, string[]>>;
 export declare const tmtContextInputSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<Record<string, string>, string[]>>;
 export declare const tmtArtifactsSchema: z.ZodDefault<z.ZodArray<z.ZodObject<{
     id: z.ZodString;

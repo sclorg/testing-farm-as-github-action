@@ -2604,7 +2604,7 @@ __metadata:
     date-fns: "npm:4.1.0"
     issue-metadata: "npm:0.2.4"
     prettier: "npm:3.6.2"
-    testing-farm: "npm:1.10.1"
+    testing-farm: "github:thrix/testing-farm#os-null-supported"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.8.3"
     vitest: "npm:3.2.4"
@@ -2612,13 +2612,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"testing-farm@npm:1.10.1":
+"testing-farm@github:thrix/testing-farm#os-null-supported":
   version: 1.10.1
-  resolution: "testing-farm@npm:1.10.1"
+  resolution: "testing-farm@https://github.com/thrix/testing-farm.git#commit=301e13d46ea619ad0fa6f664504a9580a082b590"
   dependencies:
     axios: "npm:1.9.0"
     zod: "npm:3.24.3"
-  checksum: 10/ef15d82f7935c257608d0d5fef7cc2957c619f874901c52e8a365d4c74eca3d9f381e18c3e0dde3c3c19e01452e38f1147230ee88e9c6079768d168702b0f508
+  checksum: 10/18a70f3e79dd8c2adb2afd9ee0cb4df23d9e9ac0967e40d51d884fbd1580b60fc79c44f6d2f60a631a45aef8dfe63fbbae69b0c684881a12c0750da37734fccd
   languageName: node
   linkType: hard
 

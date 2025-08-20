@@ -36,7 +36,7 @@
     "@octokit/types": "14.1.0",
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.4",
-    "testing-farm": "1.10.1",
+    "testing-farm": "github:thrix/testing-farm#os-null-supported",
     "zod": "4.0.5"
   },
   "devDependencies": {
