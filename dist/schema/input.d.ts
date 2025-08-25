@@ -6,8 +6,8 @@ export declare const tfScopeSchema: z.ZodEnum<{
 export declare const tmtEnvVarsSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<Record<string, string>, string[]>>;
 export declare const tmtEnvSecretsSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<Record<string, string>, string[]>>;
 export declare const tmtArtifactsInputSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<{
-    type: string;
     id: string;
+    type: string;
     packages?: string[] | undefined;
 }[], string[]>>;
 export declare const tmtContextInputSchema: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string[], string>>, z.ZodTransform<Record<string, string>, string[]>>;
