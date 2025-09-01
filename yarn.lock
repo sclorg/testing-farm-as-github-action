@@ -2609,7 +2609,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     typescript: "npm:5.9.2"
     vitest: "npm:3.2.4"
-    zod: "npm:4.1.1"
+    zod: "npm:4.1.5"
   languageName: unknown
   linkType: soft
 
@@ -3012,6 +3012,13 @@ __metadata:
   version: 4.1.1
   resolution: "zod@npm:4.1.1"
   checksum: 10/63e17d2f8d4e7a49331a62c2ad5b71705330139ddd677f2a055073b6a521a312e5dd2edc3e00953c90575075af098493c5c7b85429de0a952b8d6ab8c7e1b7e3
+  languageName: node
+  linkType: hard
+
+"zod@npm:4.1.5":
+  version: 4.1.5
+  resolution: "zod@npm:4.1.5"
+  checksum: 10/2ac6bef2d6647de6e673b6fa07ee392b71eb6fd6ccb2be8899d8d853084dd8b3992d4d2cf267eba6f8495a35803e2ec254509194fd0849ed0a822dea7ae4a765
   languageName: node
   linkType: hard
 
