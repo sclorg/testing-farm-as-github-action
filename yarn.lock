@@ -953,14 +953,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/ncc@npm:0.38.3":
-  version: 0.38.3
-  resolution: "@vercel/ncc@npm:0.38.3"
+"@vercel/ncc@npm:0.38.4":
+  version: 0.38.4
+  resolution: "@vercel/ncc@npm:0.38.4"
   dependencies:
     node-gyp: "npm:latest"
   bin:
     ncc: dist/ncc/cli.js
-  checksum: 10/f1a05a58e9c90d6940027b628590715a62bf1611c47bca546ad51bd6a0e8d25ce64c1c39eb27ba0b6747017182cb59ec42088da8d6530a6d561e9e1a4e8c9941
+  checksum: 10/06561fb3fd46c4db525ea1c9f39b7982e449e9a1995e94d8f5b876c939147c31dba0ca5ffaed4b30ebc6782ffbde531b3f01658996bdaaecb3928df5b1aec155
   languageName: node
   linkType: hard
 
@@ -2600,7 +2600,7 @@ __metadata:
     "@octokit/types": "npm:14.1.0"
     "@total-typescript/ts-reset": "npm:0.6.1"
     "@types/node": "npm:24.3.0"
-    "@vercel/ncc": "npm:0.38.3"
+    "@vercel/ncc": "npm:0.38.4"
     "@vitest/coverage-v8": "npm:3.2.4"
     date-fns: "npm:4.1.0"
     issue-metadata: "npm:0.2.4"
