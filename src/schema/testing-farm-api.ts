@@ -24,3 +24,27 @@ export const requestDetailsSchema = z.object({
 });
 
 export type RequestDetails = z.infer<typeof requestDetailsSchema>;
+
+export const whoamiSchema = z.object({
+  token: z.object({
+    created: z.string(),
+    enabled: z.boolean(),
+    id: z.string(),
+    name: z.string(),
+    ranch: z.enum(['public', 'private']),
+    role: z.string(),
+    updated: z.string(),
+    user_id: z.string(),
+  }),
+  user: z.object({
+    auth_id: z.string(),
+    auth_method: z.string(),
+    auth_name: z.string(),
+    created: z.string(),
+    enabled: z.boolean(),
+    id: z.string(),
+    updated: z.string(),
+  }),
+});
+
+export type Whoami = z.infer<typeof whoamiSchema>;

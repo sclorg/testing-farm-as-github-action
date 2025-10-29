@@ -1,19 +1,41 @@
-import { debug, getBooleanInput, getInput, notice, setOutput, } from '@actions/core';
+import { debug, getBooleanInput, getInput, notice, setOutput, warning, } from '@actions/core';
 import TestingFarmAPI from 'testing-farm';
 import { setTimeout } from 'timers/promises';
 import { TFError } from './error';
 import { setTfArtifactUrl, setTfRequestId } from './state';
 import { Summary } from './summary';
-import { composeStatusDescription, getSummary } from './util';
+import { composeStatusDescription, getSummary, getWhoami } from './util';
 import { pipelineSettingsSchema, envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPlanFilterSchema, tmtPathSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
     const tfInstance = getInput('api_url');
+    const apiKey = getInput('api_key', { required: true });
     // https://github.com/redhat-plumbers-in-action/testing-farm?tab=readme-ov-file#creating-the-api-instance
-    const api = new TestingFarmAPI(tfInstance, getInput('api_key', { required: true }));
-    // Set artifacts url
-    const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
-    const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
+    const api = new TestingFarmAPI(tfInstance, apiKey);
+    // Auto-detect tf_scope from the token's ranch using whoami endpoint
+    let tfScope = 'public';
+    const tfScopeInput = getInput('tf_scope');
+    // Try to auto-detect scope from whoami endpoint
+    const whoami = await getWhoami(tfInstance, apiKey);
+    if (whoami) {
+        tfScope = whoami.token.ranch;
+        debug(`Auto-detected tf_scope from token: ${tfScope}`);
+        // Warn if user manually set tf_scope and it doesn't match auto-detected value
+        if (tfScopeInput && tfScopeInput !== tfScope) {
+            warning(`The tf_scope input is set to '${tfScopeInput}' but the token's ranch is '${tfScope}'. ` +
+                `Using auto-detected value '${tfScope}'. The tf_scope input is deprecated and will be removed in a future version.`);
+        }
+        else if (tfScopeInput) {
+            warning(`The tf_scope input is deprecated and will be auto-detected from the token in future versions. ` +
+                `You can safely remove it from your workflow.`);
+        }
+    }
+    else {
+        // Fallback to manual input if whoami fails
+        const tfScopeParsed = tfScopeSchema.safeParse(tfScopeInput);
+        tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
+        debug(`Using tf_scope from input: ${tfScope}`);
+    }
     const tfUrl = tfScope === 'public'
         ? 'https://artifacts.dev.testing-farm.io'
         : 'https://artifacts.osci.redhat.com/testing-farm';

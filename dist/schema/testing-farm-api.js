@@ -18,4 +18,25 @@ export const requestDetailsSchema = z.object({
     created: z.string(),
     updated: z.string(),
 });
+export const whoamiSchema = z.object({
+    token: z.object({
+        created: z.string(),
+        enabled: z.boolean(),
+        id: z.string(),
+        name: z.string(),
+        ranch: z.enum(['public', 'private']),
+        role: z.string(),
+        updated: z.string(),
+        user_id: z.string(),
+    }),
+    user: z.object({
+        auth_id: z.string(),
+        auth_method: z.string(),
+        auth_name: z.string(),
+        created: z.string(),
+        enabled: z.boolean(),
+        id: z.string(),
+        updated: z.string(),
+    }),
+});
 //# sourceMappingURL=testing-farm-api.js.map

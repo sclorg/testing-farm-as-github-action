@@ -62,6 +62,7 @@ const mocks = vi.hoisted(() => {
     unsafeNewRequest: vi.fn(),
     requestDetails: vi.fn(),
     setTimeout: vi.fn(),
+    axiosGet: vi.fn(),
     TFError: vi.fn((message: string, url?: string | undefined) => {
       return {
         message,
@@ -94,6 +95,15 @@ vi.mock('testing-farm', async () => {
 vi.mock('timers/promises', () => {
   return {
     setTimeout: mocks.setTimeout,
+  };
+});
+
+// Mock axios module
+vi.mock('axios', () => {
+  return {
+    default: {
+      get: mocks.axiosGet,
+    },
   };
 });
 
@@ -149,10 +159,23 @@ async function assertSummary(expected: string): Promise<void> {
 
 describe('Integration tests - action.ts', () => {
   beforeEach(async () => {
+    // Clean up OUTPUT_* variables from previous tests
+    Object.keys(process.env).forEach(key => {
+      if (key.startsWith('OUTPUT_')) {
+        delete process.env[key];
+      }
+    });
+
+    // Clear TFError mock calls from previous tests
+    mocks.TFError.mockClear();
+
     // Mock setTimeout promise to resolve immediately
     vi.mocked(mocks.setTimeout).mockImplementation(async timeout => {
       return Promise.resolve();
     });
+
+    // Mock axios get to return null (whoami fails) by default
+    vi.mocked(mocks.axiosGet).mockRejectedValue(new Error('Not found'));
 
     // Mock Action environment
     vi.stubEnv('RUNNER_DEBUG', '1');
@@ -199,7 +222,15 @@ describe('Integration tests - action.ts', () => {
   });
 
   afterEach(async () => {
-    vi.restoreAllMocks();
+    // Clear specific mocks without restoring them
+    vi.mocked(mocks.newRequest).mockClear();
+    vi.mocked(mocks.unsafeNewRequest).mockClear();
+    vi.mocked(mocks.requestDetails).mockClear();
+    vi.mocked(mocks.axiosGet).mockClear();
+    vi.mocked(mocks.request).mockClear();
+    // Don't clear TFError - it needs to keep its implementation
+    // vi.mocked(mocks.TFError).mockClear();
+
     vi.unstubAllEnvs();
     await fs.promises.unlink(summaryPath);
   });
@@ -1497,5 +1528,167 @@ describe('Integration tests - action.ts', () => {
 `);
 
     expect(mocks.TFError).not.toHaveBeenCalled();
+  });
+
+  test('Auto-detect tf_scope from whoami endpoint - public ranch', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+
+    // Don't set tf_scope to test auto-detection
+    vi.stubEnv('INPUT_TF_SCOPE', '');
+
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    // Mock whoami endpoint response with public ranch
+    vi.mocked(mocks.axiosGet).mockResolvedValue({
+      data: {
+        token: {
+          created: '2025-01-14T22:50:54.124564',
+          enabled: true,
+          id: '1fc3a92a-f32f-4f75-bed9-96c8163215f5',
+          name: 'token',
+          ranch: 'public',
+          role: 'user',
+          updated: '2025-01-14T22:50:54.124573',
+          user_id: 'e42ad3aa-1769-402d-be8b-9fab3d10cc2',
+        },
+        user: {
+          auth_id: 'somebody',
+          auth_method: 'fedora',
+          auth_name: 'somebody',
+          created: '2024-08-08T04:01:20.227364',
+          enabled: true,
+          id: 'e41ad3ab-1569-402d-bf8b-86fab3d10cc3',
+          updated: '2024-08-08T04:01:20.227369',
+        },
+      },
+    });
+
+    // Mock Testing Farm API
+    vi.mocked(mocks.newRequest).mockImplementation(
+      async (_request: NewRequest, _strict: boolean) => {
+        return Promise.resolve({
+          id: '1',
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
+        });
+      }
+    );
+    vi.mocked(mocks.requestDetails).mockResolvedValue({
+      id: '1',
+      state: 'complete',
+      result: { overall: 'passed', summary: '\\o/' },
+      run_time: 3691,
+      created: '2021-08-24T14:15:22Z',
+      updated: '2021-08-24T14:15:22Z',
+    });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
+
+    await action(pr);
+
+    // Capture the output immediately after action completes
+    const testLogUrl = process.env['OUTPUT_TEST_LOG_URL'];
+
+    // Verify whoami was called
+    expect(mocks.axiosGet).toHaveBeenCalledWith(
+      'https://api.dev.testing-farm.io/whoami',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer abcdef-123456',
+        }),
+      })
+    );
+
+    // Verify artifacts URL uses public scope
+    expect(testLogUrl).toBe('https://artifacts.dev.testing-farm.io/1');
+  });
+
+  test('Auto-detect tf_scope from whoami endpoint - private ranch', async () => {
+    setDefaultInputs();
+
+    // Mock required Action inputs
+    vi.stubEnv('INPUT_API_KEY', 'private-api-key');
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+
+    // Don't set tf_scope to test auto-detection
+    vi.stubEnv('INPUT_TF_SCOPE', '');
+
+    // mock the pull request number and sha in the context
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    // Mock whoami endpoint response with private ranch
+    vi.mocked(mocks.axiosGet).mockResolvedValue({
+      data: {
+        token: {
+          created: '2025-01-14T22:50:54.124564',
+          enabled: true,
+          id: '1fc3a92a-f32f-4f75-bed9-96c8163215f5',
+          name: 'token',
+          ranch: 'private',
+          role: 'user',
+          updated: '2025-01-14T22:50:54.124573',
+          user_id: 'e42ad3aa-1769-402d-be8b-9fab3d10cc2',
+        },
+        user: {
+          auth_id: 'somebody',
+          auth_method: 'fedora',
+          auth_name: 'somebody',
+          created: '2024-08-08T04:01:20.227364',
+          enabled: true,
+          id: 'e41ad3ab-1569-402d-bf8b-86fab3d10cc3',
+          updated: '2024-08-08T04:01:20.227369',
+        },
+      },
+    });
+
+    // Mock Testing Farm API
+    vi.mocked(mocks.newRequest).mockImplementation(
+      async (_request: NewRequest, _strict: boolean) => {
+        return Promise.resolve({
+          id: '2', // Use a different ID to differentiate
+          state: 'new',
+          created: '2021-08-24T14:15:22Z',
+          updated: '2021-08-24T14:15:22Z',
+        });
+      }
+    );
+    vi.mocked(mocks.requestDetails).mockResolvedValue({
+      id: '2',
+      state: 'complete',
+      result: { overall: 'passed', summary: '\\o/' },
+      run_time: 3691,
+      created: '2021-08-24T14:15:22Z',
+      updated: '2021-08-24T14:15:22Z',
+    });
+
+    // Run action
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
+
+    await action(pr);
+
+    // Capture the output immediately after action completes
+    const testLogUrl = process.env['OUTPUT_TEST_LOG_URL'];
+
+    // Verify artifacts URL uses private scope
+    expect(testLogUrl).toBe('https://artifacts.osci.redhat.com/testing-farm/2');
   });
 });
