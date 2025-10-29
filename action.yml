@@ -14,9 +14,9 @@ inputs:
     required: false
     default: 'https://api.dev.testing-farm.io/v0.1'
   tf_scope:
-    description: 'Defines the scope of Testing Farm. Possible options are public and private'
+    description: '[DEPRECATED] Defines the scope of Testing Farm. This is now auto-detected from the API token. Possible options are public and private'
     required: false
-    default: 'public'
+    default: ''
 
   # Tmt Metadata
   git_url:

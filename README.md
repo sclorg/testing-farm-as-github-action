@@ -29,7 +29,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 |------------|-------------|---------------|
 | `api_key`  | Testing farm API key | empty, **required from user** |
 | `api_url`  | Testing farm API server url | https://api.dev.testing-farm.io/v0.1 |
-| `tf_scope` | Define the scope of Testing Farm. Possible options are 'public' or 'private' | public |
+| `tf_scope` | **[DEPRECATED]** Define the scope of Testing Farm. Possible options are 'public' or 'private'. This is now auto-detected from the API token and does not need to be set manually. | auto-detected from token |
 
 ### Tmt Metadata
 
