@@ -44,7 +44,7 @@ inputs:
 
   # Test Environment
   compose:
-    description: 'A compose to run tests against. Use "null" to skip compose specification - needed for container provisioner with image specified in plan.'
+    description: 'A compose to run tests against. Use "omit" to completely exclude the compose parameter from the request (needed for container provisioner with image specified in plan).'
     default: 'Fedora-latest'
     required: false
   arch:
