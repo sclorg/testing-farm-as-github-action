@@ -36,7 +36,7 @@
     "@octokit/types": "16.0.0",
     "date-fns": "4.1.0",
     "issue-metadata": "0.2.4",
-    "testing-farm": "1.10.2",
+    "testing-farm": "1.11.0",
     "zod": "4.1.12"
   },
   "devDependencies": {

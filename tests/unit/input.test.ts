@@ -40,7 +40,20 @@ describe('tmt variables/secrets/context input', () => {
   });
 
   test('tmt-context input', () => {
-    let input = 'distro=fedora;arch=x86_64;trigger=push';
+    // test undocumented inputs
+    let input =
+      'COMPOSE_CONTROLLER=RHEL-9-Nightly;COMPOSE_MANAGED_NODE=RHEL-9.6.0-Nightly;initiator=testing-farm';
+
+    expect(tmtContextSchema.parse(tmtContextInputSchema.parse(input)))
+      .toMatchInlineSnapshot(`
+      {
+        "COMPOSE_CONTROLLER": "RHEL-9-Nightly",
+        "COMPOSE_MANAGED_NODE": "RHEL-9.6.0-Nightly",
+        "initiator": "testing-farm",
+      }
+    `);
+
+    input = 'distro=fedora;arch=x86_64;trigger=push';
 
     expect(tmtContextSchema.parse(tmtContextInputSchema.parse(input)))
       .toMatchInlineSnapshot(`

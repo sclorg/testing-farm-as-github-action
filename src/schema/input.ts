@@ -48,7 +48,7 @@ export const tmtArtifactsSchema = z
 
 // https://api.testing-farm.io/redoc#operation/request_a_new_test_v0_1_requests_post
 // https://tmt.readthedocs.io/en/stable/spec/context.html#dimension
-export const tmtContextSchema = z.object({
+export const tmtContextSchema = z.looseObject({
   distro: z.string().min(1).optional(),
   variant: z.string().min(1).optional(),
   arch: z.string().min(1).optional(),

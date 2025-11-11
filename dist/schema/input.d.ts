@@ -27,7 +27,7 @@ export declare const tmtContextSchema: z.ZodObject<{
     module: z.ZodOptional<z.ZodString>;
     initiator: z.ZodOptional<z.ZodString>;
     trigger: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>;
+}, z.core.$loose>;
 export declare const envSettingsSchema: z.ZodOptional<z.ZodObject<{
     pipeline: z.ZodOptional<z.ZodObject<{
         skip_guest_setup: z.ZodOptional<z.ZodBoolean>;
