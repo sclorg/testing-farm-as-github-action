@@ -137,13 +137,12 @@ async function action(pr: PullRequest): Promise<void> {
     },
   };
 
-  // Always include os field, but set to null if compose input is empty/null
-  if (composeInput) {
+  // Include os field only if compose input is provided and not 'omit'
+  // If 'omit', the os field will be completely excluded from the request
+  if (composeInput && composeInput.toLowerCase() !== 'omit') {
     environment.os = {
       compose: composeInput,
     };
-  } else {
-    environment.os = null;
   }
 
   const request = {
@@ -271,7 +270,7 @@ async function action(pr: PullRequest): Promise<void> {
     runTime: tfResult.run_time || 0,
     created: tfResponse.created,
     updated: tfResponse.updated,
-    compose: composeInput || null,
+    compose: composeInput && composeInput.toLowerCase() !== 'omit' ? composeInput : null,
     arch: getInput('arch'),
     infrastructureFailure: infraError,
     status: state,
