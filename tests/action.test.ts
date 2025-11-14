@@ -58,6 +58,7 @@ function setDefaultInputs() {
 const mocks = vi.hoisted(() => {
   return {
     request: vi.fn(),
+    whoami: vi.fn(),
     newRequest: vi.fn(),
     unsafeNewRequest: vi.fn(),
     requestDetails: vi.fn(),
@@ -82,6 +83,7 @@ vi.mock('@octokit/core', () => {
 // Mock testing-farm module
 vi.mock('testing-farm', async () => {
   const TestingFarmAPI = vi.fn(() => ({
+    whoami: mocks.whoami,
     newRequest: mocks.newRequest,
     unsafeNewRequest: mocks.unsafeNewRequest,
     requestDetails: mocks.requestDetails,
@@ -158,6 +160,12 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('RUNNER_DEBUG', '1');
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
     vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock-token');
+
+    vi.mocked(mocks.whoami).mockResolvedValue({
+      token: {
+        ranch: 'public',
+      },
+    });
 
     // Mock GitHub API
     vi.mocked(mocks.request).mockImplementation(path => {
@@ -1047,6 +1055,12 @@ describe('Integration tests - action.ts', () => {
     // mock the pull request number and sha in the context
     vi.stubEnv('INPUT_PR_NUMBER', '1');
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    vi.mocked(mocks.whoami).mockResolvedValue({
+      token: {
+        ranch: 'private',
+      },
+    });
 
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(

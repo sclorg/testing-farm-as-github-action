@@ -18,7 +18,6 @@ import { composeStatusDescription, getSummary } from './util';
 import {
   pipelineSettingsSchema,
   envSettingsSchema,
-  tfScopeSchema,
   timeoutSchema,
   tmtArtifactsInputSchema,
   tmtArtifactsSchema,
@@ -46,9 +45,7 @@ async function action(pr: PullRequest): Promise<void> {
   );
 
   // Set artifacts url
-  const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
-  const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
-
+  const tfScope = (await api.whoami()).token.ranch;
   const tfUrl =
     tfScope === 'public'
       ? 'https://artifacts.dev.testing-farm.io'
