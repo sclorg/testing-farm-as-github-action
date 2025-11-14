@@ -18412,7 +18412,7 @@ __nccwpck_require__.d(__webpack_exports__, {
   Ay: () => (/* binding */ TestingFarmAPI)
 });
 
-// UNUSED EXPORTS: aboutSchema, composesSchema, isError, newRequestResponseSchema, newRequestSchema, ranchSchema, requestIdSchema, requestSchema
+// UNUSED EXPORTS: aboutSchema, composesSchema, isError, newRequestResponseSchema, newRequestSchema, ranchSchema, requestIdSchema, requestSchema, whoamiSchema
 
 // NAMESPACE OBJECT: ./node_modules/axios/lib/platform/common/utils.js
 var common_utils_namespaceObject = {};
@@ -24090,6 +24090,23 @@ class ApiKeyLink extends TestingFarmLink {
 var external = __nccwpck_require__(3455);
 ;// CONCATENATED MODULE: ./node_modules/testing-farm/dist/schema.js
 
+const whoamiSchema = external/* object */.Ikc({
+    token: external/* looseObject */._H3({
+        enabled: external/* boolean */.zMY(),
+        id: external/* string */.YjP(),
+        name: external/* string */.YjP(),
+        ranch: external/* union */.KCZ([external/* literal */.euz('public'), external/* literal */.euz('redhat')]),
+        role: external/* string */.YjP(),
+        user_id: external/* string */.YjP(),
+    }),
+    user: external/* looseObject */._H3({
+        auth_id: external/* string */.YjP(),
+        auth_method: external/* string */.YjP(),
+        auth_name: external/* string */.YjP(),
+        enabled: external/* boolean */.zMY(),
+        id: external/* string */.YjP(),
+    }),
+});
 const urlSchema = external/* url */.OZ5();
 const requestIdSchema = external/* string */.YjP();
 const testObjectSchema = external/* object */.Ikc({
@@ -24306,6 +24323,12 @@ class TestingFarmAPI {
         else {
             this.link = new ApiKeyLink(new URL(instance), apiKey);
         }
+    }
+    async whoami(strict) {
+        if (!this.isStrict(strict)) {
+            return this.link.get('whoami');
+        }
+        return whoamiSchema.parse(await this.link.get('whoami'));
     }
     async requests(filter, strict) {
         if (!this.isStrict(strict)) {
@@ -50103,8 +50126,7 @@ async function action(pr) {
     // https://github.com/redhat-plumbers-in-action/testing-farm?tab=readme-ov-file#creating-the-api-instance
     const api = new dist/* default */.Ay(tfInstance, (0,core.getInput)('api_key', { required: true }));
     // Set artifacts url
-    const tfScopeParsed = input/* tfScopeSchema */.iR.safeParse((0,core.getInput)('tf_scope'));
-    const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
+    const tfScope = (await api.whoami()).token.ranch;
     const tfUrl = tfScope === 'public'
         ? 'https://artifacts.dev.testing-farm.io'
         : 'https://artifacts.osci.redhat.com/testing-farm';
@@ -52084,7 +52106,6 @@ class PullRequest {
 /* harmony export */   So: () => (/* binding */ tmtArtifactsInputSchema),
 /* harmony export */   du: () => (/* binding */ pipelineSettingsSchema),
 /* harmony export */   fw: () => (/* binding */ timeoutSchema),
-/* harmony export */   iR: () => (/* binding */ tfScopeSchema),
 /* harmony export */   ij: () => (/* binding */ tmtArtifactsSchema),
 /* harmony export */   qT: () => (/* binding */ tmtPathSchema),
 /* harmony export */   qf: () => (/* binding */ envSettingsSchema),
@@ -52092,7 +52113,6 @@ class PullRequest {
 /* harmony export */ });
 /* harmony import */ var zod__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3455);
 
-const tfScopeSchema = zod__WEBPACK_IMPORTED_MODULE_0__/* ["enum"] */ .k5n(['public', 'private']);
 // Parse string input into object of key-value pairs
 // input: 'REPO_URL=GITHUB_SERVER_URL/GITHUB_REPOSITORY;REPO_NAME=GITHUB_REPOSITORY'
 // output: { REPO_URL: 'GITHUB_SERVER_URL/GITHUB_REPOSITORY', REPO_NAME: 'GITHUB_REPOSITORY' }

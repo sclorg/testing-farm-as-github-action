@@ -2574,7 +2574,7 @@ __metadata:
     date-fns: "npm:4.1.0"
     issue-metadata: "npm:0.2.4"
     prettier: "npm:3.6.2"
-    testing-farm: "npm:1.11.0"
+    testing-farm: "npm:1.12.0"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.9.3"
     vitest: "npm:3.2.4"
@@ -2582,13 +2582,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"testing-farm@npm:1.11.0":
-  version: 1.11.0
-  resolution: "testing-farm@npm:1.11.0"
+"testing-farm@npm:1.12.0":
+  version: 1.12.0
+  resolution: "testing-farm@npm:1.12.0"
   dependencies:
     axios: "npm:1.13.2"
     zod: "npm:4.1.12"
-  checksum: 10/2f91a5e3428ff71400aa009deff405479fc1b1cc8dd42fa5be1f8d7176e03c226f01457521efd183132367cf2f7004e4b069ceef661833c47df12ab5c2ba94e8
+  checksum: 10/7c421f2cd3bc5d05e7fbe899bffa03420a7a2f3c48749217b134aaf61a4f56f8d93c0c9dede891c3153cc09d72bf3b2416285bc4282a84e89a3fdbcc2642f813
   languageName: node
   linkType: hard
 

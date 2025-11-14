@@ -16,6 +16,7 @@ inputs:
   tf_scope:
     description: 'Defines the scope of Testing Farm. Possible options are public and private'
     required: false
+    deprecationMessage: 'This input is no longer used. tf_scope is now automatically detected based on the provided api_key. Will be removed in the future.'
     default: 'public'
 
   # Tmt Metadata
