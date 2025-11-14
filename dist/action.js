@@ -5,15 +5,14 @@ import { TFError } from './error';
 import { setTfArtifactUrl, setTfRequestId } from './state';
 import { Summary } from './summary';
 import { composeStatusDescription, getSummary } from './util';
-import { pipelineSettingsSchema, envSettingsSchema, tfScopeSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPlanFilterSchema, tmtPathSchema, } from './schema/input';
+import { pipelineSettingsSchema, envSettingsSchema, timeoutSchema, tmtArtifactsInputSchema, tmtArtifactsSchema, tmtContextInputSchema, tmtContextSchema, tmtEnvSecretsSchema, tmtEnvVarsSchema, tmtPlanRegexSchema, tmtPlanFilterSchema, tmtPathSchema, } from './schema/input';
 import { requestDetailsSchema, requestSchema, } from './schema/testing-farm-api';
 async function action(pr) {
     const tfInstance = getInput('api_url');
     // https://github.com/redhat-plumbers-in-action/testing-farm?tab=readme-ov-file#creating-the-api-instance
     const api = new TestingFarmAPI(tfInstance, getInput('api_key', { required: true }));
     // Set artifacts url
-    const tfScopeParsed = tfScopeSchema.safeParse(getInput('tf_scope'));
-    const tfScope = tfScopeParsed.success ? tfScopeParsed.data : 'public';
+    const tfScope = (await api.whoami()).token.ranch;
     const tfUrl = tfScope === 'public'
         ? 'https://artifacts.dev.testing-farm.io'
         : 'https://artifacts.osci.redhat.com/testing-farm';

@@ -1,8 +1,6 @@
 import { NewRequest } from 'testing-farm';
 import { z } from 'zod';
 
-export const tfScopeSchema = z.enum(['public', 'private']);
-
 // Parse string input into object of key-value pairs
 // input: 'REPO_URL=GITHUB_SERVER_URL/GITHUB_REPOSITORY;REPO_NAME=GITHUB_REPOSITORY'
 // output: { REPO_URL: 'GITHUB_SERVER_URL/GITHUB_REPOSITORY', REPO_NAME: 'GITHUB_REPOSITORY' }
