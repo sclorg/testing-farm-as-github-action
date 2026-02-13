@@ -1388,7 +1388,7 @@ describe('Integration tests - action.ts', () => {
     expect(mocks.TFError).not.toHaveBeenCalled();
   });
 
-  test('Compose null test', async () => {
+  test('Compose omit test', async () => {
     setDefaultInputs();
 
     // Mock required Action inputs
@@ -1403,8 +1403,8 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
 
     // Override default inputs
-    // compose - Set to empty string to simulate null/undefined input
-    vi.stubEnv('INPUT_COMPOSE', '');
+    // compose - Set to 'omit' to exclude the os field from the request
+    vi.stubEnv('INPUT_COMPOSE', 'omit');
 
     // mock the pull request number and sha in the context
     vi.stubEnv('INPUT_PR_NUMBER', '1');
@@ -1478,7 +1478,6 @@ describe('Integration tests - action.ts', () => {
       expect.objectContaining({
         environments: [
           expect.objectContaining({
-            os: null, // os should be null
             arch: process.env['INPUT_ARCH'], // arch should be set
           }),
         ],
@@ -1489,8 +1488,8 @@ describe('Integration tests - action.ts', () => {
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
 
-    // Test that the request contains the 'os' field set to null
-    expect(capturedRequest.environments[0]).toHaveProperty('os', null);
+    // Test that the request does not contain the 'os' field when compose is 'omit'
+    expect(capturedRequest.environments[0]).not.toHaveProperty('os');
     expect(capturedRequest.environments[0]).toHaveProperty('arch');
 
     // Test outputs
@@ -1505,7 +1504,7 @@ describe('Integration tests - action.ts', () => {
     // All data are provided via context and statuses are disabled by default, no need to call GitHub API
     expect(mocks.request).toHaveBeenCalledTimes(0);
 
-    // Test summary - compose should show placeholder when null
+    // Test summary - compose should show placeholder when omit
     await assertSummary(`<h1>Testing Farm as a GitHub Action summary</h1>
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>&lt;container image from plan&gt;</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
