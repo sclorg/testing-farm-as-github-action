@@ -71,6 +71,6 @@
     "skipLibCheck": true                      /* Skip type checking all .d.ts files. */
   },
   "include": ["src/"],                        /* Specifies a list of glob patterns that match files to be included in compilation. If no 'files' or 'include' property is present in a tsconfig.json, the compiler defaults to including all files in the containing directory and subdirectories except those specified by 'exclude'. Requires TypeScript version 2.0 or later. */
-  "exclude": ["node_modules/", "**/*.test.ts", "vite.config.ts"],    /* Specifies a list of files to be excluded from compilation. The 'exclude' property only affects the files included via the 'include' property and not the 'files' property. Glob patterns require TypeScript version 2.0 or later. */
+  "exclude": ["node_modules/", "**/*.test.ts", "vitest.config.ts"],    /* Specifies a list of files to be excluded from compilation. The 'exclude' property only affects the files included via the 'include' property and not the 'files' property. Glob patterns require TypeScript version 2.0 or later. */
   "compileOnSave": true                       /* Enable Compile-on-Save for this project. */
 }
