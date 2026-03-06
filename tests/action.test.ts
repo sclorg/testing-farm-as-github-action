@@ -56,6 +56,18 @@ function setDefaultInputs() {
 }
 
 const mocks = vi.hoisted(() => {
+  let TFErrorCalls: Array<{ message: string; url?: string }> = [];
+
+  class TFError extends Error {
+    url?: string;
+    constructor(message: string, url?: string) {
+      super(message);
+      this.url = url;
+      this.name = 'TFError';
+      TFErrorCalls.push({ message, url });
+    }
+  }
+
   return {
     request: vi.fn(),
     whoami: vi.fn(),
@@ -63,31 +75,34 @@ const mocks = vi.hoisted(() => {
     unsafeNewRequest: vi.fn(),
     requestDetails: vi.fn(),
     setTimeout: vi.fn(),
-    TFError: vi.fn((message: string, url?: string | undefined) => {
-      return {
-        message,
-        url,
-      };
-    }),
+    TFError,
+    get TFErrorCalls() {
+      return TFErrorCalls;
+    },
+    clearTFErrorCalls() {
+      TFErrorCalls = [];
+    },
   };
 });
 
 // Mock @octokit/core module
 vi.mock('@octokit/core', () => {
-  const Octokit = vi.fn(() => ({
-    request: mocks.request,
-  }));
+  class Octokit {
+    request = mocks.request;
+    constructor() {}
+  }
   return { Octokit };
 });
 
 // Mock testing-farm module
 vi.mock('testing-farm', async () => {
-  const TestingFarmAPI = vi.fn(() => ({
-    whoami: mocks.whoami,
-    newRequest: mocks.newRequest,
-    unsafeNewRequest: mocks.unsafeNewRequest,
-    requestDetails: mocks.requestDetails,
-  }));
+  class TestingFarmAPI {
+    whoami = mocks.whoami;
+    newRequest = mocks.newRequest;
+    unsafeNewRequest = mocks.unsafeNewRequest;
+    requestDetails = mocks.requestDetails;
+    constructor() {}
+  }
   return { default: TestingFarmAPI };
 });
 
@@ -118,18 +133,17 @@ vi.mock('@actions/core', async () => {
 });
 
 vi.mock('issue-metadata', () => {
-  const MetadataController = vi.fn(() => {
-    return {
-      setMetadata: vi.fn(),
-      getMetadata: vi.fn(() => {
-        return {
-          commentID: undefined,
-          data: [],
-          lock: 'false',
-        };
-      }),
-    };
-  });
+  class MetadataController {
+    setMetadata = vi.fn();
+    getMetadata = vi.fn(() => {
+      return {
+        commentID: undefined,
+        data: [],
+        lock: 'false',
+      };
+    });
+    constructor() {}
+  }
 
   return { default: MetadataController };
 });
@@ -151,6 +165,10 @@ async function assertSummary(expected: string): Promise<void> {
 
 describe('Integration tests - action.ts', () => {
   beforeEach(async () => {
+    // Clear all mocks before each test
+    vi.clearAllMocks();
+    mocks.clearTFErrorCalls(); // Clear TFError call tracking
+
     // Mock setTimeout promise to resolve immediately
     vi.mocked(mocks.setTimeout).mockImplementation(async timeout => {
       return Promise.resolve();
@@ -312,7 +330,7 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 
   test('Hardware test', async () => {
@@ -416,7 +434,7 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 
   test('Pipeline settings test', async () => {
@@ -518,7 +536,7 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 
   test('Pipeline settings test - invalid input', async () => {
@@ -703,6 +721,10 @@ describe('Integration tests - action.ts', () => {
     vi.stubEnv('INPUT_PR_NUMBER', '1');
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
 
+    // Reset Testing Farm API mocks
+    mocks.newRequest.mockReset();
+    mocks.requestDetails.mockReset();
+
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
       async (_request: NewRequest, _strict: boolean) => {
@@ -760,18 +782,9 @@ describe('Integration tests - action.ts', () => {
     const octokit = new Octokit({ auth: 'mock-token' });
     const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
-    try {
-      await action(pr);
-    } catch (error) {
-      expect(error).toMatchInlineSnapshot(`
-        {
-          "message": "Build finished - \\o/",
-          "url": "https://artifacts.dev.testing-farm.io/1",
-        }
-      `);
-    }
-
-    expect(mocks.TFError).toHaveBeenCalledOnce();
+    await expect(action(pr)).rejects.toMatchInlineSnapshot(`
+      [TFError: Build finished - \\o/]
+    `);
 
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
@@ -824,6 +837,10 @@ describe('Integration tests - action.ts', () => {
     // mock the pull request number and sha in the context
     vi.stubEnv('INPUT_PR_NUMBER', '1');
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    // Clear and re-mock Testing Farm API
+    mocks.newRequest.mockClear();
+    mocks.requestDetails.mockClear();
 
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
@@ -882,18 +899,9 @@ describe('Integration tests - action.ts', () => {
     const octokit = new Octokit({ auth: 'mock-token' });
     const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
-    try {
-      await action(pr);
-    } catch (error) {
-      expect(error).toMatchInlineSnapshot(`
-        {
-          "message": "Build failed - Infra problems",
-          "url": "https://artifacts.dev.testing-farm.io/1",
-        }
-      `);
-    }
-
-    expect(mocks.TFError).toHaveBeenCalledOnce();
+    await expect(action(pr)).rejects.toMatchInlineSnapshot(`
+      [TFError: Build failed - Infra problems]
+    `);
 
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(5);
@@ -1009,18 +1017,9 @@ describe('Integration tests - action.ts', () => {
     const octokit = new Octokit({ auth: 'mock-token' });
     const pr = await PullRequest.initialize(new CustomContext(), octokit);
 
-    try {
-      await action(pr);
-    } catch (error) {
-      expect(error).toMatchInlineSnapshot(`
-        {
-          "message": "Testing Farm - timeout reached. The test is still in state: 'queued'",
-          "url": "https://artifacts.dev.testing-farm.io/1",
-        }
-      `);
-    }
-
-    expect(mocks.TFError).toHaveBeenCalledOnce();
+    await expect(action(pr)).rejects.toMatchInlineSnapshot(`
+      [TFError: Testing Farm - timeout reached. The test is still in state: 'queued']
+    `);
 
     // Check if we have waited for Testing Farm to finish
     expect(mocks.requestDetails).toHaveBeenCalledTimes(2);
@@ -1061,6 +1060,10 @@ describe('Integration tests - action.ts', () => {
         ranch: 'private',
       },
     });
+
+    // Reset Testing Farm API mocks
+    mocks.newRequest.mockReset();
+    mocks.requestDetails.mockReset();
 
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
@@ -1130,7 +1133,7 @@ describe('Integration tests - action.ts', () => {
       '"https://api.dev.testing-farm.io/requests/1"'
     );
     expect(process.env['OUTPUT_TEST_LOG_URL']).toMatchInlineSnapshot(
-      '"https://artifacts.dev.testing-farm.io/1"'
+      `"https://artifacts.osci.redhat.com/testing-farm/1"`
     );
 
     // Two calls for setting the status
@@ -1153,7 +1156,7 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.osci.redhat.com/testing-farm/1">test</a>  <a href="https://artifacts.osci.redhat.com/testing-farm/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 
   test('Pull Request comment with results', async () => {
@@ -1179,6 +1182,10 @@ describe('Integration tests - action.ts', () => {
     // mock the pull request number and sha in the context
     vi.stubEnv('INPUT_PR_NUMBER', '1');
     vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    // Clear and re-mock Testing Farm API
+    mocks.newRequest.mockClear();
+    mocks.requestDetails.mockClear();
 
     // Mock Testing Farm API
     vi.mocked(mocks.newRequest).mockImplementation(
@@ -1270,7 +1277,7 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 
   test('Running in non pull_request like context', async () => {
@@ -1385,7 +1392,7 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>${process.env['INPUT_COMPOSE']}</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 
   test('Compose null test', async () => {
@@ -1510,6 +1517,6 @@ describe('Integration tests - action.ts', () => {
 <table><tr><th>name</th><th>compose</th><th>arch</th><th>status</th><th>started (UTC)</th><th>time</th><th>logs</th></tr><tr><td>Fedora</td><td>&lt;container image from plan&gt;</td><td>${process.env['INPUT_ARCH']}</td><td>✅ passed</td><td>24.08.2021 14:15:22</td><td>1h 1min 31s</td><td><a href="https://artifacts.dev.testing-farm.io/1">test</a>  <a href="https://artifacts.dev.testing-farm.io/1/pipeline.log">pipeline</a></td></tr></table>
 `);
 
-    expect(mocks.TFError).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 });

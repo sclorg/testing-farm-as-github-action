@@ -16,23 +16,23 @@ const mocks = vi.hoisted(() => {
 
 // Mock @octokit/core module
 vi.mock('@octokit/core', () => {
-  const Octokit = vi.fn(() => ({
-    request: mocks.request,
-  }));
+  class Octokit {
+    request = mocks.request;
+    constructor() {}
+  }
   return { Octokit };
 });
 
 vi.mock('issue-metadata', () => {
-  const MetadataController = vi.fn(() => {
-    return {
-      getMetadata: vi.fn(() => {
-        return {
-          commentID: undefined,
-          data: [],
-        };
-      }),
-    };
-  });
+  class MetadataController {
+    getMetadata = vi.fn(() => {
+      return {
+        commentID: undefined,
+        data: [],
+      };
+    });
+    constructor() {}
+  }
 
   return { default: MetadataController };
 });
@@ -43,6 +43,9 @@ interface TestContext {
 
 describe('Pull Request class', () => {
   beforeEach<TestContext>(async context => {
+    // Clear all mocks before each test
+    vi.clearAllMocks();
+
     vi.stubEnv('INPUT_GITHUB_TOKEN', 'mock_token');
     // populate context.repo object
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');

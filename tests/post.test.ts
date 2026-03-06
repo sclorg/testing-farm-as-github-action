@@ -27,17 +27,19 @@ const mocks = vi.hoisted(() => {
 
 // Mock @octokit/core module
 vi.mock('@octokit/core', () => {
-  const Octokit = vi.fn(() => ({
-    request: mocks.request,
-  }));
+  class Octokit {
+    request = mocks.request;
+    constructor() {}
+  }
   return { Octokit };
 });
 
 // Mock testing-farm module
 vi.mock('testing-farm', async () => {
-  const TestingFarmAPI = vi.fn(() => ({
-    cancelRequest: mocks.cancelRequest,
-  }));
+  class TestingFarmAPI {
+    cancelRequest = mocks.cancelRequest;
+    constructor() {}
+  }
   return { default: TestingFarmAPI };
 });
 
@@ -69,22 +71,24 @@ vi.mock('@actions/github', async () => {
 });
 
 vi.mock('issue-metadata', () => {
-  const MetadataController = vi.fn(() => {
-    return {
-      getMetadata: vi.fn(() => {
-        return {
-          commentID: undefined,
-          data: [],
-        };
-      }),
-    };
-  });
+  class MetadataController {
+    getMetadata = vi.fn(() => {
+      return {
+        commentID: undefined,
+        data: [],
+      };
+    });
+    constructor() {}
+  }
 
   return { default: MetadataController };
 });
 
 describe('Integration tests - post.ts', () => {
   beforeEach(() => {
+    // Clear all mocks before each test
+    vi.clearAllMocks();
+
     // Mock Action environment
     vi.stubEnv('RUNNER_DEBUG', '1');
     vi.stubEnv('GITHUB_REPOSITORY', 'sclorg/testing-farm-as-github-action');
