@@ -1519,4 +1519,85 @@ describe('Integration tests - action.ts', () => {
 
     expect(mocks.TFErrorCalls).toHaveLength(0);
   });
+
+  test('Pool test', async () => {
+    setDefaultInputs();
+
+    vi.stubEnv('INPUT_API_KEY', 'abcdef-123456');
+    vi.stubEnv(
+      'INPUT_GIT_URL',
+      'https://github.com/sclorg/testing-farm-as-github-action'
+    );
+    vi.stubEnv('INPUT_TMT_PLAN_REGEX', 'fedora');
+    vi.stubEnv('INPUT_POOL', 'aws-10-bare-metal');
+    vi.stubEnv('INPUT_PR_NUMBER', '1');
+    vi.stubEnv('INPUT_COMMIT_SHA', 'd20d0c37d634a5303fa1e02edc9ea281897ba01a');
+
+    vi.mocked(mocks.newRequest).mockImplementation(async (request: unknown) => {
+      return Promise.resolve({
+        id: '1',
+        state: 'new',
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      });
+    });
+
+    vi.mocked(mocks.requestDetails)
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'new',
+        result: null,
+        run_time: 1,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'queued',
+        result: null,
+        run_time: 61,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'pending',
+        result: null,
+        run_time: 121,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'running',
+        result: null,
+        run_time: 181,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      })
+      .mockResolvedValueOnce({
+        id: '1',
+        state: 'complete',
+        result: { overall: 'passed', summary: '\\o/' },
+        run_time: 3691,
+        created: '2021-08-24T14:15:22Z',
+        updated: '2021-08-24T14:15:22Z',
+      });
+
+    const octokit = new Octokit({ auth: 'mock-token' });
+    const pr = await PullRequest.initialize(new CustomContext(), octokit);
+    await action(pr);
+
+    expect(mocks.newRequest).toHaveBeenCalledOnce();
+    expect(mocks.newRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        environments: [
+          expect.objectContaining({
+            pool: 'aws-10-bare-metal',
+          }),
+        ],
+      }),
+      false
+    );
+  });
 });

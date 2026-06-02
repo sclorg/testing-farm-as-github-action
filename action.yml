@@ -52,6 +52,9 @@ inputs:
     description: 'Define an architecture for testing environment. Default: x86_64'
     required: false
     default: 'x86_64'
+  pool:
+    description: "Testing Farm pool to use for the testing environment. Only available on private ranches."
+    required: false
   variables:
     description: 'Environment variables for test, separated by ;'
     required: false

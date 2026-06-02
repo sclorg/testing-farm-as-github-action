@@ -63,14 +63,8 @@ async function action(pr) {
     debug(`Using git_ref: '${ref}'`);
     // Schedule a test on Testing Farm
     const composeInput = getInput('compose');
-    const environment = {
-        arch: getInput('arch'),
-        variables: tmtEnvVars,
-        settings: envSettings,
-        secrets: tmtEnvSecrets,
-        artifacts: tmtArtifacts,
-        tmt: Object.assign({}, (tmtContext ? { context: tmtContext } : {})),
-    };
+    const poolInput = getInput('pool');
+    const environment = Object.assign(Object.assign({ arch: getInput('arch') }, (poolInput ? { pool: poolInput } : {})), { variables: tmtEnvVars, settings: envSettings, secrets: tmtEnvSecrets, artifacts: tmtArtifacts, tmt: Object.assign({}, (tmtContext ? { context: tmtContext } : {})) });
     // Always include os field, but set to null if compose input is empty/null
     if (composeInput) {
         environment.os = {
