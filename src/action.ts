@@ -123,8 +123,10 @@ async function action(pr: PullRequest): Promise<void> {
 
   // Schedule a test on Testing Farm
   const composeInput = getInput('compose');
+  const poolInput = getInput('pool');
   const environment: any = {
     arch: getInput('arch'),
+    ...(poolInput ? { pool: poolInput } : {}),
     variables: tmtEnvVars,
     settings: envSettings,
     secrets: tmtEnvSecrets,
