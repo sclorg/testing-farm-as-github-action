@@ -4,7 +4,7 @@ on:
       - created
 jobs:
   container-tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     name: "Timeout test for testing farm as a github action"
 
     if: |
