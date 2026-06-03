@@ -8,13 +8,12 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild ./src/main.ts --bundle --outdir=dist --platform=node --target=node24.0.0 --packages=bundle --format=esm --external:debug --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
-    "package": "ncc build --source-map --license licenses.txt",
     "test": "vitest run --coverage",
     "update-snapshots": "vitest run --update",
-    "all": "yarn && yarn run build && yarn run format && yarn run package && yarn test"
+    "all": "yarn && yarn run build && yarn run format && yarn test"
   },
   "packageManager": "yarn@4.14.1",
   "repository": {
@@ -42,8 +41,8 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "0.6.1",
     "@types/node": "25.9.1",
-    "@vercel/ncc": "0.38.4",
     "@vitest/coverage-v8": "4.1.8",
+    "esbuild": "^0.28.0",
     "prettier": "3.8.3",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",

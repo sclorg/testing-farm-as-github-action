@@ -135,7 +135,7 @@ outputs:
     description: 'An URL of a scheduled test logs'
 
 runs:
-  using: node20
-  main: dist/index.js
+  using: node24
+  main: dist/main.js
   post-if: cancelled()
-  post: dist/index.js
+  post: dist/main.js
