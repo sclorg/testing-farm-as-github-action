@@ -1599,5 +1599,7 @@ describe('Integration tests - action.ts', () => {
       }),
       false
     );
+    expect(mocks.unsafeNewRequest).not.toHaveBeenCalled();
+    expect(mocks.TFErrorCalls).toHaveLength(0);
   });
 });

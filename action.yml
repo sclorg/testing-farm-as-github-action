@@ -53,7 +53,7 @@ inputs:
     required: false
     default: 'x86_64'
   pool:
-    description: "Testing Farm pool to use for the testing environment. Only available on private ranches."
+    description: "Testing Farm pool to use for the testing environment. Only available on private ranches. See https://docs.testing-farm.io/Testing%20Farm/0.1/test-request.html#_bare_metal_instances_in_aws"
     required: false
   variables:
     description: 'Environment variables for test, separated by ;'
