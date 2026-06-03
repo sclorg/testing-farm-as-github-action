@@ -48,6 +48,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 |------------|-------------|---------------|
 | `compose` | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) Use `null` to skip compose specification - needed for container provisioner with image specified in plan. | Fedora-latest |
 | `arch` | Define an architecture for testing environment | x86_64 |
+| `pool` | Testing Farm pool to use for the testing environment. Only available on private ranches. See [bare metal instances in AWS](https://docs.testing-farm.io/Testing%20Farm/0.1/test-request.html#_bare_metal_instances_in_aws). | empty |
 | `variables` | Environment variables for test env, separated by ; | empty |
 | `secrets` | Environment secrets for test env, separated by ; | empty |
 | `tmt_hardware` | Hardware definition for test env | empty |
