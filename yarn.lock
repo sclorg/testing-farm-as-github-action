@@ -717,12 +717,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:25.9.1":
-  version: 25.9.1
-  resolution: "@types/node@npm:25.9.1"
+"@types/node@npm:25.9.2":
+  version: 25.9.2
+  resolution: "@types/node@npm:25.9.2"
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10/8a1ccf60f0c0ca856d3324a690ee35776f26dfc1d51c3763aecdf246a3246a7971a0156bf6eb3239aa22dfa940eb361d048212f5c3204264d31ef4c41d17416a
+  checksum: 10/4ec76a3c9d51866cea5c6a5b17d52a2113b387e7fa812303bf20cc2949ff5e2b2bafcdef693c21ff8235d370ec2807961dc1075eb6bbea661916a5bbd84b6511
   languageName: node
   linkType: hard
 
@@ -1818,7 +1818,7 @@ __metadata:
     "@octokit/rest": "npm:22.0.1"
     "@octokit/types": "npm:16.0.0"
     "@total-typescript/ts-reset": "npm:0.6.1"
-    "@types/node": "npm:25.9.1"
+    "@types/node": "npm:25.9.2"
     "@vitest/coverage-v8": "npm:4.1.8"
     date-fns: "npm:^4.4.0"
     esbuild: "npm:^0.28.0"
