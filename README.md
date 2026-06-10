@@ -46,7 +46,7 @@ See [Testing Farm onboarding guide](https://docs.testing-farm.io/Testing%20Farm/
 
 | Input Name | Description | Default value |
 |------------|-------------|---------------|
-| `compose` | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) Use `null` to skip compose specification - needed for container provisioner with image specified in plan. | Fedora-latest |
+| `compose` | Compose to run tests on. [Available composes.](https://api.dev.testing-farm.io/v0.1/composes) Use the `omit` string to completely exclude the compose parameter from the request (needed for container provisioner with image specified in plan). | Fedora-latest |
 | `arch` | Define an architecture for testing environment | x86_64 |
 | `pool` | Testing Farm pool to use for the testing environment. Only available on private ranches. See [bare metal instances in AWS](https://docs.testing-farm.io/Testing%20Farm/0.1/test-request.html#_bare_metal_instances_in_aws). | empty |
 | `variables` | Environment variables for test env, separated by ; | empty |
@@ -166,9 +166,9 @@ jobs:
           api_key: ${{ secrets.TF_API_KEY }}
 ```
 
-### Using compose: null
+### Using compose: omit
 
-When you want to run tests without specifying a specific compose, you can use `compose: null`. This will skip the `os` field in the API request entirely. This is needed if you want to run testing against the container provisioner with the image specified in the plan. Specifying the container image via the API is not supported.
+When you want to run tests without specifying a specific compose, you can use `compose: omit`. It will exclude the `os` field from the API request entirely. This is needed if you want to run testing against the container provisioner with the image specified in the plan. Specifying the container image via the API is not supported.
 
 ```yaml
 name: Test with container provisioner
@@ -185,7 +185,7 @@ jobs:
         uses: sclorg/testing-farm-as-github-action@v4
         with:
           api_key: ${{ secrets.TF_API_KEY }}
-          compose: null
+          compose: omit
 ```
 
 ### How to setup Pull Request summary comments
