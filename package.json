@@ -34,7 +34,7 @@
     "@octokit/rest": "22.0.1",
     "@octokit/types": "16.0.0",
     "date-fns": "^4.4.0",
-    "issue-metadata": "0.3.0",
+    "issue-metadata": "0.2.4",
     "testing-farm": "1.12.1",
     "zod": "4.4.3"
   },
