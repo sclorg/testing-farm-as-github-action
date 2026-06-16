@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "esbuild ./src/main.ts --bundle --outdir=dist --platform=node --target=node24.0.0 --packages=bundle --format=esm --external:debug --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
+    "build": "esbuild ./src/main.ts --bundle --outdir=dist --platform=node --target=node24.0.0 --packages=bundle --format=esm --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "test": "vitest run --coverage",
@@ -34,8 +34,8 @@
     "@octokit/rest": "22.0.1",
     "@octokit/types": "16.0.0",
     "date-fns": "^4.4.0",
-    "issue-metadata": "0.3.0",
-    "testing-farm": "1.12.1",
+    "issue-metadata": "0.3.1",
+    "testing-farm": "1.12.2",
     "zod": "4.4.3"
   },
   "devDependencies": {
