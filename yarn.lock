@@ -484,7 +484,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request@npm:^10.0.6, @octokit/request@npm:^10.0.7, @octokit/request@npm:^10.0.8":
+"@octokit/request@npm:^10.0.10, @octokit/request@npm:^10.0.6, @octokit/request@npm:^10.0.7":
   version: 10.0.10
   resolution: "@octokit/request@npm:10.0.10"
   dependencies:
@@ -857,6 +857,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"agent-base@npm:6":
+  version: 6.0.2
+  resolution: "agent-base@npm:6.0.2"
+  dependencies:
+    debug: "npm:4"
+  checksum: 10/21fb903e0917e5cb16591b4d0ef6a028a54b83ac30cd1fca58dece3d4e0990512a8723f9f83130d88a41e2af8b1f7be1386fda3ea2d181bb1a62155e75e95e23
+  languageName: node
+  linkType: hard
+
 "arg@npm:^4.1.0":
   version: 4.1.3
   resolution: "arg@npm:4.1.3"
@@ -903,14 +912,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.13.6":
-  version: 1.13.6
-  resolution: "axios@npm:1.13.6"
+"axios@npm:1.18.0":
+  version: 1.18.0
+  resolution: "axios@npm:1.18.0"
   dependencies:
-    follow-redirects: "npm:^1.15.11"
+    follow-redirects: "npm:^1.16.0"
     form-data: "npm:^4.0.5"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10/a7ed83c2af3ef21d64609df0f85e76893a915a864c5934df69241001d0578082d6521a0c730bf37518ee458821b5695957cb10db9fc705f2a8996c8686ea7a89
+    https-proxy-agent: "npm:^5.0.1"
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10/586a1a9534531c6ec4ee8fbab07a536ecaa8d29bd16b40ab0f9fce361fcd24da1538a54aadde0562f08f30b55bf80f9b7ededf1987e6506f722e1fb338b09d5d
   languageName: node
   linkType: hard
 
@@ -986,6 +996,18 @@ __metadata:
   version: 4.4.0
   resolution: "date-fns@npm:4.4.0"
   checksum: 10/ae702acea42fb8452abe74f6d133c2360de9a14f00985645684b0df9c12280276649e95b52298a4fd7dabcc3b38799eb111107da99320d1cd94ba1d8a3d1c174
+  languageName: node
+  linkType: hard
+
+"debug@npm:4":
+  version: 4.4.3
+  resolution: "debug@npm:4.4.3"
+  dependencies:
+    ms: "npm:^2.1.3"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10/9ada3434ea2993800bd9a1e320bd4aa7af69659fb51cca685d390949434bc0a8873c21ed7c9b852af6f2455a55c6d050aa3937d52b3c69f796dab666f762acad
   languageName: node
   linkType: hard
 
@@ -1194,7 +1216,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.11":
+"follow-redirects@npm:^1.16.0":
   version: 1.16.0
   resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
@@ -1334,6 +1356,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"https-proxy-agent@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "https-proxy-agent@npm:5.0.1"
+  dependencies:
+    agent-base: "npm:6"
+    debug: "npm:4"
+  checksum: 10/f0dce7bdcac5e8eaa0be3c7368bb8836ed010fb5b6349ffb412b172a203efe8f807d9a6681319105ea1b6901e1972c7b5ea899672a7b9aad58309f766dcbe0df
+  languageName: node
+  linkType: hard
+
 "isexe@npm:^4.0.0":
   version: 4.0.0
   resolution: "isexe@npm:4.0.0"
@@ -1341,13 +1373,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"issue-metadata@npm:0.3.0":
-  version: 0.3.0
-  resolution: "issue-metadata@npm:0.3.0"
+"issue-metadata@npm:0.3.1":
+  version: 0.3.1
+  resolution: "issue-metadata@npm:0.3.1"
   dependencies:
-    "@octokit/request": "npm:^10.0.8"
-    zod: "npm:^4.3.6"
-  checksum: 10/c1379145cdbaf318c6008d7eea42885c2f2252baba09b226a0daca0bdd1e69386213d9ca960cc8eeac632e00bce70eb0070a82acf4778d0634d566109253b90b
+    "@octokit/request": "npm:^10.0.10"
+    zod: "npm:^4.4.3"
+  checksum: 10/51810810d992312267cfe997c38f2c8e8d51445beb32b313a972939bd1bd9062b437b875289a0e2ec94e4c669c5d613f671db9b7f2cce98aeba62b784624418b
   languageName: node
   linkType: hard
 
@@ -1588,6 +1620,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ms@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "ms@npm:2.1.3"
+  checksum: 10/aa92de608021b242401676e35cfa5aa42dd70cbdc082b916da7fb925c542173e36bce97ea3e804923fe92c0ad991434e4a38327e15a1b5b5f945d66df615ae6d
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.12":
   version: 3.3.12
   resolution: "nanoid@npm:3.3.12"
@@ -1683,10 +1722,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: 10/f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
+"proxy-from-env@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "proxy-from-env@npm:2.1.0"
+  checksum: 10/fbbaf4dab2a6231dc9e394903a5f66f20475e36b734335790b46feb9da07c37d6b32e2c02e3e2ea4d4b23774c53d8562e5b7cc73282cb43f4a597b7eacaee2ee
   languageName: node
   linkType: hard
 
@@ -1822,9 +1861,9 @@ __metadata:
     "@vitest/coverage-v8": "npm:4.1.8"
     date-fns: "npm:^4.4.0"
     esbuild: "npm:^0.28.0"
-    issue-metadata: "npm:0.3.0"
+    issue-metadata: "npm:0.3.1"
     prettier: "npm:3.8.4"
-    testing-farm: "npm:1.12.1"
+    testing-farm: "npm:1.12.2"
     ts-node: "npm:10.9.2"
     typescript: "npm:6.0.3"
     vitest: "npm:4.1.8"
@@ -1832,13 +1871,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"testing-farm@npm:1.12.1":
-  version: 1.12.1
-  resolution: "testing-farm@npm:1.12.1"
+"testing-farm@npm:1.12.2":
+  version: 1.12.2
+  resolution: "testing-farm@npm:1.12.2"
   dependencies:
-    axios: "npm:1.13.6"
-    zod: "npm:4.3.6"
-  checksum: 10/304e79a9c67f57a059cda003b7e367da120298c3a2041d2fc0148d9454754b16e9d032578b389ada3283ebc8e65c4703cd361012a17060b6e81fbde8eca5090c
+    axios: "npm:1.18.0"
+    zod: "npm:4.4.3"
+  checksum: 10/4649bbeb35a184bb54e411302496b4e1803bbacbe1403bbb1e9a288ab5990bb1bd959ff76d4581088ef470ea70315452ee3587e1b257716ff5c5144097b94284
   languageName: node
   linkType: hard
 
@@ -2135,14 +2174,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:4.3.6":
-  version: 4.3.6
-  resolution: "zod@npm:4.3.6"
-  checksum: 10/25fc0f62e01b557b4644bf0b393bbaf47542ab30877c37837ea8caf314a8713d220c7d7fe51f68ffa72f0e1018ddfa34d96f1973d23033f5a2a5a9b6b9d9da01
-  languageName: node
-  linkType: hard
-
-"zod@npm:4.4.3, zod@npm:^4.3.6":
+"zod@npm:4.4.3, zod@npm:^4.4.3":
   version: 4.4.3
   resolution: "zod@npm:4.4.3"
   checksum: 10/804b9a42aa8f35f2b3c5a8dff906291cb749115f83ee2afe3576d70b5b5c53c965365c7f4967690647a9c54af9838ff232a85ff9577a0a36c44b68bc6cdefe36
