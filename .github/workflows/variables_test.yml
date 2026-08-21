@@ -1,22 +1,43 @@
 on:
-  issue_comment:
-    types:
-      - created
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
 jobs:
   container-tests:
     runs-on: ubuntu-latest
     name: "Variables test for testing farm as a github action"
 
-    if: |
-      github.event.issue.pull_request
-      && contains(github.event.comment.body, '[test]')
-      && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
 
     steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
+      # This repo is the action under test, so we must check out the PR
+      # code to validate changes. The permission check above ensures only
+      # users with write access can reach this step.
       - name: Checkout repo
         uses: actions/checkout@v6
         with:
-          ref: "refs/pull/${{ github.event.issue.number }}/head"
+          ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
 
       - name: Run the tests
         uses: ./
