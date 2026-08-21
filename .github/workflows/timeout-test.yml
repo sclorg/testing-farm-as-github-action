@@ -34,7 +34,7 @@ jobs:
       # code to validate changes. The permission check above ensures only
       # users with write access can reach this step.
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           allow-unsafe-pr-checkout: true
